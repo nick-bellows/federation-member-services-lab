@@ -1,0 +1,133 @@
+'use client';
+
+import { DataTable } from '@/app/components/Table/DataTable';
+import { ResourceName } from '@/resources/resource';
+import {
+    TActivityLogDeserialized,
+    TActivityLogProperties,
+} from '@/types/resources';
+import { formatDate } from '@/utils/dates';
+import { SupportedLocale } from '@/utils/localization';
+import { ColumnDef } from '@tanstack/react-table';
+import useTranslation from 'next-translate/useTranslation';
+
+interface Props {
+    activityLogs: TActivityLogDeserialized[];
+    totalPages: number;
+    /**
+     * Translation namespace used to resolve attribute labels of the
+     * logged subject, e.g. 'club' resolves 'zip_code' to
+     * t('club:zip_code.label').
+     */
+    labelNamespace?: string;
+}
+
+function formatValue(value: unknown): string {
+    if (value === null || value === undefined || value === '') {
+        return '–';
+    }
+
+    if (typeof value === 'boolean') {
+        return value ? '✓' : '✗';
+    }
+
+    if (typeof value === 'object') {
+        return JSON.stringify(value);
+    }
+
+    return String(value);
+}
+
+function ChangesCell({
+    properties,
+    labelNamespace,
+}: {
+    properties?: TActivityLogProperties;
+    labelNamespace?: string;
+}) {
+    const { t } = useTranslation();
+    const attributes = properties?.attributes ?? {};
+    const old = properties?.old ?? {};
+
+    return (
+        <ul className="flex flex-col gap-1">
+            {Object.entries(attributes).map(([key, value]) => (
+                <li key={key}>
+                    <span className="font-medium">
+                        {labelNamespace
+                            ? t(
+                                  `${labelNamespace}:${key}.label`,
+                                  undefined,
+                                  { default: key },
+                              )
+                            : key}
+                        :{' '}
+                    </span>
+                    {key in old && (
+                        <>
+                            <span className="text-gray-500 line-through">
+                                {formatValue(old[key])}
+                            </span>{' '}
+                            →{' '}
+                        </>
+                    )}
+                    <span>{formatValue(value)}</span>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+export default function ActivityLogTable({
+    activityLogs,
+    totalPages,
+    labelNamespace,
+}: Props) {
+    const { t, lang } = useTranslation();
+
+    const columns: ColumnDef<TActivityLogDeserialized>[] = [
+        {
+            header: t('activity:created_at.label'),
+            accessorKey: 'createdAt',
+            cell: ({ row }) =>
+                formatDate(
+                    row.getValue('createdAt'),
+                    lang as SupportedLocale,
+                    'dd.MM.yyyy HH:mm',
+                ),
+        },
+        {
+            header: t('activity:causer.label'),
+            accessorKey: 'causerName',
+            cell: ({ row }) =>
+                row.getValue('causerName') ?? t('activity:causer.system'),
+        },
+        {
+            header: t('activity:event.label'),
+            accessorKey: 'event',
+            cell: ({ row }) =>
+                t(`activity:event.${row.getValue('event')}`, undefined, {
+                    default: row.getValue('event'),
+                }),
+        },
+        {
+            header: t('activity:changes.label'),
+            accessorKey: 'properties',
+            cell: ({ row }) => (
+                <ChangesCell
+                    properties={row.getValue('properties')}
+                    labelNamespace={labelNamespace}
+                />
+            ),
+        },
+    ];
+
+    return (
+        <DataTable
+            data={activityLogs}
+            columns={columns}
+            resourceName={'activity-logs' as ResourceName}
+            totalPages={totalPages}
+        />
+    );
+}

@@ -1,0 +1,20 @@
+{
+    "title": "Änderungsverlauf",
+    "created_at": {
+        "label": "Datum"
+    },
+    "causer": {
+        "label": "Geändert von",
+        "system": "System"
+    },
+    "event": {
+        "label": "Aktion",
+        "created": "Erstellt",
+        "updated": "Aktualisiert",
+        "deleted": "Gelöscht"
+    },
+    "changes": {
+        "label": "Änderungen"
+    },
+    "empty": "Es wurden noch keine Änderungen aufgezeichnet."
+}
