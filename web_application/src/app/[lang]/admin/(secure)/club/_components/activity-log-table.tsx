@@ -50,30 +50,32 @@ function ChangesCell({
     const old = properties?.old ?? {};
 
     return (
-        <ul className="flex flex-col gap-1">
-            {Object.entries(attributes).map(([key, value]) => (
-                <li key={key}>
-                    <span className="font-medium">
-                        {labelNamespace
-                            ? t(
-                                  `${labelNamespace}:${key}.label`,
-                                  undefined,
-                                  { default: key },
-                              )
-                            : key}
-                        :{' '}
-                    </span>
-                    {key in old && (
-                        <>
-                            <span className="text-gray-500 line-through">
-                                {formatValue(old[key])}
-                            </span>{' '}
-                            →{' '}
-                        </>
-                    )}
-                    <span>{formatValue(value)}</span>
-                </li>
-            ))}
+        <ul className="flex flex-col gap-1 text-sm">
+            {Object.entries(attributes).map(([key, value]) => {
+                const hasOldValue = key in old;
+                const fieldLabel = labelNamespace
+                    ? t(`${labelNamespace}:${key}.label`, undefined, {
+                          default: key,
+                      })
+                    : key;
+
+                return (
+                    <li key={key} className="flex flex-wrap items-center gap-1">
+                        <span className="font-medium">{fieldLabel}:</span>
+                        {hasOldValue && (
+                            <>
+                                <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-700">
+                                    {formatValue(old[key])}
+                                </span>
+                                <span className="text-gray-400">→</span>
+                            </>
+                        )}
+                        <span className="rounded bg-green-50 px-1.5 py-0.5 text-green-700">
+                            {formatValue(value)}
+                        </span>
+                    </li>
+                );
+            })}
         </ul>
     );
 }

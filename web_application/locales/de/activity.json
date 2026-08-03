@@ -14,7 +14,9 @@
         "deleted": "Gelöscht"
     },
     "changes": {
-        "label": "Änderungen"
+        "label": "Änderungen",
+        "old": "Alt",
+        "new": "Neu"
     },
     "empty": "Es wurden noch keine Änderungen aufgezeichnet."
 }

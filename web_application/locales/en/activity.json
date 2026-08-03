@@ -14,7 +14,9 @@
         "deleted": "Deleted"
     },
     "changes": {
-        "label": "Changes"
+        "label": "Changes",
+        "old": "Old",
+        "new": "New"
     },
     "empty": "No changes have been recorded yet."
 }
