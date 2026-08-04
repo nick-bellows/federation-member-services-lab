@@ -65,9 +65,6 @@ class ClubScope implements Scope
         }
 
         if ($model instanceof ActivityLog) {
-            // Restrict logs to subjects that belong to the current club.
-            // The club itself is its own subject; other subjects are
-            // expected to have a club_id column.
             $builder->whereHasMorph('subject', '*', function ($query, $type) use ($clubId) {
                 if ($type === Club::class) {
                     $query->where('clubs.id', $clubId);

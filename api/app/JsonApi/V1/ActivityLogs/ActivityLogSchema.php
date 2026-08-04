@@ -4,7 +4,7 @@ namespace App\JsonApi\V1\ActivityLogs;
 
 use App\JsonApi\V1\PagePagination;
 use App\Models\ActivityLog;
-use Illuminate\Support\Str as SupportStr;
+use Illuminate\Support\Str as StringHelper;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\ArrayHash;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
@@ -67,7 +67,7 @@ class ActivityLogSchema extends Schema
      */
     protected static function resourceTypeFromModelClass(string $modelClass): string
     {
-        return SupportStr::of(class_basename($modelClass))->kebab()->plural()->toString();
+        return StringHelper::of(class_basename($modelClass))->kebab()->plural()->toString();
     }
 
     /**
@@ -76,6 +76,6 @@ class ActivityLogSchema extends Schema
      */
     protected static function modelClassFromResourceType(string $resourceType): string
     {
-        return 'App\\Models\\'.SupportStr::of($resourceType)->singular()->studly()->toString();
+        return 'App\\Models\\'.StringHelper::of($resourceType)->singular()->studly()->toString();
     }
 }
