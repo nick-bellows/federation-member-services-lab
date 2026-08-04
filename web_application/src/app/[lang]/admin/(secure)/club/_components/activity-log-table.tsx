@@ -10,6 +10,7 @@ import { formatDate } from '@/utils/dates';
 import { SupportedLocale } from '@/utils/localization';
 import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
+import { Translate } from 'next-translate';
 
 interface Props {
     activityLogs: TActivityLogDeserialized[];
@@ -36,6 +37,29 @@ function formatValue(value: unknown): string {
     }
 
     return String(value);
+}
+
+/**
+ * Try to translate an enum value, falling back to the formatted value.
+ *
+ * For a key like 'membership_start_cycle_type' with value 'daily',
+ * looks up 'club:membership_start_cycle_type.daily' → 'täglich'.
+ */
+function translateValue(
+    t: Translate,
+    labelNamespace: string | undefined,
+    key: string,
+    value: unknown,
+): string {
+    const formatted = formatValue(value);
+
+    if (!labelNamespace || typeof value !== 'string' || formatted === '–') {
+        return formatted;
+    }
+
+    return t(`${labelNamespace}:${key}.${value}`, undefined, {
+        default: formatted,
+    });
 }
 
 function ChangesCell({
@@ -65,13 +89,13 @@ function ChangesCell({
                         {hasOldValue && (
                             <>
                                 <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-700">
-                                    {formatValue(old[key])}
+                                    {translateValue(t, labelNamespace, key, old[key])}
                                 </span>
                                 <span className="text-gray-400">→</span>
                             </>
                         )}
                         <span className="rounded bg-green-50 px-1.5 py-0.5 text-green-700">
-                            {formatValue(value)}
+                            {translateValue(t, labelNamespace, key, value)}
                         </span>
                     </li>
                 );
