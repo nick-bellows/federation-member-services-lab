@@ -43,13 +43,14 @@ export function TriStateHeaderFilter({
                     <Button
                         data-cy={`${paramKey}-button`}
                         className="relative"
-                        variant="tertiaryGrey"
+                        variant="tertiaryGray"
                         size={'icon'}
-                    >
-                        <ListFilter
-                            className={`ml-auto h-4 w-4 text-gray-400${hasActiveFilter ? 'scale-125 text-green-800' : ''}`}
-                        />
-                    </Button>
+                        rightIcon={
+                            <ListFilter
+                                className={`ml-auto h-4 w-4 text-gray-400${hasActiveFilter ? 'scale-125 text-green-800' : ''}`}
+                            />
+                        }
+                    ></Button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="flex gap-4 p-2">

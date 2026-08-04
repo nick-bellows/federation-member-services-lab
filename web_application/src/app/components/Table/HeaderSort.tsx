@@ -21,7 +21,7 @@ export default function HeaderSort({ parser, columnTitle, columnId }: Props) {
             {columnTitle}
             <Button
                 className="cursor-pointer"
-                variant="tertiaryGrey"
+                variant="tertiaryGray"
                 size={'icon'}
                 data-cy={`sort-${columnId}`}
                 onClick={() =>
@@ -39,15 +39,16 @@ export default function HeaderSort({ parser, columnTitle, columnId }: Props) {
                         return null;
                     })
                 }
-            >
-                {matchedSort === `-${columnId}` ? (
-                    <ArrowDown className="h-4 w-4 stroke-slate-900" />
-                ) : matchedSort === columnId ? (
-                    <ArrowUp className="h-4 w-4 stroke-slate-900" />
-                ) : (
-                    <ArrowUpDown className="h-4 w-4 stroke-slate-500" />
-                )}
-            </Button>
+                rightIcon={
+                    matchedSort === `-${columnId}` ? (
+                        <ArrowDown className="h-4 w-4 stroke-slate-900" />
+                    ) : matchedSort === columnId ? (
+                        <ArrowUp className="h-4 w-4 stroke-slate-900" />
+                    ) : (
+                        <ArrowUpDown className="h-4 w-4 stroke-slate-500" />
+                    )
+                }
+            />
         </span>
     );
 }

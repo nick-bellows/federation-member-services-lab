@@ -4,12 +4,13 @@ import {
     PaginationContent,
     PaginationEllipsis,
     PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
 } from '@/app/components/ui/pagination';
 
-import { Button } from '../ui/button';
 import { useQueryState } from 'nuqs';
 import { paginationSearchParamParser } from '@/utils/search-params';
-import useTranslation from 'next-translate/useTranslation';
 
 interface Props {
     totalPages?: number;
@@ -28,7 +29,6 @@ type PageItemType = {
 type PaginationItemType = EllipsesItemType | PageItemType;
 
 export default function TablePagination({ totalPages }: Props) {
-    const { t } = useTranslation('general');
     const [currentPage, setCurrentPage] = useQueryState(
         'page',
         paginationSearchParamParser,
@@ -39,7 +39,7 @@ export default function TablePagination({ totalPages }: Props) {
     }
 
     function changeCurrentPage(
-        event: React.MouseEvent<HTMLButtonElement>,
+        event: React.MouseEvent<HTMLAnchorElement>,
         page: number,
     ) {
         event.preventDefault();
@@ -146,16 +146,12 @@ export default function TablePagination({ totalPages }: Props) {
         <Pagination>
             <PaginationContent>
                 <PaginationItem>
-                    <Button
+                    <PaginationPrevious
                         onClick={(event) =>
                             changeCurrentPage(event, currentPage - 1)
                         }
-                        variant="primary"
                         disabled={currentPage <= 1}
-                        data-cy="table-pagination-previous-button"
-                    >
-                        {t('pagination.previous')}
-                    </Button>
+                    />
                 </PaginationItem>
 
                 {getPaginationItems().map((item, index) => {
@@ -167,32 +163,26 @@ export default function TablePagination({ totalPages }: Props) {
 
                     return (
                         <PaginationItem key={index}>
-                            <Button
-                                className="w-10"
+                            <PaginationLink
+                                isActive={item.disabled}
                                 onClick={(event) =>
                                     changeCurrentPage(event, item.index)
                                 }
-                                variant={item.disabled ? 'primary' : 'tertiary'}
-                                disabled={item.disabled ?? false}
                                 data-cy={`table-pagination-button-${item.index}`}
                             >
                                 {item.index}
-                            </Button>
+                            </PaginationLink>
                         </PaginationItem>
                     );
                 })}
 
                 <PaginationItem>
-                    <Button
+                    <PaginationNext
                         onClick={(event) =>
                             changeCurrentPage(event, currentPage + 1)
                         }
-                        variant="primary"
                         disabled={currentPage >= totalPages}
-                        data-cy="table-pagination-next-button"
-                    >
-                        {t('pagination.next')}
-                    </Button>
+                    />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>
