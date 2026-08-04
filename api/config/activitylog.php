@@ -49,4 +49,22 @@ return [
      * Laravel's database.default will be used instead.
      */
     'database_connection' => env('ACTIVITY_LOGGER_DB_CONNECTION'),
+
+    /**
+     * Maps foreign key columns to their related model's display attribute.
+     *
+     * When logging activity, foreign key IDs will be replaced with the
+     * related model's display value (e.g., "tax_account_chart: SKR03"
+     * instead of "tax_account_chart_id: 1").
+     *
+     * Format: 'foreign_key' => ['relation_method', 'display_attribute']
+     *
+     * The display_attribute can be:
+     * - A column name: 'title', 'name'
+     * - An accessor: 'fullName' (defined as Attribute on the related model)
+     */
+    'relations' => [
+        'tax_account_chart_id' => ['taxAccountChart', 'title'],
+        'user_id' => ['user', 'name'],
+    ],
 ];
