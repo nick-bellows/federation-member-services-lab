@@ -21,12 +21,12 @@ export default async function SecureLayout({ children }: PropsWithChildren) {
                 ['--color-primary-500']: hexToCssString(clubPrimaryColor),
             }}
             className={[
-                'flex min-h-screen w-full flex-col bg-slate-400 md:flex-row',
+                'bg-backgroundGradient flex min-h-screen w-full flex-col md:flex-row',
                 shouldUseDarkMode(clubPrimaryColor) ? 'dark-primary' : '',
             ].join(' ')}
         >
             <Navigation />
-            <div className="flex w-full flex-1 flex-col overflow-hidden bg-white">
+            <div className="flex w-full flex-1 flex-col overflow-hidden">
                 <TitleBar />
                 <ContentContainer>{children}</ContentContainer>
             </div>

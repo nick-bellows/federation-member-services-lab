@@ -164,3 +164,13 @@
     width: var(--radix-popover-trigger-width);
     max-height: var(--radix-popover-content-available-height);
 }
+@utility bg-backgroundGradient {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(251, 231, 224, 0.6) 0%,
+            rgba(221, 240, 254, 0.6) 50%,
+            rgba(203, 248, 223, 0.6) 100%
+        ),
+        #fff;
+}
