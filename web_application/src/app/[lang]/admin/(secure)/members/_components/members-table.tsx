@@ -153,12 +153,12 @@ export default function MembersTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-between">
-                    <CreateButton href="/admin/members/create" />
+                <div className="flex justify-end">
                     <TableExportModal
                         ids={allIds ?? []}
                         resourceName="members"
                     />
+                    <CreateButton href="/admin/members/create" />
                 </div>
             )}
             <DataTable

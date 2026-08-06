@@ -78,12 +78,12 @@ export default function DivisionsTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-between">
-                    <CreateButton href="/admin/divisions/create" />
+                <div className="flex justify-end">
                     <TableExportModal
                         ids={allIds ?? []}
                         resourceName="divisions"
                     />
+                    <CreateButton href="/admin/divisions/create" />
                 </div>
             )}
             <DataTable

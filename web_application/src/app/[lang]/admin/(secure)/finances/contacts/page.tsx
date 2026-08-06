@@ -34,12 +34,12 @@ export default async function Page({ searchParams }: WithSearchParams) {
 
     return (
         <div>
-            <div className="flex justify-between">
-                <CreateButton href={`/admin/finances/contacts/create/`} />
+            <div className="flex justify-end">
                 <TableExportModal
                     ids={meta.page?.allIds}
                     resourceName="finance_contacts"
                 />
+                <CreateButton href={`/admin/finances/contacts/create/`} />
             </div>
             <ContactsTable contacts={contacts} totalPages={totalPages} />
         </div>

@@ -82,7 +82,9 @@ export default function UsersTable({ users }: Props) {
 
     return (
         <>
-            <CreateButton href={`/admin/users/create/`} />
+            <div className="flex justify-end">
+                <CreateButton href={`/admin/users/create/`} />
+            </div>
             <DataTable
                 data={users}
                 columns={columns}

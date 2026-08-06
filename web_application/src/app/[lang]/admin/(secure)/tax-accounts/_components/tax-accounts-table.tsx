@@ -44,7 +44,9 @@ export default function TaxAccountsTable({ taxAccounts, totalPages }: Props) {
 
     return (
         <>
-            <CreateButton href="/admin/tax-accounts/create" />
+            <div className="flex justify-end">
+                <CreateButton href="/admin/tax-accounts/create" />
+            </div>
             <DataTable
                 data={taxAccounts}
                 columns={columns}
