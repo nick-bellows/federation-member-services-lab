@@ -54,6 +54,12 @@ function PaginationLink({
     ...props
 }: PaginationLinkProps) {
     const isNonInteractable = isActive || disabled;
+    const isTextButton = size === 'default' || size === 'sm';
+
+    const textPadding = cn(
+        isTextButton && !leftIcon && 'pl-2',
+        isTextButton && !rightIcon && 'pr-2',
+    );
 
     return (
         <Button
@@ -91,7 +97,7 @@ function PaginationLink({
                         {leftIcon}
                     </span>
                 )}
-                {children && <span>{children}</span>}
+                {children && <span className={textPadding}>{children}</span>}
                 {rightIcon && (
                     <span className="[&_svg]:shrink-0 [&_svg]:fill-current">
                         {rightIcon}
