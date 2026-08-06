@@ -42,6 +42,9 @@
     --color-textHover: var(--color-blue-600);
     --color-textLink: var(--color-blue-500);
 
+    --color-bgSurfaceSolidSubtle: var(--color-neutral-100);
+    --color-bgSurfaceGlassMedium: --alpha(var(--color-white-solid) / 80%);
+
     --color-borderSubtle: var(--color-neutral-200);
     --color-borderFocus: var(--color-blue-500);
 

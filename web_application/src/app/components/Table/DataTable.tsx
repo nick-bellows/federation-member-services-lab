@@ -6,6 +6,7 @@ import {
     TableBody,
     TableCell,
     TableHead,
+    TableToolbar,
     TableHeader,
     TableRow,
 } from '@/app/components/Table/Table';
@@ -20,6 +21,7 @@ import {
 } from '@tanstack/react-table';
 import { TableAction } from './TableAction';
 import TablePagination from './TablePagination';
+import createTranslation from 'next-translate/createTranslation';
 
 interface DataTableProps<TData, TValue> {
     data: TData[];
@@ -52,10 +54,12 @@ export function DataTable<TData extends Model, TValue>({
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
+    const { t } = createTranslation();
 
     return (
         <div className="flex flex-col gap-8 overflow-auto">
-            <div className="rounded-md border">
+            <div>
+                <TableToolbar />
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -64,7 +68,7 @@ export function DataTable<TData extends Model, TValue>({
                                     return (
                                         <TableHead key={header.id}>
                                             {header.isPlaceholder ? null : (
-                                                <div className="text-sm font-medium text-gray-500">
+                                                <div className="text-textSecondary text-sm font-medium">
                                                     {flexRender(
                                                         header.column.columnDef
                                                             .header,
@@ -75,10 +79,17 @@ export function DataTable<TData extends Model, TValue>({
                                         </TableHead>
                                     );
                                 })}
+                                <TableHead>
+                                    <div className="text-textSecondary text-sm font-medium">
+                                        <span>
+                                            {t('contact:actions.label')}
+                                        </span>
+                                    </div>
+                                </TableHead>
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="bg-bgSurfaceGlassMedium">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
@@ -102,7 +113,7 @@ export function DataTable<TData extends Model, TValue>({
                                     {(canEdit || canView || deleteAction) && (
                                         <TableCell
                                             key="actions"
-                                            className="flex items-center justify-end gap-4"
+                                            className="flex items-center justify-start gap-4"
                                         >
                                             {typeof canEdit === 'function' ? (
                                                 <TableAction
