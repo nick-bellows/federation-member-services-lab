@@ -214,14 +214,12 @@ export default function ReceiptsTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-end">
-                    <div className="flex gap-2">
-                        <FinancialStatementExportModal receiptIds={allIds} />
-                        <TableExportModal
-                            ids={allIds ?? []}
-                            resourceName="receipts"
-                        />
-                    </div>
+                <div className="flex justify-end gap-1">
+                    <FinancialStatementExportModal receiptIds={allIds} />
+                    <TableExportModal
+                        ids={allIds ?? []}
+                        resourceName="receipts"
+                    />
                     <CreateButton href="/admin/finances/receipts/create" />
                 </div>
             )}
