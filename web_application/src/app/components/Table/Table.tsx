@@ -49,7 +49,10 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <tbody
         ref={ref}
-        className={cn('text-textPrimary [&_tr:last-child]:border-t', className)}
+        className={cn(
+            'text-textPrimary font-normal [&_tr:last-child]:border-t',
+            className,
+        )}
         {...props}
     />
 ));

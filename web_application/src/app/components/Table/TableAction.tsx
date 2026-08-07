@@ -5,7 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import DeleteForm from './DeleteForm';
 import IconEye from '/public/svg/eye.svg';
-import IconPen from '/public/svg/pen.svg';
+import IconPen from '/public/svg/edit.svg';
 
 interface Props {
     href?: string;
@@ -63,11 +63,7 @@ export function TableAction({
                     }
                 }}
             >
-                {type === 'view' ? (
-                    <IconEye {...iconProps} />
-                ) : (
-                    <IconPen {...iconProps} />
-                )}
+                {type === 'view' ? <IconEye {...iconProps} /> : <IconPen />}
             </button>
         );
     }
@@ -93,7 +89,7 @@ export function TableAction({
             {type === 'view' ? (
                 <IconEye {...iconProps} />
             ) : type === 'edit' ? (
-                <IconPen {...iconProps} />
+                <IconPen />
             ) : null}
         </Link>
     );
