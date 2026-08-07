@@ -57,7 +57,7 @@ export function DataTable<TData extends Model, TValue>({
     const { t } = createTranslation();
 
     return (
-        <div className="flex flex-col gap-8 overflow-auto">
+        <div className="flex flex-col gap-4 overflow-auto">
             <div>
                 <TableToolbar />
                 <Table>
