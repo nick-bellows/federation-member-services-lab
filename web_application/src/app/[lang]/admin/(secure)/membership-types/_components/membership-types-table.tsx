@@ -11,6 +11,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
 import CreateButton from '../../components/CreateButton';
 import TableExportModal from '../../components/TableExportModal';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 
 interface Props {
     membershipTypes: TMembershipTypeDeserialized[];
@@ -44,10 +45,19 @@ export default function MembershipTypesTable({
                     t('membership_type:title.label', { count: 1 })
                 ),
             cell: ({ row }) => {
+                const membershipType = row.original;
                 const title =
-                    row.original.titleTranslations?.[lang] ||
-                    row.getValue('title');
-                return <TextCell>{title}</TextCell>;
+                    membershipType.titleTranslations?.[lang] ||
+                    membershipType.title;
+
+                return (
+                    <BelongsToCell
+                        resource={membershipType}
+                        path="/admin/membership-types"
+                        content={title}
+                        truncate
+                    />
+                );
             },
         },
         {

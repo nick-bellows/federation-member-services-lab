@@ -9,6 +9,7 @@ import { listTaxAccountSearchParams } from '@/utils/search-params';
 import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
 import CreateButton from '../../components/CreateButton';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 
 interface Props {
     taxAccounts: TTaxAccountDeserialized[];
@@ -29,6 +30,18 @@ export default function TaxAccountsTable({ taxAccounts, totalPages }: Props) {
                 />
             ),
             accessorKey: 'accountNumber',
+            cell: ({ row }) => {
+                const taxAccount = row.original;
+
+                return (
+                    <BelongsToCell
+                        resource={taxAccount}
+                        path="/admin/tax-accounts"
+                        content={taxAccount.accountNumber}
+                        truncate
+                    />
+                );
+            },
         },
         {
             header: ({ column }) => (

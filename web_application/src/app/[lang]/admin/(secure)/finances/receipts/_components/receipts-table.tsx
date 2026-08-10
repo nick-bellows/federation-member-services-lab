@@ -58,11 +58,20 @@ export default function ReceiptsTable({
                 ) : (
                     t('receipt:receipt_type.label')
                 ),
-            cell: ({ row }) => (
-                <TextCell>
-                    {t('receipt:receipt_type.' + row.getValue('receiptType'))}
-                </TextCell>
-            ),
+            cell: ({ row }) => {
+                const receipt = row.original as TReceiptDeserialized;
+
+                return (
+                    <BelongsToCell
+                        resource={receipt}
+                        path="/admin/finances/receipts"
+                        content={t(
+                            `receipt:receipt_type.${receipt.receiptType}`,
+                        )}
+                        truncate
+                    />
+                );
+            },
         },
         {
             accessorKey: 'referenceNumber',

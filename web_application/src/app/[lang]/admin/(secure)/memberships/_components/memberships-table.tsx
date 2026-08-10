@@ -50,7 +50,8 @@ export default function MembershipsTable({
                         content={
                             (owner as { fullName?: string }).fullName ?? '-'
                         }
-                        path="/admin/members"
+                        path="/admin/memberships"
+                        truncate
                     />
                 ) : (
                     <TextCell>-</TextCell>

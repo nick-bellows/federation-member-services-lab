@@ -1,6 +1,7 @@
 'use client';
 
 import { statementTypeOptions } from '@/actions/statements/list.schema';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 import CurrencyCell from '@/app/components/Table/CurrencyCell';
 import { DataTable } from '@/app/components/Table/DataTable';
 import { HeaderOptionFilter } from '@/app/components/Table/HeaderOptionFilter';
@@ -35,9 +36,18 @@ export default function StatementsTable({
         {
             accessorKey: 'title',
             header: t('statement:title.label'),
-            cell: ({ row }) => (
-                <TextCell truncate>{row.getValue('title')}</TextCell>
-            ),
+            cell: ({ row }) => {
+                const statement = row.original as TStatementDeserialized;
+
+                return (
+                    <BelongsToCell
+                        resource={statement}
+                        path="/admin/finances/statements"
+                        content={statement.title}
+                        truncate
+                    />
+                );
+            },
         },
         {
             accessorKey: 'transactions',

@@ -3,7 +3,6 @@
 import BelongsToManyCell from '@/app/components/Table/BelongsToManyCell';
 import { DataTable } from '@/app/components/Table/DataTable';
 import HeaderSort from '@/app/components/Table/HeaderSort';
-import TextCell from '@/app/components/Table/TextCell';
 import {
     TDivisionDeserialized,
     TMembershipTypeDeserialized,
@@ -14,6 +13,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
 import CreateButton from '../../components/CreateButton';
 import TableExportModal from '../../components/TableExportModal';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 
 interface Props {
     divisions: TDivisionDeserialized[];
@@ -45,10 +45,18 @@ export default function DivisionsTable({
                     t('division:title.label', { count: 1 })
                 ),
             cell: ({ row }) => {
+                const division = row.original as TDivisionDeserialized;
                 const title =
-                    row.original.titleTranslations?.[lang] ||
-                    row.getValue('title');
-                return <TextCell>{title}</TextCell>;
+                    division.titleTranslations?.[lang] || division.title;
+
+                return (
+                    <BelongsToCell
+                        resource={division}
+                        path="/admin/divisions"
+                        content={title}
+                        truncate
+                    />
+                );
             },
         },
         ...(extended

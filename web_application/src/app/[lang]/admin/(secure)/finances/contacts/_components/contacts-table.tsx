@@ -1,6 +1,7 @@
 'use client';
 
 import { financeContactTypeOptions } from '@/actions/financeContacts/list.schema';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 import { DataTable } from '@/app/components/Table/DataTable';
 import { HeaderOptionFilter } from '@/app/components/Table/HeaderOptionFilter';
 import HeaderSort from '@/app/components/Table/HeaderSort';
@@ -51,7 +52,18 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
                     columnTitle={t('contact:name.label')}
                 />
             ),
-            cell: ({ row }) => <TextCell>{row.getValue('fullName')}</TextCell>,
+            cell: ({ row }) => {
+                const contact = row.original as TFinanceContactDeserialized;
+
+                return (
+                    <BelongsToCell
+                        resource={contact}
+                        path="/admin/finances/contacts"
+                        content={contact.fullName}
+                        truncate
+                    />
+                );
+            },
         },
         {
             accessorKey: 'companyName',

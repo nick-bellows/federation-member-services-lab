@@ -12,6 +12,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
 import CreateButton from '../../components/CreateButton';
 import DateField from '../../components/Fields/Detail/DateField';
+import BelongsToCell from '@/app/components/Table/BelongsToCell';
 
 interface Props {
     users: TUserDeserialized[];
@@ -31,7 +32,18 @@ export default function UsersTable({ users }: Props) {
                     columnTitle={t('user:title.label')}
                 />
             ),
-            cell: ({ row }) => <TextCell>{row.getValue('name')}</TextCell>,
+            cell: ({ row }) => {
+                const user = row.original;
+
+                return (
+                    <BelongsToCell
+                        resource={user}
+                        path="/admin/users"
+                        content={user.name}
+                        truncate
+                    />
+                );
+            },
         },
         {
             accessorKey: 'email',

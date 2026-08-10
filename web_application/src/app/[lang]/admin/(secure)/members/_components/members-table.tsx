@@ -50,7 +50,18 @@ export default function MembersTable({
                 ) : (
                     t('member:name.label')
                 ),
-            cell: ({ row }) => <TextCell>{row.getValue('fullName')}</TextCell>,
+            cell: ({ row }) => {
+                const member = row.original as TMemberDeserialized;
+
+                return (
+                    <BelongsToCell
+                        resource={member}
+                        path="/admin/members"
+                        content={member.fullName}
+                        truncate
+                    />
+                );
+            },
         },
         {
             accessorKey: 'membership',
