@@ -55,7 +55,7 @@ export default function DeleteForm({
                     data-cy={`delete-${id}-button`}
                     title={t('general:delete')}
                     className={[
-                        'transition-color duration-300',
+                        'transition-color p-2 duration-300',
                         disabled
                             ? 'cursor-not-allowed opacity-30'
                             : 'cursor-pointer text-red-400 hover:text-red-500/50',

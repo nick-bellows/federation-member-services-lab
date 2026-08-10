@@ -113,7 +113,7 @@ export function DataTable<TData extends Model, TValue>({
                                     {(canEdit || canView || deleteAction) && (
                                         <TableCell
                                             key="actions"
-                                            className="flex items-center justify-start gap-4"
+                                            className="flex items-center justify-start"
                                         >
                                             {typeof canEdit === 'function' ? (
                                                 <TableAction
@@ -157,13 +157,6 @@ export function DataTable<TData extends Model, TValue>({
                                                         id={row.original.id}
                                                     />
                                                 )
-                                            )}
-                                            {canView && (
-                                                <TableAction
-                                                    type="view"
-                                                    href={`/admin/${resourceName}/${row.original.id}`}
-                                                    id={row.original.id}
-                                                />
                                             )}
                                             {typeof canDelete === 'function' &&
                                             deleteAction ? (
