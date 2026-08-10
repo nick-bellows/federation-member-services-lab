@@ -50,7 +50,7 @@ const TableBody = React.forwardRef<
     <tbody
         ref={ref}
         className={cn(
-            'text-textPrimary font-normal [&_tr:last-child]:border-t',
+            'text-textPrimary [&_td:first-child]:font-medium [&_tr:last-child]:border-t',
             className,
         )}
         {...props}
@@ -64,10 +64,7 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <tfoot
         ref={ref}
-        className={cn(
-            'border-t bg-slate-100/50 font-medium last:[&>tr]:border-t',
-            className,
-        )}
+        className={cn('border-t last:[&>tr]:border-t', className)}
         {...props}
     />
 ));
