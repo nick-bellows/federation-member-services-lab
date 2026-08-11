@@ -90,7 +90,10 @@
         inset -0.5px 1px 0.5px 0 rgb(255, 255, 255, 0.9);
     --shadow-buttonPrimary: 0 4px 15px 0 rgba(0, 0, 0, 0.07);
     --shadow-buttonSecondary: 0 4px 15px 0 rgba(0, 0, 0, 0.05);
-    --shadow-buttonSecondaryDisabled: var(--shadow-navigationItem);
+
+    --shadow-buttonSecondaryDisabled:
+        inset -1px 1px 0.5px 0 rgba(255, 255, 255, 1),
+        inset 0 1px 15px 0 rgba(0, 0, 0, 0.02), 0 4px 15px 0 rgba(0, 0, 0, 0.05);
 
     --shadow-topbar:
         inset 0px 1px 100px 0px rgba(0, 0, 0, 0.01),
@@ -99,7 +102,9 @@
 
     --drop-shadow-display: 0px 4px 6px rgba(0, 0, 0, 0.3);
 
-    --blur-topbar: 2px;
+    --blur-small: 2px;
+    --blur-topbar: var(--blur-small);
+    --blur-secondaryButton: var(--blur-small);
 
     --animate-move-up: move-up 0.3s cubic-bezier(0.39, 1.42, 0.43, 1);
     --animate-move-down: move-down 0.4s cubic-bezier(0.39, 1.42, 0.43, 1);

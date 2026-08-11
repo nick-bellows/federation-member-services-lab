@@ -11,7 +11,7 @@ const buttonVariants = cva(
                 primary:
                     'bg-btnBgPrimary text-white-solid shadow-buttonPrimary hover:bg-btnBgPrimaryHover focus-visible:bg-btnBgPrimaryHover focus-visible:ring-offset-2 disabled:bg-btnBgPrimaryDisabled disabled:shadow-none',
                 secondary:
-                    'bg-btnBgSecondary text-textPrimary shadow-buttonSecondary hover:bg-btnSecondaryHover hover:text-textHover focus-visible:bg-btnBgSecondary focus-visible:text-textLink disabled:bg-btnBgSecondaryDisabled disabled:shadow-buttonSecondaryDisabled',
+                    'bg-btnBgSecondary text-textPrimary shadow-buttonSecondary hover:bg-btnSecondaryHover hover:text-textHover focus-visible:bg-btnBgSecondary focus-visible:text-textLink disabled:bg-btnBgSecondaryDisabled disabled:shadow-buttonSecondaryDisabled disabled:backdrop-blur-secondaryButton',
                 tertiary:
                     'text-textLink hover:bg-btnBgTertiaryHover hover:text-textHover focus-visible:bg-btnBgTertiaryHover focus-visible:text-textLink',
                 tertiaryDanger:

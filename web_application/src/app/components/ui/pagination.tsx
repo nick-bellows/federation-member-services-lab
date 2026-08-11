@@ -70,7 +70,7 @@ function PaginationLink({
             className={cn(
                 isActive && 'pointer-events-none',
                 disabled &&
-                    'text-textDisabled pointer-events-none cursor-not-allowed',
+                    'bg-btnBgSecondaryDisabled shadow-buttonSecondaryDisabled backdrop-blur-topbar text-textDisabled pointer-events-none cursor-not-allowed',
                 !isActive && !disabled && 'cursor-pointer',
                 className,
             )}
