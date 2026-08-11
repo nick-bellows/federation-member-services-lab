@@ -33,8 +33,8 @@ export default async function Page({ searchParams }: WithSearchParams) {
     const totalPages = (meta?.page?.lastPage as number) ?? 1;
 
     return (
-        <div>
-            <div className="flex justify-end">
+        <>
+            <div className="col-span-1 flex justify-end">
                 <TableExportModal
                     ids={meta.page?.allIds}
                     resourceName="finance_contacts"
@@ -42,6 +42,6 @@ export default async function Page({ searchParams }: WithSearchParams) {
                 <CreateButton href={`/admin/finances/contacts/create/`} />
             </div>
             <ContactsTable contacts={contacts} totalPages={totalPages} />
-        </div>
+        </>
     );
 }

@@ -86,7 +86,7 @@ export default function DivisionsTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-end">
+                <div className="col-span-1 flex justify-end">
                     <TableExportModal
                         ids={allIds ?? []}
                         resourceName="divisions"
@@ -94,15 +94,17 @@ export default function DivisionsTable({
                     <CreateButton href="/admin/divisions/create" />
                 </div>
             )}
-            <DataTable
-                data={divisions}
-                columns={columns}
-                resourceName={'divisions'}
-                totalPages={totalPages}
-                canEdit={true}
-                canView={true}
-                deleteAction={deleteAction}
-            />
+            <div className="col-span-2">
+                <DataTable
+                    data={divisions}
+                    columns={columns}
+                    resourceName={'divisions'}
+                    totalPages={totalPages}
+                    canEdit={true}
+                    canView={true}
+                    deleteAction={deleteAction}
+                />
+            </div>
         </>
     );
 }

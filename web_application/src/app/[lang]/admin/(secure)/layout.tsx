@@ -7,7 +7,6 @@ import {
 } from '@/utils/colors';
 import { PropsWithChildren } from 'react';
 import ContentContainer from './components/ContentContainer';
-import TitleBar from './components/TitleBar';
 import { auth } from '@/utils/auth';
 import { MenuProvider } from './components/Navigation/MenuProvider';
 import TopBar from './components/Navigation/TopBar';
@@ -38,7 +37,6 @@ export default async function SecureLayout({ children }: PropsWithChildren) {
                 <div className="flex w-full flex-1 flex-col overflow-hidden md:flex-row">
                     <Navigation />
                     <div className="flex w-full flex-1 flex-col overflow-y-auto">
-                        <TitleBar />
                         <ContentContainer>{children}</ContentContainer>
                     </div>
                 </div>

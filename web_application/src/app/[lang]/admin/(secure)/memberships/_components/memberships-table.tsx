@@ -156,23 +156,27 @@ export default function MembershipsTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-end">
-                    <TableExportModal
-                        ids={allIds ?? []}
-                        resourceName="memberships"
-                    />
-                    <CreateButton href="/admin/memberships/create" />
+                <div className="col-span-1">
+                    <div className="flex justify-end">
+                        <TableExportModal
+                            ids={allIds ?? []}
+                            resourceName="memberships"
+                        />
+                        <CreateButton href="/admin/memberships/create" />
+                    </div>
                 </div>
             )}
-            <DataTable
-                data={memberships}
-                columns={columns}
-                resourceName={'memberships' as ResourceName}
-                totalPages={totalPages}
-                canEdit={true}
-                canView={true}
-                deleteAction={deleteAction}
-            />
+            <div className="col-span-2">
+                <DataTable
+                    data={memberships}
+                    columns={columns}
+                    resourceName={'memberships' as ResourceName}
+                    totalPages={totalPages}
+                    canEdit={true}
+                    canView={true}
+                    deleteAction={deleteAction}
+                />
+            </div>
         </>
     );
 }

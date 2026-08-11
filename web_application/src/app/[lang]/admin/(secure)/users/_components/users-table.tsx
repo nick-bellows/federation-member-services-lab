@@ -94,17 +94,19 @@ export default function UsersTable({ users }: Props) {
 
     return (
         <>
-            <div className="flex justify-end">
+            <div className="col-span-1 flex justify-end">
                 <CreateButton href={`/admin/users/create/`} />
             </div>
-            <DataTable
-                data={users}
-                columns={columns}
-                resourceName={'users' as ResourceName}
-                canView={true}
-                canEdit={true}
-                deleteAction={deleteAction}
-            />
+            <div className="col-span-2">
+                <DataTable
+                    data={users}
+                    columns={columns}
+                    resourceName={'users' as ResourceName}
+                    canView={true}
+                    canEdit={true}
+                    deleteAction={deleteAction}
+                />
+            </div>
         </>
     );
 }

@@ -90,7 +90,7 @@ export default function MembershipTypesTable({
     return (
         <>
             {extended && (
-                <div className="flex justify-end">
+                <div className="col-span-1 flex justify-end">
                     <TableExportModal
                         ids={allIds ?? []}
                         resourceName={'membership-types'}
@@ -98,15 +98,17 @@ export default function MembershipTypesTable({
                     <CreateButton href="/admin/membership-types/create" />
                 </div>
             )}
-            <DataTable
-                data={membershipTypes}
-                columns={columns}
-                resourceName={'membership-types' as ResourceName}
-                totalPages={totalPages}
-                canEdit={true}
-                canView={true}
-                deleteAction={deleteAction}
-            />
+            <div className="col-span-2">
+                <DataTable
+                    data={membershipTypes}
+                    columns={columns}
+                    resourceName={'membership-types' as ResourceName}
+                    totalPages={totalPages}
+                    canEdit={true}
+                    canView={true}
+                    deleteAction={deleteAction}
+                />
+            </div>
         </>
     );
 }
