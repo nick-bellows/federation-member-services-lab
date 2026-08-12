@@ -8,7 +8,6 @@ import { createDeleteFormAction } from '@/utils/deleteActions';
 import { listTaxAccountSearchParams } from '@/utils/search-params';
 import { ColumnDef } from '@tanstack/react-table';
 import useTranslation from 'next-translate/useTranslation';
-import CreateButton from '../../components/CreateButton';
 import BelongsToCell from '@/app/components/Table/BelongsToCell';
 
 interface Props {
@@ -52,6 +51,9 @@ export default function TaxAccountsTable({ taxAccounts, totalPages }: Props) {
                 />
             ),
             accessorKey: 'description',
+            meta: {
+                mobileLabel: t('tax_account:description.label'),
+            } as any,
         },
     ];
 

@@ -89,33 +89,44 @@ export function DataTable<TData extends Model, TValue>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody className="bg-bgSurfaceGlassMedium">
+                    <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                    data-cy={`${row.index}-row`}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            data-cy={`${cell.id}-cell`}
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                    {(canEdit || canView || deleteAction) && (
-                                        <TableCell
-                                            key="actions"
-                                            className="flex items-center justify-start"
-                                        >
-                                            {typeof canEdit === 'function' ? (
+                            table.getRowModel().rows.map((row) => {
+                                const cells = row.getVisibleCells();
+
+                                const mobileHeaderCell =
+                                    cells.find(
+                                        (c) =>
+                                            (c.column.columnDef as any).meta
+                                                ?.isMobileHeader,
+                                    ) || cells[0];
+
+                                const renderActions = () => (
+                                    <>
+                                        {typeof canEdit === 'function' ? (
+                                            <TableAction
+                                                type="edit"
+                                                href={
+                                                    onEdit
+                                                        ? undefined
+                                                        : `/admin/${resourceName}/edit/${row.original.id}`
+                                                }
+                                                onClick={
+                                                    onEdit
+                                                        ? () =>
+                                                              onEdit(
+                                                                  row.original,
+                                                              )
+                                                        : undefined
+                                                }
+                                                disabled={
+                                                    canEdit(row.original) ===
+                                                    false
+                                                }
+                                                id={row.original.id}
+                                            />
+                                        ) : (
+                                            canEdit && (
                                                 <TableAction
                                                     type="edit"
                                                     href={
@@ -131,69 +142,118 @@ export function DataTable<TData extends Model, TValue>({
                                                                   )
                                                             : undefined
                                                     }
-                                                    disabled={
-                                                        canEdit(row.original) ==
-                                                        false
-                                                    }
                                                     id={row.original.id}
                                                 />
-                                            ) : (
-                                                canEdit && (
-                                                    <TableAction
-                                                        type="edit"
-                                                        href={
-                                                            onEdit
-                                                                ? undefined
-                                                                : `/admin/${resourceName}/edit/${row.original.id}`
-                                                        }
-                                                        onClick={
-                                                            onEdit
-                                                                ? () =>
-                                                                      onEdit(
-                                                                          row.original,
-                                                                      )
-                                                                : undefined
-                                                        }
-                                                        id={row.original.id}
-                                                    />
-                                                )
-                                            )}
-                                            {typeof canDelete === 'function' &&
-                                            deleteAction ? (
+                                            )
+                                        )}
+                                        {typeof canDelete === 'function' &&
+                                        deleteAction ? (
+                                            <TableAction
+                                                type="delete"
+                                                deleteAction={deleteAction}
+                                                disabled={
+                                                    canDelete(row.original) ===
+                                                    false
+                                                }
+                                                id={row.original.id}
+                                                resourceName={resourceName}
+                                            />
+                                        ) : (
+                                            deleteAction && (
                                                 <TableAction
                                                     type="delete"
                                                     deleteAction={deleteAction}
-                                                    disabled={
-                                                        canDelete(
-                                                            row.original,
-                                                        ) === false
-                                                    }
                                                     id={row.original.id}
                                                     resourceName={resourceName}
                                                 />
-                                            ) : (
-                                                deleteAction && (
-                                                    <TableAction
-                                                        type="delete"
-                                                        deleteAction={
-                                                            deleteAction
-                                                        }
-                                                        id={row.original.id}
-                                                        resourceName={
-                                                            resourceName
-                                                        }
-                                                    />
-                                                )
+                                            )
+                                        )}
+                                    </>
+                                );
+
+                                return (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={
+                                            row.getIsSelected() && 'selected'
+                                        }
+                                        data-cy={`${row.index}-row`}
+                                    >
+                                        <td className="border-borderSubtle flex items-center justify-between border-b py-4 pr-3 pl-4 md:hidden">
+                                            <div className="text-textPrimary text-base font-semibold [&_a]:underline">
+                                                {flexRender(
+                                                    mobileHeaderCell.column
+                                                        .columnDef.cell,
+                                                    mobileHeaderCell.getContext(),
+                                                )}
+                                            </div>
+                                            {(canEdit ||
+                                                canView ||
+                                                deleteAction) && (
+                                                <div className="flex items-center gap-2">
+                                                    {renderActions()}
+                                                </div>
                                             )}
-                                        </TableCell>
-                                    )}
-                                </TableRow>
-                            ))
+                                        </td>
+
+                                        {cells.map((cell, index) => {
+                                            const isMobileHeader =
+                                                cell.id === mobileHeaderCell.id;
+
+                                            const isLastCell =
+                                                index === cells.length - 1;
+
+                                            return (
+                                                <TableCell
+                                                    key={cell.id}
+                                                    data-cy={`${cell.id}-cell`}
+                                                    className={
+                                                        isMobileHeader
+                                                            ? 'hidden md:table-cell'
+                                                            : `flex md:table-cell md:items-start ${isLastCell ? '' : 'border-borderSubtle border-b md:border-0'}`
+                                                    }
+                                                >
+                                                    <span className="text-textSecondary w-1/2 pr-4 text-sm font-medium md:hidden md:w-auto md:pr-0">
+                                                        {(
+                                                            cell.column
+                                                                .columnDef as any
+                                                        ).meta?.mobileLabel ||
+                                                            cell.column.id}
+                                                    </span>
+                                                    <div className="wrap-break text-textPrimary flex w-1/2 justify-start overflow-hidden text-left md:w-auto md:flex-auto [&_*]:!text-sm [&_*]:!font-normal">
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            );
+                                        })}
+
+                                        {(canEdit ||
+                                            canView ||
+                                            deleteAction) && (
+                                            <TableCell
+                                                key="actions"
+                                                className="hidden items-center justify-start gap-2 md:flex"
+                                            >
+                                                {renderActions()}
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                );
+                            })
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    colSpan={
+                                        columns.length +
+                                        (canEdit || canView || deleteAction
+                                            ? 1
+                                            : 0)
+                                    }
+                                    className="flex h-24 justify-center text-center md:table-cell"
                                 >
                                     No results.
                                 </TableCell>

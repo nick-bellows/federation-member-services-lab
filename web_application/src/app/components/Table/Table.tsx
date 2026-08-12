@@ -6,10 +6,13 @@ const Table = React.forwardRef<
     HTMLTableElement,
     React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto rounded-b-2xl">
+    <div className="md:bg-bgSurfaceGlassMedium relative w-full overflow-auto rounded-b-none md:overflow-visible md:rounded-b-2xl">
         <table
             ref={ref}
-            className={cn('w-full caption-bottom text-sm', className)}
+            className={cn(
+                'block w-full caption-bottom rounded-b-none text-sm md:table md:rounded-b-2xl',
+                className,
+            )}
             {...props}
         />
     </div>
@@ -23,7 +26,7 @@ const TableToolbar = React.forwardRef<
     <div
         ref={ref}
         className={cn(
-            'border-borderSubtle bg-bgSurfaceGlassMedium rounded-t-2xl border-b p-4',
+            'border-borderSubtle bg-bgSurfaceGlassMedium shadow-tableItems mb-2 rounded-t-2xl rounded-b-2xl border-b p-4 md:mb-0 md:rounded-t-2xl md:rounded-b-none md:shadow-none',
             className,
         )}
         {...props}
@@ -37,7 +40,10 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <thead
         ref={ref}
-        className={cn('bg-bgSurfaceSolidSubtle [&_tr]:border-0', className)}
+        className={cn(
+            'bg-bgSurfaceSolidSubtle hidden md:table-header-group [&_tr]:border-0',
+            className,
+        )}
         {...props}
     />
 ));
@@ -50,7 +56,7 @@ const TableBody = React.forwardRef<
     <tbody
         ref={ref}
         className={cn(
-            'text-textPrimary [&_td:first-child]:font-medium [&_tr:last-child]:border-t',
+            'text-textPrimary flex flex-col gap-3 md:table-row-group md:gap-0 [&_td:first-child]:font-medium',
             className,
         )}
         {...props}
@@ -64,7 +70,10 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <tfoot
         ref={ref}
-        className={cn('border-t last:[&>tr]:border-t', className)}
+        className={cn(
+            'hidden border-t md:table-footer-group last:[&>tr]:border-t',
+            className,
+        )}
         {...props}
     />
 ));
@@ -77,7 +86,8 @@ const TableRow = React.forwardRef<
     <tr
         ref={ref}
         className={cn(
-            'border-borderSubtle border-t transition-colors data-[state=selected]:bg-slate-100',
+            'shadow-tableItems border-borderSubtle bg-bgSurfaceGlassMedium flex flex-col overflow-hidden rounded-2xl border transition-colors data-[state=selected]:bg-slate-100 md:table-row md:rounded-none md:border-0 md:border-t md:bg-transparent md:shadow-none',
+
             className,
         )}
         {...props}
@@ -107,7 +117,7 @@ const TableCell = React.forwardRef<
     <td
         ref={ref}
         className={cn(
-            'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+            'mx-4 flex items-center justify-between px-0 py-3 align-middle md:mx-0 md:table-cell md:px-4 [&:has([role=checkbox])]:pr-0',
             className,
         )}
         {...props}

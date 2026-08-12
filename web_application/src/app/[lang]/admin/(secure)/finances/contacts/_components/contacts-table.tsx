@@ -26,6 +26,7 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
     const columns: ColumnDef<TFinanceContactDeserialized>[] = [
         {
             accessorKey: 'contactType',
+            meta: { mobileLabel: t('contact:contact_type.label') } as any,
             header: ({ column }) => (
                 <HeaderOptionFilter
                     options={financeContactTypeOptions ?? []}
@@ -45,6 +46,7 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
         },
         {
             accessorKey: 'fullName',
+            meta: { isMobileHeader: true } as any,
             header: ({ column }) => (
                 <HeaderSort
                     parser={listFinanceContactSearchParams.sort}
@@ -67,6 +69,7 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
         },
         {
             accessorKey: 'companyName',
+            meta: { mobileLabel: t('contact:company_name.label') } as any,
             header: ({ column }) => (
                 <HeaderSort
                     parser={listFinanceContactSearchParams.sort}
@@ -80,6 +83,7 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
         },
         {
             accessorKey: 'city',
+            meta: { mobileLabel: t('contact:city.label') } as any,
             header: ({ column }) => (
                 <HeaderSort
                     parser={listFinanceContactSearchParams.sort}
@@ -91,6 +95,7 @@ export default function ContactsTable({ contacts, totalPages }: Props) {
         },
         {
             accessorKey: 'email',
+            meta: { mobileLabel: t('contact:email.label') } as any,
             header: t('contact:email.label'),
             cell: ({ row }) => <TextCell>{row.getValue('email')}</TextCell>,
         },

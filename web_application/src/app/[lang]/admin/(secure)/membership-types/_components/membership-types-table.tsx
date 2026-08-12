@@ -62,6 +62,9 @@ export default function MembershipTypesTable({
         },
         {
             accessorKey: 'description',
+            meta: {
+                mobileLabel: t('membership_type:description.label'),
+            } as any,
             header: t('membership_type:description.label'),
             cell: ({ row }) => {
                 const description =
@@ -72,6 +75,9 @@ export default function MembershipTypesTable({
         },
         {
             accessorKey: 'monthlyFee',
+            meta: {
+                mobileLabel: t('membership_type:monthly_fee.label'),
+            } as any,
             header: t('membership_type:monthly_fee.label'),
             cell: ({ getValue }) => {
                 const monthlyFee = getValue() as number;

@@ -36,6 +36,9 @@ export default function StatementsTable({
         {
             accessorKey: 'title',
             header: t('statement:title.label'),
+            meta: {
+                mobileLabel: t('statement:title.label'),
+            } as any,
             cell: ({ row }) => {
                 const statement = row.original as TStatementDeserialized;
 
@@ -51,6 +54,9 @@ export default function StatementsTable({
         },
         {
             accessorKey: 'transactions',
+            meta: {
+                mobileLabel: t('statement:type.label'),
+            } as any,
             header: () => (
                 <HeaderOptionFilter
                     options={statementTypeOptions ?? []}
@@ -93,6 +99,9 @@ export default function StatementsTable({
         },
         {
             accessorKey: 'date',
+            meta: {
+                mobileLabel: t('statement:date.label'),
+            } as any,
             header: ({ column }) => (
                 <HeaderSort
                     parser={listStatementSearchParams.sort}
@@ -108,6 +117,9 @@ export default function StatementsTable({
         },
         {
             accessorKey: 'status',
+            meta: {
+                mobileLabel: t('transaction:status.label'),
+            } as any,
             header: t('transaction:status.label'),
             cell: ({ row }) => (
                 <StatusCell
@@ -119,6 +131,9 @@ export default function StatementsTable({
         },
         {
             accessorKey: 'financeAccount.title',
+            meta: {
+                mobileLabel: t('finance_account:title.one'),
+            } as any,
             header: () => (
                 <span className={accountId !== null ? 'text-slate-900' : ''}>
                     {t('finance_account:title.one')}
@@ -130,6 +145,9 @@ export default function StatementsTable({
         },
         {
             accessorKey: 'amount',
+            meta: {
+                mobileLabel: t('statement:amount.label'),
+            } as any,
             header: ({ column }) => (
                 <HeaderSort
                     parser={listStatementSearchParams.sort}

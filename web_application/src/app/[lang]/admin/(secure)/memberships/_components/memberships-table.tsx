@@ -61,6 +61,9 @@ export default function MembershipsTable({
         {
             accessorKey: 'membershipType',
             header: t('membership_type:title.one'),
+            meta: {
+                mobileLabel: t('membership_type:title.one'),
+            } as any,
             cell: ({ row }) => {
                 const membershipType = row.getValue(
                     'membershipType',
@@ -78,6 +81,9 @@ export default function MembershipsTable({
         },
         {
             accessorKey: 'startedAt',
+            meta: {
+                mobileLabel: t('membership:started_at.label'),
+            } as any,
             header: ({ column }) =>
                 extended ? (
                     <HeaderSort
@@ -93,6 +99,9 @@ export default function MembershipsTable({
         {
             accessorKey: 'monthlyFee',
             header: t('membership:monthly_fee.label'),
+            meta: {
+                mobileLabel: t('membership:monthly_fee.label'),
+            } as any,
             cell: ({ row }) => (
                 <CurrencyCell value={row.getValue('monthlyFee')} />
             ),
@@ -100,6 +109,9 @@ export default function MembershipsTable({
         {
             accessorKey: 'paymentPeriod',
             header: t('payment_period:title.one'),
+            meta: {
+                mobileLabel: t('payment_period:title.one'),
+            } as any,
             cell: ({ row }) => {
                 const paymentPeriod = row.getValue(
                     'paymentPeriod',
@@ -114,6 +126,9 @@ export default function MembershipsTable({
         {
             accessorKey: 'members',
             header: t('member:title.other'),
+            meta: {
+                mobileLabel: t('member:title.other'),
+            } as any,
             cell: ({ row }) => {
                 const members =
                     (row.getValue('members') as TMemberDeserialized[]) ?? [];
@@ -131,6 +146,9 @@ export default function MembershipsTable({
         },
         {
             accessorKey: 'status',
+            meta: {
+                mobileLabel: t('membership:status.label'),
+            } as any,
             header: () =>
                 extended ? (
                     <HeaderOptionFilter

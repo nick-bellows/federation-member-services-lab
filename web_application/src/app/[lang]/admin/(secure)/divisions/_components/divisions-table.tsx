@@ -34,6 +34,7 @@ export default function DivisionsTable({
     const columns: ColumnDef<TDivisionDeserialized>[] = [
         {
             accessorKey: 'title',
+            meta: { isMobileHeader: true } as any,
             header: ({ column }) =>
                 extended ? (
                     <HeaderSort
@@ -63,6 +64,9 @@ export default function DivisionsTable({
             ? [
                   {
                       accessorKey: 'membershipTypes',
+                      meta: {
+                          mobileLabel: t('membership_type:title.other'),
+                      } as any,
                       header: t('membership_type:title.other'),
                       cell: (cell: any) => {
                           const membershipTypes =

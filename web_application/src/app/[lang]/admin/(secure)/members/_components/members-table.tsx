@@ -40,6 +40,7 @@ export default function MembersTable({
     const columns: ColumnDef<TMemberDeserialized>[] = [
         {
             accessorKey: 'fullName',
+            meta: { isMobileHeader: true } as any,
             header: ({ column }) =>
                 extended ? (
                     <HeaderSort
@@ -65,6 +66,7 @@ export default function MembersTable({
         },
         {
             accessorKey: 'membership',
+            meta: { mobileLabel: t('member:membership.label') } as any,
             header: t('member:membership.label'),
             cell: ({ row }) => {
                 const membership = row.getValue(
@@ -94,6 +96,7 @@ export default function MembersTable({
         {
             id: 'startedAt',
             accessorFn: (row) => row.membership?.startedAt,
+            meta: { mobileLabel: t('membership:started_at.label') } as any,
             header: ({ column }) =>
                 extended ? (
                     <HeaderSort
@@ -108,6 +111,7 @@ export default function MembersTable({
         },
         {
             accessorKey: 'divisions',
+            meta: { mobileLabel: t('division:title.other') } as any,
             header: t('division:title.other'),
             cell: (cell) => {
                 const divisions =
@@ -126,11 +130,13 @@ export default function MembersTable({
         },
         {
             accessorKey: 'email',
+            meta: { mobileLabel: t('member:email.label') } as any,
             header: t('member:email.label'),
             cell: ({ row }) => <TextCell>{row.getValue('email')}</TextCell>,
         },
         {
             accessorKey: 'status',
+            meta: { mobileLabel: t('member:status.label') } as any,
             header: ({ column }) =>
                 extended ? (
                     <HeaderOptionFilter

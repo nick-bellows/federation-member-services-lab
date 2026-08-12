@@ -47,12 +47,18 @@ export default function UsersTable({ users }: Props) {
         },
         {
             accessorKey: 'email',
+            meta: {
+                mobileLabel: t('general:email'),
+            } as any,
             header: t('general:email'),
             cell: ({ row }) => <TextCell>{row.getValue('email')}</TextCell>,
         },
         {
             accessorKey: 'role',
             header: t('role:title.other'),
+            meta: {
+                mobileLabel: t('role:title.other'),
+            } as any,
             cell: ({ row }) => {
                 const roles = row.original.roles as
                     | { name: string }[]
@@ -83,11 +89,17 @@ export default function UsersTable({ users }: Props) {
         {
             accessorKey: 'createdAt',
             header: t('general:created_at'),
+            meta: {
+                mobileLabel: t('general:created_at'),
+            } as any,
             cell: ({ row }) => <DateField value={row.getValue('createdAt')} />,
         },
         {
             accessorKey: 'updatedAt',
             header: t('general:updated_at'),
+            meta: {
+                mobileLabel: t('general:updated_at'),
+            } as any,
             cell: ({ row }) => <DateField value={row.getValue('updatedAt')} />,
         },
     ];
