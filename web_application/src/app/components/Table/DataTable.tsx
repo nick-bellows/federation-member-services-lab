@@ -220,7 +220,7 @@ export function DataTable<TData extends Model, TValue>({
                                                         ).meta?.mobileLabel ||
                                                             cell.column.id}
                                                     </span>
-                                                    <div className="wrap-break text-textPrimary flex w-1/2 justify-start overflow-hidden text-left md:w-auto md:flex-auto [&_*]:!text-sm [&_*]:!font-normal">
+                                                    <div className="wrap-break text-textPrimary flex w-1/2 justify-start overflow-hidden text-left md:w-auto md:flex-auto [&_*]:!text-sm [&_*]:!leading-5 [&_*]:!font-normal md:[&_*]:!leading-6">
                                                         {flexRender(
                                                             cell.column
                                                                 .columnDef.cell,
