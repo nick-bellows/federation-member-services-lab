@@ -6,12 +6,12 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` — Milestone 0 (archaeology) complete; Milestone 1 (baseline fix, line endings, draft CI) complete except the first CI run; one behaviour fix landed (ADR-0002) |
+| Lifecycle | `DRAFT` — M0 (archaeology) and M1 (baseline fix, line endings, draft CI) complete except the first CI run; M2 (federation domain, application state machine, audit trail) complete with 30 tests; no user-facing federation feature yet |
 | Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11 |
 | Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
-| Original product claim | None. Nothing federation-specific exists yet |
+| Original product claim | Domain layer only: hierarchy, application state machine and audit trail exist and are tested; no API or UI for them yet |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
 Start with `docs/UPSTREAM_ANALYSIS.md`, then `docs/adr/`. The sibling Learning Center owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and consumes credentials over an HTTP contract only. The two never share a database.
@@ -52,7 +52,9 @@ Goal: the one high-value backend feature a senior reviewer opens first.
 4. Duplicate-submission protection at the database (unique constraint per member, organization and season) and at the API (idempotency key on submit). This is Incident 2 from the brief, done as a feature with its regression test.
 5. Domain unit tests for every legal and illegal transition; feature tests for authorization of each transition by role.
 
-Acceptance: state machine and audit trail covered by tests; `docs/DOMAIN_MODEL.md` and `docs/DATABASE_BASELINE.md` completed; ADR-0002 (preserve Laravel), ADR-0003 (derive status, do not store an editable flag), ADR-0004 (state machine over booleans) written.
+Acceptance: state machine and audit trail covered by tests; `docs/DOMAIN_MODEL.md` and `docs/DATABASE_BASELINE.md` completed; ADRs for the hierarchy attachment and the state machine written.
+
+**Status 2026-09-02: done.** `App\Federation` namespace with enums, models, transition table, `StartApplication` and `TransitionApplication`, actor resolver, audit recorder, event; eight migrations with full referential integrity; two nullable columns on upstream tables; `NorthgateDemoSeeder`; 30 federation tests (all 49 transition pairs pinned, actors, reasons, audit, duplicates at both layers, idempotency, hierarchy, schema identifier lengths); ADR-0005 and ADR-0006; `docs/DOMAIN_MODEL.md`. Verified on the development MariaDB (`docs/baseline/northgate_seed_rows.txt`). The HTTP idempotency header and request-id plumbing belong to A4. Derived participation status stays planned for the Learning Center milestone.
 
 ### A3 — Identity boundary (M3) — size L
 

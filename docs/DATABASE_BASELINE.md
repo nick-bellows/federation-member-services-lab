@@ -57,3 +57,23 @@ Verified 2026-09-01 against MariaDB 11.8 after `migrate:fresh --seeder=FakeDatab
 - **Column types** match the migrations: `memberships.status` and `members.status` are `varchar(255) NULL`; `memberships.started_at` is `timestamp NULL`; money is `int(10) unsigned`; InnoDB, `utf8mb4_unicode_ci` throughout.
 - **Seeded volume:** 6 clubs, 19 users, 116 members, 60 memberships, 33 divisions, 18 membership types, 3 roles, 56 permissions.
 - **Observed but not explained:** `CREATE TABLE` statements took 6–24 s each on this container (the full `migrate:fresh` with seed took 298 s). To be examined before any performance claim is made.
+
+## 3. Federation tables added in Milestone 2
+
+Migrations `api/database/migrations/2026_09_02_1000*.php`; decisions in `docs/adr/0005` and `docs/adr/0006`; entity meaning in `docs/DOMAIN_MODEL.md`. Every new table has real foreign keys and indexes.
+
+| Table | Keys and constraints |
+|---|---|
+| `federations` | `code` unique |
+| `seasons` | FK `federation_id` cascade; unique (`federation_id`, `label`) |
+| `member_organizations` | FK `federation_id` cascade; unique (`federation_id`, `code`) |
+| `federation_administrators` | FKs `federation_id`, `user_id` cascade; unique pair |
+| `organization_administrators` | FKs `member_organization_id`, `user_id` cascade; unique pair, **named explicitly** (see below) |
+| `registration_applications` | FKs `member_organization_id`, `season_id`, `applicant_user_id` **restrict** on delete; `active_key` nullable unique (portable partial uniqueness); `idempotency_key` nullable unique; indexes (`member_organization_id`, `status`) and (`applicant_user_id`, `season_id`) |
+| `audit_entries` | FK `actor_user_id` set null; indexes (`auditable_type`, `auditable_id`), `actor_user_id`, `request_id`; no `updated_at` |
+| `clubs.member_organization_id` (new column) | nullable FK, set null on delete |
+| `members.user_id` (new column) | nullable FK, set null on delete |
+
+**Engine difference found by running the migrations on MariaDB after they passed on SQLite.** Laravel's generated name for the unique index on `organization_administrators` (`organization_administrators_member_organization_id_user_id_unique`) is 65 characters; MariaDB and MySQL limit identifiers to 64, SQLite has no limit. Because MariaDB DDL is not transactional and Laravel adds indexes with separate statements after `CREATE TABLE`, both pivot tables existed without their unique indexes when the migration failed, and the retry failed with "table already exists". Fix: the index is named explicitly; `api/tests/Unit/Federation/SchemaIdentifierLengthTest.php` now asserts on SQLite that every table, index and foreign-key name in the whole schema fits 64 characters. Evidence: `docs/baseline/northgate_seed_run.txt`.
+
+**Verified on MariaDB 11.8, 2026-09-02** (`docs/baseline/northgate_seed_rows.txt`): the eight migrations ran in 14 s on the already-populated development database; the Northgate seeder produced 1 federation, 2 seasons, 3 organizations, 5 assigned and 1 unassigned club, 4 administrator rows, 5 applications in five distinct states and 15 audit entries whose actor and state chains match the seeder's script.

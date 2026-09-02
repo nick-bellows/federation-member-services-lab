@@ -69,3 +69,20 @@ _Pending; recorded in the internal review file._
 **Surprises.** A fourth `env()` call site (password reset) hid behind a grep filter that excluded lines containing `//`, which every `https://` default contains. The four fallbacks disagreed on `http` versus `https`. `next build` succeeds with no API reachable, so the frontend job needs no services.
 
 **Decisions recorded.** ADR-0002 (config over env), ADR-0003 (Playwright), ADR-0004 (what is offered upstream: the fix plus `.gitattributes`, not the workflow yet).
+
+## 2026-09-02 — Milestone 2: federation domain and application state machine
+
+**Goal.** The federation hierarchy above upstream's clubs, and a registration application whose lifecycle is a state machine with an audit trail, all without changing upstream behaviour.
+
+**Built.** Eight migrations (`api/database/migrations/2026_09_02_1000*.php`); the `App\Federation` namespace: enums, models, the transition table, two actions (`StartApplication`, `TransitionApplication`), the actor resolver, the audit recorder, one event; four factories; the `NorthgateDemoSeeder`; two nullable columns and three relation methods on upstream models. The shape is explained in `docs/DOMAIN_MODEL.md`, the decisions in ADR-0005 and ADR-0006.
+
+**Tests.** 30 federation tests (6 pure unit tests pinning all 49 transition pairs, 23 feature tests for actors, reasons, audit, duplicates, idempotency, hierarchy, plus the schema identifier-length test). Full suite: see `docs/baseline/phpunit_after_m2.txt`.
+
+**What went wrong, in order.**
+
+1. Eloquent fires `saving` before `creating`; the default status set in `creating` was not there when the `saving` hook computed `active_key`. Nineteen tests failed on one null. Fixed by defaulting in `saving` for new rows.
+2. The audit relation is ordered ascending; adding `latest()` in a test appended a second `ORDER BY` and still returned the oldest row. The tests take the last entry of the loaded relation instead.
+3. **The migrations passed on SQLite and failed on the development MariaDB**: a generated unique-index name was 65 characters. MariaDB DDL is not transactional, so the retry hit "table already exists". Named the index, dropped the partial tables, added a test that checks every identifier length on SQLite. This is the concrete case for running the suite on the runtime engine in CI.
+4. The seeder's guard is coarse (it checks the federation exists), so a partial first run had to be cleaned by hand before the second. Noted in `docs/future-work.md`.
+
+**Evidence.** `docs/baseline/northgate_seed_run.txt` (migration and seed timings on MariaDB), `docs/baseline/northgate_seed_rows.txt` (the seeded applications and the 15-row audit trail).

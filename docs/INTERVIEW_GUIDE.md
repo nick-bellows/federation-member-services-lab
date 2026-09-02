@@ -76,3 +76,37 @@ Two extra config keys versus four hard-coded fallbacks; running the suite twice 
 2. How do you know a fix is real? Walk through fail-then-pass for this one.
 3. Your CI runs the suite on SQLite and on MariaDB. Why both, and what would you do about the cost?
 4. Why is Pint a report and not a gate, and how would you enforce style on new code without reformatting upstream?
+
+## M2 — Federation domain and application state machine
+
+### What it does
+
+Adds federation, member organization, season, administrator roles and registration applications above upstream's clubs, with a seven-state application lifecycle whose only writer is one transition service, an append-only audit trail, and two-layer duplicate protection.
+
+### Why we built it this way
+
+Upstream's nullable-string status works for three states and one transition; a federation application has seven states, two actor kinds and reasons. A transition table that executes, a single writer inside a transaction, and an audit row per change make the rules impossible to bypass from a controller and every change attributable.
+
+### Alternatives considered
+
+A generic organizations table replacing clubs; a pivot instead of a nullable column on clubs; a separate persons table; the OIDC subject on members; `spatie/laravel-model-states`; per-transition command classes; `spatie/laravel-activitylog`; event sourcing; a database `CHECK` on status (ADR-0005, ADR-0006).
+
+### Failure modes
+
+Status assigned outside the service (throws); two live applications (unique `active_key` as backstop); retried "start" calls (idempotency key); a season from another federation (domain exception); a listener failing after commit (event fires after commit but has no retry until the outbox milestone); identifier names over 64 characters on MariaDB (tested).
+
+### Tradeoffs
+
+Two vocabularies for "member" coexist; clubs may have no organization; the transition table must be edited on purpose; the audit table grows unbounded; `restrict` on delete for organizations with applications means cleanup is deliberate.
+
+### Code to locate immediately
+
+`api/app/Federation/StateMachine/ApplicationTransitions.php` · `api/app/Federation/Actions/TransitionApplication.php` · `api/app/Federation/Actions/StartApplication.php` · `api/app/Federation/Models/RegistrationApplication.php` (the `saving` guard and `active_key`) · `api/app/Federation/Support/ApplicationActorResolver.php` · `api/app/Federation/Models/AuditEntry.php` · `api/database/migrations/2026_09_02_100006_create_registration_applications_table.php` · `api/tests/Unit/Federation/ApplicationTransitionsTest.php` · `api/tests/Feature/Federation/TransitionApplicationTest.php` · `api/database/seeders/NorthgateDemoSeeder.php`
+
+### Likely interviewer questions
+
+1. Walk through what happens when a reviewer approves an application, from the method call to the committed row and the event.
+2. How do you prevent duplicate registrations, and why two layers?
+3. Why not a package for the state machine or the activity log?
+4. Why should eligibility never be a boolean column, and where will it be computed?
+5. What did running the migrations on MariaDB teach you that SQLite could not?

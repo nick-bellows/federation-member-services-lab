@@ -11,3 +11,6 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **`env()` calls outside `config/`** — fixed in M1 (ADR-0002); offering upstream is planned in ADR-0004.
 - **Pint enforcement** — report-only in CI; decide whether to run Pint on the federation namespaces only, or propose a one-time formatting commit upstream.
 - **MariaDB test job runtime** — `DatabaseMigrations` re-runs all migrations per test; consider `RefreshDatabase` (transactions) for the fork's own tests if the MariaDB job proves slow on GitHub runners.
+- **Seeder idempotency** — `NorthgateDemoSeeder` guards on the federation's existence only; a partial run has to be cleaned by hand. Make each entity `firstOrCreate` or wrap the seed in a transaction if it is reused beyond demos.
+- **Database `CHECK` constraint on application status** — MariaDB and PostgreSQL syntax differ and Laravel's builder has no portable `check()`; decide per engine in the PostgreSQL milestone.
+- **Audit retention** — `audit_entries` grows without bound; define retention before any production-like deployment.
