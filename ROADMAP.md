@@ -7,7 +7,7 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 | Field | Current state |
 | --- | --- |
 | Lifecycle | `DRAFT` — Milestone 0 (engineering archaeology) complete; no product behaviour changed |
-| Branch | `m0/engineering-archaeology`, three commits ahead of upstream `main` (`dca9be3`): M0 docs, this roadmap's predecessor, one correction after a live probe |
+| Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11 |
 | Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite); Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; no CI that runs tests |
@@ -26,7 +26,7 @@ Sizes below are planning estimates, not commitments: **S** = one working session
 
 ## Phase A — reach the public gate
 
-Public visibility is allowed only when A1–A4 are done and the acceptance checklist at the end of Phase A passes. Until then: no fork, no `origin`, no push.
+Public visibility is allowed only when A1–A5 are done and the acceptance checklist at the end of Phase A passes. Until then: no fork, no `origin`, no push.
 
 ### A1 — Baseline quality and one defensible fix (M1) — size M
 
@@ -52,7 +52,19 @@ Goal: the one high-value backend feature a senior reviewer opens first.
 
 Acceptance: state machine and audit trail covered by tests; `docs/DOMAIN_MODEL.md` and `docs/DATABASE_BASELINE.md` completed; ADR-0002 (preserve Laravel), ADR-0003 (derive status, do not store an editable flag), ADR-0004 (state machine over booleans) written.
 
-### A3 — One complete registration-review slice (M4 in the brief) — size L
+### A3 — Identity boundary (M3) — size L
+
+Goal: separate "who are you" from "what may you do" before the federation workflow exists, so the review slice is built on the identity model it will keep.
+
+1. OIDC-compatible login for the new member and reviewer surfaces: authorization-code flow with PKCE in the Next.js app, ID token for the session, access token validated by Laravel (issuer, audience, signature via JWKS, expiry). No custom cryptography; a maintained JWT library.
+2. Provider: an **Auth0 free-tier tenant** created by the owner for the documented walkthrough and screenshots; a **self-hosted OIDC provider in compose and CI** so tests never depend on an external account. The validation code is provider-agnostic.
+3. Authorization stays in the application: roles and scopes such as `member:read:self`, `application:create`, `application:review`, `organization:manage` resolved from the database, never trusted from token claims alone; policies extended for the federation roles.
+4. Upstream's Sanctum login for club admins and the Filament session keep working unchanged; the new boundary is additive.
+5. Adapter tests against fixture tokens and the self-hosted provider; privilege-boundary tests for every role pair; ADR-0005 (identity provider separated from application authorization).
+
+Acceptance: a member can sign in through OIDC in compose and in CI; token validation failures are tested; no upstream login path regressed.
+
+### A4 — One complete registration-review slice (M4 in the brief) — size L
 
 Goal: the workflow a product reviewer can follow end to end.
 
@@ -68,13 +80,13 @@ organization admin opens a registration window
 
 1. Backend: JSON:API resources for applications, requirements and document metadata in the upstream style (schemas, requests, policies), reusing upstream's tenancy pattern and extending it with the organization level.
 2. Frontend: member pages (start, fill, submit, status) and administrator pages (queue, detail, decision, history) in the upstream Next.js conventions, with server actions and Zod schemas; keyboard-navigable, labelled forms, error announcements.
-3. Authentication stays on upstream's Sanctum tokens for this phase, extended with the new roles and permissions. The OIDC boundary comes in Phase B (see the decision below).
+3. Authentication uses the OIDC boundary from A3 for the member and reviewer surfaces; upstream's Sanctum flows for club admins keep working unchanged.
 4. Playwright critical-path test for the whole slice; axe checks on every new page.
 5. Screenshots and a short GIF of the slice, generated from the running application and checked into `docs/assets/`.
 
 Acceptance: the slice runs from a cold clone by following the README; E2E and accessibility checks green in CI; `docs/incidents/INCIDENT-002.md` (duplicate submission) written from the actual regression test.
 
-### A4 — Publication (M11 brought forward) — size M
+### A5 — Publication (M11 brought forward) — size M
 
 1. README rewritten for the five-minute path: what upstream is and what was added, the modernization problem, architecture diagram (before and after), the one feature to open, the tests to open, the ADRs, the incident report, the upstream contribution status, explicit attribution, test instructions.
 2. Upstream-versus-fork manifest generated in CI and linked from the README.
@@ -86,7 +98,8 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 - [ ] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs
 - [ ] Cold-clone verification recorded in `docs/LEARNING_LOG.md`
 - [ ] One feature (state machine + review slice) with unit, feature, authorization and E2E tests
-- [ ] ADR-0000 to ADR-0004, `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
+- [ ] OIDC sign-in working against the self-hosted provider in CI and against the Auth0 tenant in the documented walkthrough; privilege-boundary tests
+- [ ] ADR-0000 to ADR-0005, `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
 - [ ] README passes the one-minute and five-minute reads; attribution and license unchanged
 - [ ] One upstream contribution offered, status recorded truthfully
 - [ ] Explicit approval for visibility received
@@ -97,7 +110,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 
 | Milestone | Delivers | Size | Notes |
 | --- | --- | --- | --- |
-| B1 Identity boundary (M3) | OIDC-compatible login for the member and reviewer surfaces; JWT validation (issuer, audience, JWKS, expiry); scopes such as `application:create`, `application:review`, `organization:manage`; adapter tests; privilege-boundary tests | L | Auth0 free tier needs account approval; a self-hosted OIDC container is the no-account fallback. ADR-0005 |
+| B1 Identity boundary (M3) | Moved to Phase A as A3 by decision 1 on 2026-09-02 | — | — |
 | B2 Learning Center contract (M5) | `GET /v1/members/{id}/credentials` contract with fixtures and a mock server; derived participation status from approval + credentials + holds; timeout, stale-data and reconciliation behaviour; Incident 1 (slow credential service) | M | Contract must be authenticated and use non-enumerable ids. Decide whether the Learning Center adds the endpoint or this repo consumes its eligibility. ADR-0006 |
 | B3 Events and reliability (M6) | Transactional outbox, worker, retries, idempotent consumers; domain events for submit, approve, reject, credential change; Incident 3 (worker fails after approval) | M | Database queue locally; explain the mapping to SQS, RabbitMQ or Kafka in one ADR, implement none of them. ADR-0007 |
 | B4 PostgreSQL (M7) | CI matrix on MariaDB and PostgreSQL; the MySQL-only constructs fixed or isolated; differences documented, none hidden | M | Candidate for a second upstream contribution |
@@ -117,18 +130,18 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 
 | When | Recruiter, one minute | Engineer, five minutes | Product reviewer |
 | --- | --- | --- | --- |
-| After Phase A | Fork of a real open-source system, modernized; Laravel, Next.js, TypeScript, PostgreSQL planned, CI badges backed by real jobs; screenshots of the review slice | State machine with transition tests, audit trail, idempotent submit, ADRs, one incident report, the upstream PR | A registration flow with roles, review, explanations and an audit history |
-| After B1–B3 | OIDC, integration contract, event-driven processing | Token validation tests, contract tests with a mock, outbox with failure exercises, three incident reports | Degraded behaviour when the credential service is slow; nothing lost when a worker dies |
+| After Phase A | Fork of a real open-source system, modernized; Laravel, Next.js, TypeScript, Auth0/OIDC, PostgreSQL planned, CI badges backed by real jobs; screenshots of the review slice | State machine with transition tests, audit trail, idempotent submit, token validation and privilege-boundary tests, ADRs, one incident report, the upstream PR | A registration flow with sign-in, roles, review, explanations and an audit history |
+| After B2–B3 | Integration contract, event-driven processing | Contract tests with a mock, outbox with failure exercises, three incident reports | Degraded behaviour when the credential service is slow; nothing lost when a worker dies |
 | After B4–B9 | PostgreSQL, observability, accessibility, deployment architecture | Traces, metrics, load measurements, threat model, runbook | Accessibility review, performance budgets, case study |
 
-## Decisions for review
+## Decisions taken (2026-09-02, owner's review)
 
-1. **Sequencing:** review slice before the OIDC boundary (recommended, shortest path to the public gate) versus the brief's order of identity first.
-2. **The M1 fix:** `env()` outside config (recommended) versus the development config-cache trap.
-3. **E2E tool:** Playwright (recommended) versus Cypress.
-4. **Fictional federation name and branding** for A2 onwards; must not resemble any real federation's marks.
-5. **Auth0 account** for B1: approve creating a free-tier tenant, or use a self-hosted OIDC provider.
-6. **Learning Center side of B2:** add a credentials endpoint there, or consume its eligibility endpoint and label credentials `planned`.
+1. **Sequencing: identity before the review slice**, as in the original brief. The public gate moves one milestone later; the first public state shows OIDC.
+2. **M1 fix: the `env()` calls outside `config/`**, with a regression test that fails before and passes after.
+3. **E2E tool: Playwright.**
+4. **Fictional federation: Northgate Soccer Federation (NSF).** Name and any branding are invented for this project and must not resemble a real federation's marks.
+5. **Identity provider: Auth0 free tier**, tenant created by the owner when A3 starts; a self-hosted OIDC provider in compose and CI so nothing depends on the external account.
+6. **Learning Center contract: add `GET /v1/members/{id}/credentials` to the Learning Center** as a bounded milestone there; this repository consumes it through fixtures and contract tests first.
 
 ## Stop conditions
 
