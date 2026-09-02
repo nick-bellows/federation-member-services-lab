@@ -1,0 +1,24 @@
+== 1. club + membership types
+club_id=1 membership_type_id=1 min_members=1 max_members=1 title=Trial Membership
+== 2. POST memberships
+http=201 membership_id=61 status=null club=?
+== 3. POST members
+http=201 member_id=117 errors=?
+== 4. PATCH memberships/61 owner
+http=200 owner=?
+== 5. POST memberships/61/-actions/apply
+http=200 status=applied
+== 6. apply again (idempotency probe)
+http=422 detail=The membership is not eligable to apply: Membership status must previously been null
+== 7. club-admin token of club 1 tries to apply the same membership (tenant probe)
+club_admin_club=1 demo_club=1 GET membership as club admin http=200
+club2_membership_id=11
+GET /memberships/11 as club-admin-1 (club 1) → http=404 body={"jsonapi":{"version":"1.0"},"errors":[{"status":"404","title":"Not Found"}]}
+GET /memberships index as club-admin-1 → count=11 clubs=?
+POST /memberships/11/-actions/apply as club-admin-1 → http=404
+--- storage link
+lrwxrwxrwx    1 root     root            32 Sep  2 01:41 /var/www/html/api/public/storage -> /var/www/html/storage/app/public
+id	club_id	status	owner_member_id	membership_type_id
+61	1	applied	117	1
+id	club_id	membership_id	status
+117	1	61	inactive

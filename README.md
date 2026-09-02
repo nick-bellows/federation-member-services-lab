@@ -1,3 +1,11 @@
+> **Fork notice.** This repository is a fork of [vereinfacht/vereinfacht](https://github.com/vereinfacht/vereinfacht) (MIT, © visuellverstehen GmbH), used as the base for an engineering modernization lab: a fictional national soccer federation inherits this club-management platform and evolves it into a member-services system (organizations, registration, review, credentials, eligibility, audit) without a rewrite. Status: `draft` — Milestone 0 (engineering archaeology) only; no product behavior has changed yet. Start with [`docs/UPSTREAM_ANALYSIS.md`](docs/UPSTREAM_ANALYSIS.md) and [`docs/adr/`](docs/adr/).
+>
+> The federation is fictional. This project is not affiliated with, endorsed by, or based on the internal systems of any real federation; all data is synthetic.
+>
+> Boundary: the sibling [learning-center-reference](https://github.com/nick-bellows/learning-center-reference) project owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and will consume credential data from the Learning Center over an HTTP contract only. The two never share a database.
+>
+> The upstream README follows unchanged.
+
 <img src="https://vereinfacht.digital/assets/github-header-1752496154.png" alt="vereinfacht repository header graphic">
 
 # vereinfacht

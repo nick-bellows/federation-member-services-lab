@@ -1,0 +1,18 @@
+# Copy to docker-compose.override.yml (gitignored) on Windows/NTFS hosts. See docs/UPSTREAM_ANALYSIS.md section 11.
+# Local-only override (gitignored upstream). Windows/NTFS hosts: keep dependency
+# trees in named volumes so `composer install` / `npm ci` do not run on bind mounts.
+# The api service and the tooling service share the same vendor volume.
+services:
+  api:
+    volumes:
+      - api_vendor:/var/www/html/vendor
+  tooling:
+    volumes:
+      - api_vendor:/var/www/html/api/vendor
+      - api_node_modules:/var/www/html/api/node_modules
+      - web_node_modules:/var/www/html/web_application/node_modules
+
+volumes:
+  api_vendor:
+  api_node_modules:
+  web_node_modules:
