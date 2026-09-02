@@ -1,0 +1,24 @@
+federations	seasons	organizations	clubs_assigned	clubs_unassigned	admin_rows	applications	audit_entries
+1	2	3	5	1	4	5	15
+id	applicant	org	season	role	status	live	reason
+1	alex.participant@northgate.example	NYSA	2026/27	participant	submitted	1	NULL
+2	sam.coach@northgate.example	NYSA	2026/27	coach	needs_information	1	Coaching licence number is missing.
+3	riley.referee@northgate.example	NRA	2026/27	referee	approved	1	NULL
+4	riley.referee@northgate.example	NYSA	2025/26	coach	rejected	0	Background check not completed before the dea
+5	jordan.newcomer@northgate.example	NASL	2026/27	participant	draft	1	NULL
+id	actor	action	prev	new_status	app
+1	32	application.created	NULL	"draft"	1
+2	32	application.submitted	"draft"	"submitted"	1
+3	33	application.created	NULL	"draft"	2
+4	33	application.submitted	"draft"	"submitted"	2
+5	29	application.under_review	"submitted"	"under_review"	2
+6	29	application.needs_information	"under_review"	"needs_information"	2
+7	34	application.created	NULL	"draft"	3
+8	34	application.submitted	"draft"	"submitted"	3
+9	31	application.under_review	"submitted"	"under_review"	3
+10	31	application.approved	"under_review"	"approved"	3
+11	34	application.created	NULL	"draft"	4
+12	34	application.submitted	"draft"	"submitted"	4
+13	28	application.under_review	"submitted"	"under_review"	4
+14	28	application.rejected	"under_review"	"rejected"	4
+15	35	application.created	NULL	"draft"	5

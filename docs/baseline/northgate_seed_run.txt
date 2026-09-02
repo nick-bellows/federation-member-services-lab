@@ -1,0 +1,7 @@
+  2026_09_02_100004_create_administrator_pivot_tables ................ 4s DONE
+  2026_09_02_100005_alter_members_table_add_user_id_column ........... 1s DONE
+  2026_09_02_100006_create_registration_applications_table ........... 4s DONE
+  2026_09_02_100007_create_audit_entries_table ....................... 2s DONE
+migrate_seconds=14
+   INFO  Seeding database.  
+seed_exit=0 seed_seconds=3
