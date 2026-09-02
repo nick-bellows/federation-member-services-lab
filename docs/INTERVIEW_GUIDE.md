@@ -144,3 +144,37 @@ Two identity systems coexist; `host.docker.internal` is a Docker Desktop convent
 3. What happens if the identity provider is down?
 4. How do you handle key rotation, and what could an attacker do with your refresh logic?
 5. Tell me about a time you broke your own environment. What did you change so it cannot happen again?
+
+## M4 — The registration-review slice
+
+### What it does
+
+An organization administrator opens a registration window; a signed-in person starts an application inside it, supplies details and document metadata (files hashed in the browser, bytes never stored), and submits; a reviewer works a queue scoped to their organizations, judges documents, requests information, approves or rejects with reasons; the applicant sees the status, the reason and the full history. All of it over a second JSON:API server with generated TypeScript types, idempotent submission and correlation ids on every audit entry.
+
+### Why we built it this way
+
+The workflow is the product; the state machine and identity boundary only earn their keep when a reviewer can click through it. Keeping upstream's contract style (JSON:API, OpenAPI, typed client, server actions with Zod) proves the fork lives inside the inherited conventions rather than beside them.
+
+### Alternatives considered
+
+Extending upstream's `v1` server; plain JSON controllers; real uploads via medialibrary; S3 now; implicit "current season" instead of explicit windows (ADR-0008 and the roadmap decisions).
+
+### Failure modes
+
+Double submission (idempotency key, 409 on a new key, unique `active_key`); submitting an incomplete application (422 with what is missing); a reviewer from another organization (404 through scoping, 403 on the action); a stale route cache in the API container after adding routes; OpenAPI drift between the merged document and the code; a rejected sort silently emptying a page.
+
+### Tradeoffs
+
+Documents are promises until object storage exists; the OpenAPI document is partly hand-described; `history` is computed per resource; the review queue relies on server-side scoping rather than a dedicated endpoint.
+
+### Code to locate immediately
+
+`api/app/Federation/JsonApi/Server.php` · `api/routes/federation.php` · `api/app/Federation/Http/Controllers/RegistrationApplicationController.php` · `api/app/Federation/Http/Controllers/Concerns/RendersDomainExceptions.php` · `api/app/Federation/JsonApi/RegistrationApplications/RegistrationApplicationSchema.php` (scoping, history) · `api/app/Federation/Actions/AttachDocumentMetadata.php` · `api/app/Federation/Console/GenerateFederationOpenApi.php` · `api/tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php` · `web_application/src/actions/federation/actions.ts` · `web_application/src/app/[lang]/member/applications/[id]/DocumentsPanel.tsx` · `e2e/tests/registration-review.spec.ts` · `docs/incidents/INCIDENT-002-duplicate-submission.md`
+
+### Likely interviewer questions
+
+1. How do you prevent a duplicate registration when the user double-clicks, and when two tabs race?
+2. Why does the applicant never upload a file in this version, and what changes when object storage arrives?
+3. Where is authorization enforced for the review queue, and how would you test that a reviewer cannot see another organization's applications?
+4. Why a second JSON:API server instead of extending the existing one?
+5. What did the OpenAPI generator not do for you, and how did you keep the frontend typed anyway?

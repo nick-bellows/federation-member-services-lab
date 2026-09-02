@@ -18,3 +18,8 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **API entrypoint caching in development** — the container caches config, routes and events on every start; consider caching only when `APP_ENV=production` (INCIDENT-000 follow-up).
 - **OIDC session lifetime** — no refresh-token handling yet; the member page sends visitors back to sign-in when the access token has expired.
 - **Auth0 walkthrough** — needs the owner's tenant; document callback URLs, audience and screenshots once created.
+- **OpenAPI drift guard** — a CI step that regenerates `api/public/federation_openapi.json` and fails when it differs from the committed file.
+- **Object storage for documents** — pre-signed uploads to S3-compatible storage with checksum verification against the recorded SHA-256; retention rules with the audit trail (ADR-0008 follow-up).
+- **History pagination** — the `history` attribute grows with every transition; cap or paginate before long-lived applications exist.
+- **Review queue as its own endpoint** — today the queue is the scoped applications index filtered by status; a dedicated resource could add assignment, ageing and counts.
+- **Registration side effects** — approval does not yet create a registration record or link the applicant to upstream's `members`; decide with the Learning Center contract.

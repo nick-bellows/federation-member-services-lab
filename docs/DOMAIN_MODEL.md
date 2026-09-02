@@ -110,6 +110,17 @@ Rows are append-only: the model throws on update and delete; the table has no `u
 
 Whether a person may participate is **not** a column. It will be computed from: an approved application for the season and role, valid credentials from the Learning Center contract, and no blocking hold. That computation, its caching and its explanation to the member are the subject of the Learning Center milestone; nothing in M2 pre-empts it, and no editable "eligible" flag exists anywhere in the schema.
 
+## Registration windows and documents (M4)
+
+| Entity | Meaning | Rules |
+|---|---|---|
+| **Registration window** (`registration_windows`) | An organization administrator opens registration for one season and a set of roles, with `opens_at` and `closes_at`. One window per organization and season. | Applications can only be started inside an open window and only for roles it offers (`StartApplication`). Created over the API by an administrator of that organization or its federation; audited as `window.opened`. |
+| **Application details** | `date_of_birth`, `phone`, `applicant_notes` on the application. | Editable by the applicant while the application is `DRAFT` or `NEEDS_INFORMATION`; every change is audited as `application.details_updated`. Role and window are fixed once started. |
+| **Application document** (`application_documents`) | Metadata about one document: type, file name, MIME type, size, SHA-256 checksum, review status, reviewer note. No bytes are stored (ADR-0008). | One per type per application (unique). Attached by the applicant while editable; replacing resets the review to `pending`. Reviewed (`accepted` / `rejected` with a note) by a reviewer while the application is `UNDER_REVIEW`. |
+| **Required documents** | `DocumentType::requiredFor(role)`: participant needs proof of age and photo; coach adds coaching licence and background-check consent; referee adds referee certificate and background-check consent. | Submission is refused with a 422 listing what is missing until every required type has metadata and a date of birth is present. |
+
+Over HTTP the same rules appear as stable error codes: `window_closed`, `role_not_offered`, `duplicate_application`, `application_incomplete` (with `meta.missingDocuments`), `application_not_editable`, `illegal_transition`, `transition_not_allowed_for_actor`, `reason_required`, `document_not_allowed`.
+
 ## Deliberately not modelled
 
 - Teams, matches, competitions, transfers: out of scope for a member-services lab.

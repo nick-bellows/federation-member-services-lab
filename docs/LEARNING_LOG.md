@@ -91,7 +91,7 @@ _Pending; recorded in the internal review file._
 
 **Goal.** Sign in with OpenID Connect, validate access tokens in Laravel, keep authorization in the database, touch none of upstream's login paths.
 
-**Built.** Backend: `config/oidc.php`, the `oidc` request guard in `App\Federation\FederationServiceProvider`, `OidcTokenVerifier` (JWKS discovery, cache, one refresh on an unknown key id, issuer, audience, subject), `OidcUserResolver` (known subject, link by verified e-mail, provision), `FederationScopes`, `GET /api/v1/federation/me`, `users.oidc_issuer`/`oidc_subject`. Frontend: next-auth providers `northgate-id` and `auth0`, the access token kept server-side in the encrypted cookie, `/member/sign-in` and `/member` pages, middleware protection, en/de translations. Stack: `oidc` service (`mock-oauth2-server`) with personas in `docker/oidc/config.json`. Tests: 20 PHPUnit tests for the verifier and guard with an in-test RSA issuer, 3 Playwright tests including axe scans. ADR-0007.
+**Built.** Backend: `config/oidc.php`, the `oidc` request guard in `App\Federation\FederationServiceProvider`, `OidcTokenVerifier` (JWKS discovery, cache, one refresh on an unknown key id, issuer, audience, subject), `OidcUserResolver` (known subject, link by verified e-mail, provision), `FederationScopes`, `GET /api/v1/federation-identity/me`, `users.oidc_issuer`/`oidc_subject`. Frontend: next-auth providers `northgate-id` and `auth0`, the access token kept server-side in the encrypted cookie, `/member/sign-in` and `/member` pages, middleware protection, en/de translations. Stack: `oidc` service (`mock-oauth2-server`) with personas in `docker/oidc/config.json`. Tests: 20 PHPUnit tests for the verifier and guard with an in-test RSA issuer, 3 Playwright tests including axe scans. ADR-0007.
 
 **Evidence.**
 
@@ -113,3 +113,30 @@ _Pending; recorded in the internal review file._
 7. The axe scan failed the first page on contrast: upstream's Tailwind theme redefines `slate-600` as `#8c9da6`, 2.8:1 on white. Switched to `slate-700`. A default-palette assumption would have shipped.
 
 **Not done in this milestone.** The Auth0 tenant walkthrough (owner action); the CI end-to-end job has been written but not run; refresh tokens and session expiry.
+
+## 2026-09-02 — Milestone 4: the registration-review slice
+
+**Goal.** The first workflow a product reviewer can follow: an organization opens registration, a person applies with details and document metadata, a reviewer decides, the applicant sees the outcome and the history. Everything on top of the M2 state machine and the M3 identity boundary, nothing bypassing either.
+
+**Built.** Backend: registration windows, application details, document metadata with required types per role, `AttachDocumentMetadata` and `ReviewDocument`, completeness and HTTP idempotency in `TransitionApplication`, a second JSON:API server `federation` with seven schemas, three request classes, three controllers with six transition actions, a domain-exception-to-HTTP mapping, policies, a request-id middleware, `php artisan federation:openapi`. Frontend: typed client generated from the merged OpenAPI document, seven server actions, member pages (applications list, start, detail with details form, document panel that hashes files locally, submit and withdraw, history), reviewer pages (queue, detail with document decisions and transitions), the registration-window page, navigation by capability. Playwright: four journeys with axe on every page. ADR-0008; INCIDENT-002.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Full PHP suite | `docs/baseline/phpunit_after_m4_backend.txt` | 168 passed, 674 assertions |
+| HTTP tests for windows, applications, documents | `api/tests/Feature/Federation/Http` | 19 passed: idempotent submit with the same key and one audit row, 409 on a new key, scoped queues, actor rules, reasons, read-only fields, validation |
+| Browser journeys | `docs/baseline/playwright_m4.txt` | applicant start → documents → submit; reviewer queue → review → accept → approve; applicant sees decision and history; administrator opens a window; identity specs; no serious axe violations |
+| Screenshots | `docs/assets/` | captured from the running stack by `e2e/tests/screenshots.spec.ts` |
+
+**What went wrong, in order.**
+
+1. The package calls controller hooks positionally (`creating($request, $query)`); extra typed parameters received the query object. Dependencies are resolved inside the hooks instead.
+2. My test helper was named `jsonApi`, which collides with the JSON:API testing trait upstream's base test uses. Renamed.
+3. Six HTTP tests failed at once because Laravel's request guard caches its user for the application's lifetime, which in a feature test spans every request the test makes. The test helper now resets guards between requests; production is unaffected because one process serves one request.
+4. "Prohibited" validation rules failed on PATCH because the package merges the stored resource into the request before validating. The idiomatic answer is `readOnlyOnUpdate()` in the schema; the package then ignores those fields rather than rejecting the request, and the test asserts the field is unchanged.
+5. The OpenAPI generator treats every route whose *name* contains the server's name as a JSON:API action; the identity endpoint moved to `/api/v1/federation-identity/me` under the route name `identity.me`. It also builds examples by querying each schema, so scoped index queries return nothing for a console caller; the scope now applies only when a request exists.
+6. The generator does not describe custom actions; `federation:openapi` merges the six action paths from the document's own resource schema.
+7. Playwright's `selectOption` takes a string label, not a pattern; reference-data sorts were rejected with 400 because the schemas had not declared those fields sortable, and the page helper swallowed that into an empty list, which hid the window form; the applicant journey collided with its own previous run because an approved application is live, so the spec now signs in a fresh identity per run.
+
+**Decisions recorded.** ADR-0008 (documents as metadata, second JSON:API server, merged OpenAPI). Incident write-up: INCIDENT-002 (duplicate submission), designed and reproduced rather than suffered.

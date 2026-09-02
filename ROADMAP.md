@@ -6,12 +6,12 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` — M0, M1, M2 complete; M3 (OIDC identity boundary) complete in compose with browser tests, CI job unrun; first user-facing federation surface is the member sign-in and identity page |
+| Lifecycle | `DRAFT` — M0 to M4 complete in compose (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests); CI jobs written but unrun; README rewrite and publication (A5) pending |
 | Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, mock OIDC provider, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11; seed with `NorthgateDemoSeeder` |
 | Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
-| Original product claim | Domain layer only: hierarchy, application state machine and audit trail exist and are tested; no API or UI for them yet |
+| Original product claim | One complete registration-review workflow: windows, applications with details and document metadata, review with decisions and reasons, audit history, over an OIDC-authenticated JSON:API and accessible member and reviewer pages; verified by PHPUnit and Playwright in compose, not yet in CI |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
 Start with `docs/UPSTREAM_ANALYSIS.md`, then `docs/adr/`. The sibling Learning Center owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and consumes credentials over an HTTP contract only. The two never share a database.
@@ -68,7 +68,7 @@ Goal: separate "who are you" from "what may you do" before the federation workfl
 
 Acceptance: a member can sign in through OIDC in compose and in CI; token validation failures are tested; no upstream login path regressed.
 
-**Status 2026-09-02: done in compose; CI job written, not run.** `oidc` guard on `firebase/php-jwt` 7.1 with JWKS discovery, cache and rotation; subject-to-user resolution with verified-e-mail linking and optional provisioning; scopes from database roles; `GET /api/v1/federation/me`; next-auth providers for the mock issuer and Auth0 with the access token server-side only; `/member` pages; `mock-oauth2-server` in compose with personas. 20 PHPUnit tests, 3 Playwright tests with axe (`docs/baseline/playwright_m3.txt`), full suite 147/147. ADR-0007. INCIDENT-000 (development database wiped by the config-cache trap) fixed permanently in `phpunit.xml` with a regression test. Open: the Auth0 tenant walkthrough (owner creates the tenant), the first CI run, refresh-token handling.
+**Status 2026-09-02: done in compose; CI job written, not run.** `oidc` guard on `firebase/php-jwt` 7.1 with JWKS discovery, cache and rotation; subject-to-user resolution with verified-e-mail linking and optional provisioning; scopes from database roles; `GET /api/v1/federation-identity/me`; next-auth providers for the mock issuer and Auth0 with the access token server-side only; `/member` pages; `mock-oauth2-server` in compose with personas. 20 PHPUnit tests, 3 Playwright tests with axe (`docs/baseline/playwright_m3.txt`), full suite 147/147. ADR-0007. INCIDENT-000 (development database wiped by the config-cache trap) fixed permanently in `phpunit.xml` with a regression test. Open: the Auth0 tenant walkthrough (owner creates the tenant), the first CI run, refresh-token handling.
 
 ### A4 — One complete registration-review slice (M4 in the brief) — size L
 
@@ -91,6 +91,8 @@ organization admin opens a registration window
 5. Screenshots and a short GIF of the slice, generated from the running application and checked into `docs/assets/`.
 
 Acceptance: the slice runs from a cold clone by following the README; E2E and accessibility checks green in CI; `docs/incidents/INCIDENT-002.md` (duplicate submission) written from the actual regression test.
+
+**Status 2026-09-02: done in compose; CI unrun; README rewrite pending (A5).** Backend: registration windows, application details, document metadata with required types per role, second JSON:API server `federation` (seven schemas, six transition actions, stable error codes, request ids, HTTP idempotency), `php artisan federation:openapi`. Frontend: generated typed client, server actions, member pages (list, start, detail with local file hashing, submit and withdraw, history), reviewer pages (queue, detail with document decisions), window page, navigation by capability, en and de. Tests: 168 PHPUnit (19 HTTP tests for the slice), 7 Playwright journeys with axe (`docs/baseline/playwright_m4.txt`), screenshots in `docs/assets/`. ADR-0008, INCIDENT-002. Open: cold-clone verification through the README (A5), the first CI run, a GIF or short demo.
 
 ### A5 — Publication (M11 brought forward) — size M
 
