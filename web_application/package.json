@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "generate-schema": "npx openapi-typescript http://api/v1_openapi.json -o ./src/types/schema_v1.d.ts",
+        "generate-schema:federation": "npx openapi-typescript http://api/federation_openapi.json -o ./src/types/schema_federation.d.ts",
         "dev": "npm run generate-schema && next dev",
         "build": "next build",
         "start": "next start",

@@ -34,7 +34,7 @@ export async function fetchFederationIdentity(
     accessToken: string,
 ): Promise<FederationIdentity> {
     const response = await fetch(
-        `${process.env.API_DOMAIN}${process.env.API_PATH}/federation/me`,
+        `${process.env.API_DOMAIN}${process.env.API_PATH}/federation-identity/me`,
         {
             headers: {
                 Accept: 'application/json',
