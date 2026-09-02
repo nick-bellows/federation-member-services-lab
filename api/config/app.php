@@ -213,6 +213,11 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\StatementParserServiceProvider::class,
+
+        /*
+         * Federation module (fork): OIDC guard and federation routes.
+         */
+        App\Federation\FederationServiceProvider::class,
     ],
 
     /*
