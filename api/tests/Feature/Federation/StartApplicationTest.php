@@ -6,9 +6,10 @@ use App\Federation\Actions\StartApplication;
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
 use App\Federation\Exceptions\DuplicateApplicationException;
-use App\Federation\Exceptions\SeasonNotInFederationException;
-use App\Federation\Models\Federation;
+use App\Federation\Exceptions\RoleNotOfferedException;
+use App\Federation\Exceptions\WindowClosedException;
 use App\Federation\Models\RegistrationApplication;
+use App\Federation\Models\RegistrationWindow;
 use App\Federation\Models\Season;
 use Illuminate\Database\UniqueConstraintViolationException;
 
@@ -70,19 +71,39 @@ class StartApplicationTest extends FederationTestCase
         $this->expectException(UniqueConstraintViolationException::class);
 
         RegistrationApplication::factory()->create([
-            'member_organization_id' => $first->member_organization_id,
-            'season_id' => $first->season_id,
+            'registration_window_id' => $first->registration_window_id,
             'applicant_user_id' => $first->applicant_user_id,
             'role' => $first->role,
         ]);
     }
 
-    public function test_the_season_must_belong_to_the_organizations_federation(): void
+    public function test_a_closed_window_refuses_new_applications(): void
     {
-        $foreignSeason = Season::factory()->create(['federation_id' => Federation::factory()->create()->getKey()]);
+        $closed = RegistrationWindow::factory()->closed()->create([
+            'member_organization_id' => $this->otherOrganization->getKey(),
+            'season_id' => Season::factory()->create(['federation_id' => $this->federation->getKey()])->getKey(),
+        ]);
 
-        $this->expectException(SeasonNotInFederationException::class);
+        $this->expectException(WindowClosedException::class);
 
-        app(StartApplication::class)->execute($this->applicant, $this->organization, $foreignSeason, ApplicationRole::PARTICIPANT);
+        app(StartApplication::class)->execute($this->applicant, $closed, ApplicationRole::PARTICIPANT);
+    }
+
+    public function test_a_window_only_accepts_the_roles_it_offers(): void
+    {
+        $this->otherWindow->forceFill(['roles' => [ApplicationRole::REFEREE->value]])->save();
+
+        $this->expectException(RoleNotOfferedException::class);
+
+        app(StartApplication::class)->execute($this->applicant, $this->otherWindow, ApplicationRole::COACH);
+    }
+
+    public function test_the_application_inherits_organization_and_season_from_the_window(): void
+    {
+        $application = $this->startApplication(complete: false);
+
+        $this->assertTrue($application->registrationWindow->is($this->window));
+        $this->assertSame($this->organization->getKey(), $application->member_organization_id);
+        $this->assertSame($this->season->getKey(), $application->season_id);
     }
 }

@@ -10,7 +10,7 @@ use App\Models\User;
 
 class OidcGuardTest extends OidcTestCase
 {
-    private const ME = '/api/v1/federation/me';
+    private const ME = '/api/v1/federation-identity/me';
 
     public function test_a_request_without_a_token_is_unauthenticated(): void
     {
