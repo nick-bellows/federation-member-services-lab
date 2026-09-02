@@ -1,0 +1,4152 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "Northgate federation member services JSON:API",
+        "description": "Registration windows, applications, documents and review, authenticated with OpenID Connect bearer tokens. Custom actions on registration applications are added by federation:openapi; the package generator does not describe them.",
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+            "url": "{serverUrl}",
+            "variables": {
+                "serverUrl": {
+                    "default": "http://localhost:3001/api/v1/federation"
+                }
+            }
+        }
+    ],
+    "paths": {
+        "/federations": {
+            "get": {
+                "tags": [
+                    "Federations"
+                ],
+                "summary": "Get all federations",
+                "description": "",
+                "operationId": "federations.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "1": {
+                                "value": [
+                                    "1"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index federations",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.federations.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            }
+        },
+        "/federations/{federation}": {
+            "get": {
+                "tags": [
+                    "Federations"
+                ],
+                "summary": "Show one federation",
+                "description": "",
+                "operationId": "federations.show",
+                "parameters": [
+                    {
+                        "name": "federation",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show federations",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.federations.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/seasons": {
+            "get": {
+                "tags": [
+                    "Seasons"
+                ],
+                "summary": "Get all seasons",
+                "description": "",
+                "operationId": "seasons.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "1": {
+                                "value": [
+                                    "1"
+                                ]
+                            },
+                            "2": {
+                                "value": [
+                                    "2"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index seasons",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.seasons.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            }
+        },
+        "/seasons/{season}": {
+            "get": {
+                "tags": [
+                    "Seasons"
+                ],
+                "summary": "Show one season",
+                "description": "",
+                "operationId": "seasons.show",
+                "parameters": [
+                    {
+                        "name": "season",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show seasons",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.seasons.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/member-organizations": {
+            "get": {
+                "tags": [
+                    "Member-organizations"
+                ],
+                "summary": "Get all member-organizations",
+                "description": "",
+                "operationId": "member-organizations.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "1": {
+                                "value": [
+                                    "1"
+                                ]
+                            },
+                            "2": {
+                                "value": [
+                                    "2"
+                                ]
+                            },
+                            "3": {
+                                "value": [
+                                    "3"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[code]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "NYSA": {
+                                "value": "NYSA"
+                            },
+                            "NASL": {
+                                "value": "NASL"
+                            },
+                            "NRA": {
+                                "value": "NRA"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index member-organizations",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.member-organizations.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            }
+        },
+        "/member-organizations/{member_organization}": {
+            "get": {
+                "tags": [
+                    "Member-organizations"
+                ],
+                "summary": "Show one member-organization",
+                "description": "",
+                "operationId": "member-organizations.show",
+                "parameters": [
+                    {
+                        "name": "member_organization",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            },
+                            "3": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show member-organizations",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.member-organizations.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/registration-windows": {
+            "get": {
+                "tags": [
+                    "Registration-windows"
+                ],
+                "summary": "Get all registration-windows",
+                "description": "",
+                "operationId": "registration-windows.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id",
+                                    "opensAt",
+                                    "-opensAt",
+                                    "closesAt",
+                                    "-closesAt"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "1": {
+                                "value": [
+                                    "1"
+                                ]
+                            },
+                            "2": {
+                                "value": [
+                                    "2"
+                                ]
+                            },
+                            "3": {
+                                "value": [
+                                    "3"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[memberOrganization]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": 1
+                            },
+                            "2": {
+                                "value": 2
+                            },
+                            "3": {
+                                "value": 3
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[season]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "2": {
+                                "value": 2
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[open]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index registration-windows",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.registration-windows.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Registration-windows"
+                ],
+                "summary": "Store one registration-window",
+                "description": "",
+                "operationId": "registration-windows.store",
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.registration-windows.resource.store"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Store registration-windows",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-windows.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/registration-windows/{registration_window}": {
+            "get": {
+                "tags": [
+                    "Registration-windows"
+                ],
+                "summary": "Show one registration-window",
+                "description": "",
+                "operationId": "registration-windows.show",
+                "parameters": [
+                    {
+                        "name": "registration_window",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            },
+                            "3": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show registration-windows",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-windows.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Registration-windows"
+                ],
+                "summary": "Update one registration-window",
+                "description": "",
+                "operationId": "registration-windows.update",
+                "parameters": [
+                    {
+                        "name": "registration_window",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            },
+                            "3": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.registration-windows.resource.update"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update registration-windows",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-windows.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/registration-applications": {
+            "get": {
+                "tags": [
+                    "Registration-applications"
+                ],
+                "summary": "Get all registration-applications",
+                "description": "",
+                "operationId": "registration-applications.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id",
+                                    "submittedAt",
+                                    "-submittedAt",
+                                    "createdAt",
+                                    "-createdAt"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "3": {
+                                "value": [
+                                    "3"
+                                ]
+                            },
+                            "4": {
+                                "value": [
+                                    "4"
+                                ]
+                            },
+                            "5": {
+                                "value": [
+                                    "5"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "A list of statuss to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": {
+                                "value": []
+                            },
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "approved": {
+                                "value": "approved"
+                            },
+                            "rejected": {
+                                "value": "rejected"
+                            },
+                            "draft": {
+                                "value": "draft"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[memberOrganization]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": 3
+                            },
+                            "1": {
+                                "value": 1
+                            },
+                            "2": {
+                                "value": 2
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[season]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "2": {
+                                "value": 2
+                            },
+                            "1": {
+                                "value": 1
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Registration-applications"
+                ],
+                "summary": "Store one registration-application",
+                "description": "",
+                "operationId": "registration-applications.store",
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.registration-applications.resource.store"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Store registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}": {
+            "get": {
+                "tags": [
+                    "Registration-applications"
+                ],
+                "summary": "Show one registration-application",
+                "description": "",
+                "operationId": "registration-applications.show",
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Registration-applications"
+                ],
+                "summary": "Update one registration-application",
+                "description": "",
+                "operationId": "registration-applications.update",
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.registration-applications.resource.update"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/application-documents": {
+            "get": {
+                "tags": [
+                    "Application-documents"
+                ],
+                "summary": "Get all application-documents",
+                "description": "",
+                "operationId": "application-documents.index",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "id",
+                                    "-id"
+                                ],
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[id]",
+                        "in": "query",
+                        "description": "A list of ids to filter by.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "default": [],
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": []
+                            },
+                            "1": {
+                                "value": [
+                                    "1"
+                                ]
+                            },
+                            "2": {
+                                "value": [
+                                    "2"
+                                ]
+                            },
+                            "3": {
+                                "value": [
+                                    "3"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "filter[application]",
+                        "in": "query",
+                        "description": "Filters the records",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": 1
+                            },
+                            "2": {
+                                "value": 2
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Index application-documents",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/resources.application-documents.resource.fetch"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Application-documents"
+                ],
+                "summary": "Store one application-document",
+                "description": "",
+                "operationId": "application-documents.store",
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.application-documents.resource.store"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Store application-documents",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.application-documents.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/application-documents/{application_document}": {
+            "get": {
+                "tags": [
+                    "Application-documents"
+                ],
+                "summary": "Show one application-document",
+                "description": "",
+                "operationId": "application-documents.show",
+                "parameters": [
+                    {
+                        "name": "application_document",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            },
+                            "3": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show application-documents",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.application-documents.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Application-documents"
+                ],
+                "summary": "Update one application-document",
+                "description": "",
+                "operationId": "application-documents.update",
+                "parameters": [
+                    {
+                        "name": "application_document",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "1": {
+                                "value": "1"
+                            },
+                            "2": {
+                                "value": "2"
+                            },
+                            "3": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/resources.application-documents.resource.update"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update application-documents",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.application-documents.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/submit": {
+            "post": {
+                "summary": "Submit a draft or resubmit after an information request (applicant).",
+                "operationId": "registration-applications.Submit",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/cancel": {
+            "post": {
+                "summary": "Cancel an open application (applicant).",
+                "operationId": "registration-applications.Cancel",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/start-review": {
+            "post": {
+                "summary": "Take a submitted application under review (reviewer).",
+                "operationId": "registration-applications.StartReview",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/request-information": {
+            "post": {
+                "summary": "Send the application back to the applicant with a reason (reviewer).",
+                "operationId": "registration-applications.RequestInformation",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/approve": {
+            "post": {
+                "summary": "Approve an application under review (reviewer).",
+                "operationId": "registration-applications.Approve",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/reject": {
+            "post": {
+                "summary": "Reject an application under review with a reason (reviewer).",
+                "operationId": "registration-applications.Reject",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "helper.errors": {
+                "title": "Helper/Errors",
+                "type": "array",
+                "items": {
+                    "title": "Error",
+                    "type": "object",
+                    "required": [
+                        "status",
+                        "title"
+                    ],
+                    "properties": {
+                        "detail": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "title": {
+                            "type": "string"
+                        },
+                        "source": {
+                            "type": "object",
+                            "properties": {
+                                "pointer": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "helper.jsonapi": {
+                "title": "Helper/JSONAPI",
+                "type": "object",
+                "required": [
+                    "version"
+                ],
+                "properties": {
+                    "version": {
+                        "title": "version",
+                        "type": "string",
+                        "example": "1.0"
+                    }
+                }
+            },
+            "resources.application-documents.resource.fetch": {
+                "title": "Resource/Application-document/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "application-documents",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "documentType": {
+                                "title": "documentType",
+                                "type": "string",
+                                "example": "proof_of_age"
+                            },
+                            "fileName": {
+                                "title": "fileName",
+                                "type": "string",
+                                "example": "proof-of-age.pdf"
+                            },
+                            "mimeType": {
+                                "title": "mimeType",
+                                "type": "string",
+                                "example": "application/pdf"
+                            },
+                            "sizeBytes": {
+                                "title": "sizeBytes",
+                                "type": "number",
+                                "example": 120000
+                            },
+                            "checksumSha256": {
+                                "title": "checksumSha256",
+                                "type": "string",
+                                "example": "1e7bfd03f48c994eeb2a84442dffa7306effcbd0844768ff492f11285f8715c8"
+                            },
+                            "reviewStatus": {
+                                "title": "reviewStatus",
+                                "type": "string",
+                                "example": "pending"
+                            },
+                            "reviewNote": {
+                                "title": "reviewNote",
+                                "type": "string"
+                            },
+                            "reviewedAt": {
+                                "title": "reviewedAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "application": {
+                                "title": "application",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "reviewedBy": {
+                                "title": "reviewedBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.application-documents.resource.store": {
+                "title": "Resource/Application-document/Store",
+                "type": "object",
+                "required": [
+                    "type",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "application-documents",
+                        "type": "string"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "documentType": {
+                                "title": "documentType",
+                                "type": "string",
+                                "example": "proof_of_age"
+                            },
+                            "fileName": {
+                                "title": "fileName",
+                                "type": "string",
+                                "example": "proof-of-age.pdf"
+                            },
+                            "mimeType": {
+                                "title": "mimeType",
+                                "type": "string",
+                                "example": "application/pdf"
+                            },
+                            "sizeBytes": {
+                                "title": "sizeBytes",
+                                "type": "number",
+                                "example": 120000
+                            },
+                            "checksumSha256": {
+                                "title": "checksumSha256",
+                                "type": "string",
+                                "example": "1e7bfd03f48c994eeb2a84442dffa7306effcbd0844768ff492f11285f8715c8"
+                            },
+                            "reviewStatus": {
+                                "title": "reviewStatus",
+                                "type": "string",
+                                "example": "pending"
+                            },
+                            "reviewNote": {
+                                "title": "reviewNote",
+                                "type": "string"
+                            },
+                            "reviewedAt": {
+                                "title": "reviewedAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "application": {
+                                "title": "application",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "reviewedBy": {
+                                "title": "reviewedBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.application-documents.resource.update": {
+                "title": "Resource/Application-document/Update",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "application-documents",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "documentType": {
+                                "title": "documentType",
+                                "type": "string",
+                                "example": "proof_of_age"
+                            },
+                            "fileName": {
+                                "title": "fileName",
+                                "type": "string",
+                                "example": "proof-of-age.pdf"
+                            },
+                            "mimeType": {
+                                "title": "mimeType",
+                                "type": "string",
+                                "example": "application/pdf"
+                            },
+                            "sizeBytes": {
+                                "title": "sizeBytes",
+                                "type": "number",
+                                "example": 120000
+                            },
+                            "checksumSha256": {
+                                "title": "checksumSha256",
+                                "type": "string",
+                                "example": "1e7bfd03f48c994eeb2a84442dffa7306effcbd0844768ff492f11285f8715c8"
+                            },
+                            "reviewStatus": {
+                                "title": "reviewStatus",
+                                "type": "string",
+                                "example": "pending"
+                            },
+                            "reviewNote": {
+                                "title": "reviewNote",
+                                "type": "string"
+                            },
+                            "reviewedAt": {
+                                "title": "reviewedAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:16.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "application": {
+                                "title": "application",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applications/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "reviewedBy": {
+                                "title": "reviewedBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/reviewed-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.federations.resource.fetch": {
+                "title": "Resource/Federation/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "federations",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "name",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "Northgate Soccer Federation"
+                            },
+                            "code": {
+                                "title": "code",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "NSF"
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:14.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "seasons": {
+                                "title": "seasons",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "memberOrganizations": {
+                                "title": "memberOrganizations",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.member-organizations.resource.fetch": {
+                "title": "Resource/Member-organization/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "member-organizations",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "name",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "Northgate Youth Soccer Association"
+                            },
+                            "code": {
+                                "title": "code",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "NYSA"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "federation": {
+                                "title": "federation",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/federations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/federations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "registrationWindows": {
+                                "title": "registrationWindows",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-applications.resource.fetch": {
+                "title": "Resource/Registration-application/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-applications",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "3"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "role": {
+                                "title": "role",
+                                "type": "string",
+                                "example": "referee"
+                            },
+                            "status": {
+                                "title": "status",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "approved"
+                            },
+                            "statusReason": {
+                                "title": "statusReason",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "dateOfBirth": {
+                                "title": "dateOfBirth",
+                                "type": "string",
+                                "example": "1990-06-21T00:00:00.000000Z"
+                            },
+                            "phone": {
+                                "title": "phone",
+                                "type": "string"
+                            },
+                            "applicantNotes": {
+                                "title": "applicantNotes",
+                                "type": "string"
+                            },
+                            "missingRequiredDocuments": {
+                                "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "submittedAt": {
+                                "title": "submittedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "decidedAt": {
+                                "title": "decidedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "cancelledAt": {
+                                "title": "cancelledAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "registrationWindow": {
+                                "title": "registrationWindow",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "applicant": {
+                                "title": "applicant",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "documents": {
+                                "title": "documents",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-applications.resource.store": {
+                "title": "Resource/Registration-application/Store",
+                "type": "object",
+                "required": [
+                    "type",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-applications",
+                        "type": "string"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "role": {
+                                "title": "role",
+                                "type": "string",
+                                "example": "referee"
+                            },
+                            "status": {
+                                "title": "status",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "approved"
+                            },
+                            "statusReason": {
+                                "title": "statusReason",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "dateOfBirth": {
+                                "title": "dateOfBirth",
+                                "type": "string",
+                                "example": "1990-06-21T00:00:00.000000Z"
+                            },
+                            "phone": {
+                                "title": "phone",
+                                "type": "string"
+                            },
+                            "applicantNotes": {
+                                "title": "applicantNotes",
+                                "type": "string"
+                            },
+                            "missingRequiredDocuments": {
+                                "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "submittedAt": {
+                                "title": "submittedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "decidedAt": {
+                                "title": "decidedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "cancelledAt": {
+                                "title": "cancelledAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "registrationWindow": {
+                                "title": "registrationWindow",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "applicant": {
+                                "title": "applicant",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "documents": {
+                                "title": "documents",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-applications.resource.update": {
+                "title": "Resource/Registration-application/Update",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-applications",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "3"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "role": {
+                                "title": "role",
+                                "type": "string",
+                                "example": "referee"
+                            },
+                            "status": {
+                                "title": "status",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "approved"
+                            },
+                            "statusReason": {
+                                "title": "statusReason",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "dateOfBirth": {
+                                "title": "dateOfBirth",
+                                "type": "string",
+                                "example": "1990-06-21T00:00:00.000000Z"
+                            },
+                            "phone": {
+                                "title": "phone",
+                                "type": "string"
+                            },
+                            "applicantNotes": {
+                                "title": "applicantNotes",
+                                "type": "string"
+                            },
+                            "missingRequiredDocuments": {
+                                "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "submittedAt": {
+                                "title": "submittedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "decidedAt": {
+                                "title": "decidedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "cancelledAt": {
+                                "title": "cancelledAt",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:17.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "registrationWindow": {
+                                "title": "registrationWindow",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "applicant": {
+                                "title": "applicant",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "documents": {
+                                "title": "documents",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-windows.resource.fetch": {
+                "title": "Resource/Registration-window/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-windows",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "opensAt": {
+                                "title": "opensAt",
+                                "type": "string",
+                                "example": "2026-08-19T18:55:15.000000Z"
+                            },
+                            "closesAt": {
+                                "title": "closesAt",
+                                "type": "string",
+                                "example": "2026-11-02T18:55:15.000000Z"
+                            },
+                            "roles": {
+                                "title": "roles",
+                                "type": "array",
+                                "example": [
+                                    "participant",
+                                    "coach",
+                                    "referee"
+                                ]
+                            },
+                            "isOpen": {
+                                "title": "isOpen",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "createdBy": {
+                                "title": "createdBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-windows.resource.store": {
+                "title": "Resource/Registration-window/Store",
+                "type": "object",
+                "required": [
+                    "type",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-windows",
+                        "type": "string"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "opensAt": {
+                                "title": "opensAt",
+                                "type": "string",
+                                "example": "2026-08-19T18:55:15.000000Z"
+                            },
+                            "closesAt": {
+                                "title": "closesAt",
+                                "type": "string",
+                                "example": "2026-11-02T18:55:15.000000Z"
+                            },
+                            "roles": {
+                                "title": "roles",
+                                "type": "array",
+                                "example": [
+                                    "participant",
+                                    "coach",
+                                    "referee"
+                                ]
+                            },
+                            "isOpen": {
+                                "title": "isOpen",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "createdBy": {
+                                "title": "createdBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.registration-windows.resource.update": {
+                "title": "Resource/Registration-window/Update",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "registration-windows",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "opensAt": {
+                                "title": "opensAt",
+                                "type": "string",
+                                "example": "2026-08-19T18:55:15.000000Z"
+                            },
+                            "closesAt": {
+                                "title": "closesAt",
+                                "type": "string",
+                                "example": "2026-11-02T18:55:15.000000Z"
+                            },
+                            "roles": {
+                                "title": "roles",
+                                "type": "array",
+                                "example": [
+                                    "participant",
+                                    "coach",
+                                    "referee"
+                                ]
+                            },
+                            "isOpen": {
+                                "title": "isOpen",
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "createdAt": {
+                                "title": "createdAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            },
+                            "updatedAt": {
+                                "title": "updatedAt",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-09-02T18:55:15.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "memberOrganization": {
+                                "title": "memberOrganization",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "season": {
+                                "title": "season",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "createdBy": {
+                                "title": "createdBy",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/created-bies/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "resources.seasons.resource.fetch": {
+                "title": "Resource/Season/Fetch",
+                "type": "object",
+                "required": [
+                    "type",
+                    "id",
+                    "attributes"
+                ],
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "default": "seasons",
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "label": {
+                                "title": "label",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2025/26"
+                            },
+                            "startsOn": {
+                                "title": "startsOn",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2025-09-01T00:00:00.000000Z"
+                            },
+                            "endsOn": {
+                                "title": "endsOn",
+                                "type": "string",
+                                "readOnly": true,
+                                "example": "2026-08-31T00:00:00.000000Z"
+                            }
+                        }
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "properties": {
+                            "federation": {
+                                "title": "federation",
+                                "type": "object",
+                                "properties": {
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "related": {
+                                                "title": "related",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/federations/1"
+                                            },
+                                            "self": {
+                                                "title": "self",
+                                                "type": "string",
+                                                "example": "http://localhost:3001/api/v1/federation/federations/1"
+                                            }
+                                        },
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "responses": {
+            "400": {
+                "description": "Bad request",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "helper.jsonapi": {
+                                    "$ref": "#/components/schemas/helper.jsonapi"
+                                },
+                                "helper.errors": {
+                                    "$ref": "#/components/schemas/helper.errors"
+                                }
+                            }
+                        },
+                        "examples": {
+                            "-": {
+                                "value": {
+                                    "jsonapi": {
+                                        "version": "1.0"
+                                    },
+                                    "errors": [
+                                        {
+                                            "detail": "The member id is required.",
+                                            "source": {
+                                                "pointer": "/data"
+                                            },
+                                            "status": "400",
+                                            "title": "Non-Compliant JSON:API Document"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "401": {
+                "description": "Unauthorized Action",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "helper.jsonapi": {
+                                    "$ref": "#/components/schemas/helper.jsonapi"
+                                },
+                                "helper.errors": {
+                                    "$ref": "#/components/schemas/helper.errors"
+                                }
+                            }
+                        },
+                        "examples": {
+                            "-": {
+                                "value": {
+                                    "jsonapi": {
+                                        "version": "1.0"
+                                    },
+                                    "errors": [
+                                        {
+                                            "title": "Unauthorized.",
+                                            "status": "401",
+                                            "detail": "Unauthenticated."
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "Content Not Found",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "helper.jsonapi": {
+                                    "$ref": "#/components/schemas/helper.jsonapi"
+                                },
+                                "helper.errors": {
+                                    "$ref": "#/components/schemas/helper.errors"
+                                }
+                            }
+                        },
+                        "examples": {
+                            "-": {
+                                "value": {
+                                    "jsonapi": {
+                                        "version": "1.0"
+                                    },
+                                    "errors": [
+                                        {
+                                            "title": "Not Found",
+                                            "status": "404"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "422": {
+                "description": "Unprocessable Entity",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "helper.jsonapi": {
+                                    "$ref": "#/components/schemas/helper.jsonapi"
+                                },
+                                "helper.errors": {
+                                    "$ref": "#/components/schemas/helper.errors"
+                                }
+                            }
+                        },
+                        "examples": {
+                            "-": {
+                                "value": {
+                                    "jsonapi": {
+                                        "version": "1.0"
+                                    },
+                                    "errors": [
+                                        {
+                                            "detail": "Lorem Ipsum",
+                                            "source": {
+                                                "pointer": "/data/attributes/lorem"
+                                            },
+                                            "title": "Unprocessable Entity",
+                                            "status": "422"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

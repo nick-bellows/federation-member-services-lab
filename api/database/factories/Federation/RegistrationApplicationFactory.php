@@ -3,9 +3,8 @@
 namespace Database\Factories\Federation;
 
 use App\Federation\Enums\ApplicationRole;
-use App\Federation\Models\MemberOrganization;
 use App\Federation\Models\RegistrationApplication;
-use App\Federation\Models\Season;
+use App\Federation\Models\RegistrationWindow;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,14 +24,14 @@ class RegistrationApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'member_organization_id' => MemberOrganization::factory(),
-            'season_id' => function (array $attributes) {
-                $organization = MemberOrganization::query()->findOrFail($attributes['member_organization_id']);
-
-                return Season::factory()->create(['federation_id' => $organization->federation_id])->getKey();
-            },
+            'registration_window_id' => RegistrationWindow::factory(),
+            'member_organization_id' => fn (array $attributes) => RegistrationWindow::query()
+                ->findOrFail($attributes['registration_window_id'])->member_organization_id,
+            'season_id' => fn (array $attributes) => RegistrationWindow::query()
+                ->findOrFail($attributes['registration_window_id'])->season_id,
             'applicant_user_id' => User::factory(),
             'role' => $this->faker->randomElement(ApplicationRole::cases()),
+            'date_of_birth' => $this->faker->dateTimeBetween('-50 years', '-6 years')->format('Y-m-d'),
         ];
     }
 }

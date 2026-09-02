@@ -28,5 +28,7 @@ return [
     */
     'servers' => [
         'v1' => \App\JsonApi\V1\Server::class,
+        // Federation (fork): OIDC-authenticated resources under /api/v1/federation.
+        'federation' => \App\Federation\JsonApi\Server::class,
     ],
 ];

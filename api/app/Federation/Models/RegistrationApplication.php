@@ -4,11 +4,13 @@ namespace App\Federation\Models;
 
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
+use App\Federation\Enums\DocumentType;
 use App\Models\User;
 use Database\Factories\Federation\RegistrationApplicationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LogicException;
 
@@ -25,8 +27,12 @@ class RegistrationApplication extends Model
     protected $fillable = [
         'member_organization_id',
         'season_id',
+        'registration_window_id',
         'applicant_user_id',
         'role',
+        'date_of_birth',
+        'phone',
+        'applicant_notes',
         'idempotency_key',
     ];
 
@@ -40,6 +46,7 @@ class RegistrationApplication extends Model
         return [
             'role' => ApplicationRole::class,
             'status' => ApplicationStatus::class,
+            'date_of_birth' => 'date',
             'submitted_at' => 'datetime',
             'decided_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -99,9 +106,42 @@ class RegistrationApplication extends Model
         ]);
     }
 
+    /**
+     * Whether the applicant may still change details and documents.
+     */
+    public function isEditableByApplicant(): bool
+    {
+        return in_array($this->status, [ApplicationStatus::DRAFT, ApplicationStatus::NEEDS_INFORMATION], true);
+    }
+
+    /**
+     * Required document types that have no metadata attached yet.
+     *
+     * @return array<int, DocumentType>
+     */
+    public function missingRequiredDocuments(): array
+    {
+        $present = $this->documents()->pluck('document_type')->map(fn ($type) => $type instanceof DocumentType ? $type->value : $type)->all();
+
+        return array_values(array_filter(
+            DocumentType::requiredFor($this->role),
+            fn (DocumentType $type) => ! in_array($type->value, $present, true),
+        ));
+    }
+
     public function memberOrganization(): BelongsTo
     {
         return $this->belongsTo(MemberOrganization::class);
+    }
+
+    public function registrationWindow(): BelongsTo
+    {
+        return $this->belongsTo(RegistrationWindow::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ApplicationDocument::class)->orderBy('document_type');
     }
 
     public function season(): BelongsTo

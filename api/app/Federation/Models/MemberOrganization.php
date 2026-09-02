@@ -45,6 +45,11 @@ class MemberOrganization extends Model
         return $this->hasMany(RegistrationApplication::class);
     }
 
+    public function registrationWindows(): HasMany
+    {
+        return $this->hasMany(RegistrationWindow::class);
+    }
+
     protected static function newFactory(): MemberOrganizationFactory
     {
         return MemberOrganizationFactory::new();

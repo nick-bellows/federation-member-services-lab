@@ -6,9 +6,21 @@ use App\Federation\Auth\OidcException;
 use App\Federation\Auth\OidcIdentity;
 use App\Federation\Auth\OidcTokenVerifier;
 use App\Federation\Auth\OidcUserResolver;
+use App\Federation\Console\GenerateFederationOpenApi;
+use App\Federation\Models\ApplicationDocument;
+use App\Federation\Models\Federation;
+use App\Federation\Models\MemberOrganization;
+use App\Federation\Models\RegistrationApplication;
+use App\Federation\Models\RegistrationWindow;
+use App\Federation\Models\Season;
+use App\Federation\Policies\ApplicationDocumentPolicy;
+use App\Federation\Policies\ReadOnlyPolicy;
+use App\Federation\Policies\RegistrationApplicationPolicy;
+use App\Federation\Policies\RegistrationWindowPolicy;
 use App\Federation\Support\AuditRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +33,10 @@ class FederationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([GenerateFederationOpenApi::class]);
+        }
+
         $this->app->singleton(OidcTokenVerifier::class, function ($app) {
             return new OidcTokenVerifier($app['cache.store'], $app['config']->get('oidc', []));
         });
@@ -58,6 +74,13 @@ class FederationServiceProvider extends ServiceProvider
 
             return $user;
         });
+
+        Gate::policy(Federation::class, ReadOnlyPolicy::class);
+        Gate::policy(Season::class, ReadOnlyPolicy::class);
+        Gate::policy(MemberOrganization::class, ReadOnlyPolicy::class);
+        Gate::policy(RegistrationWindow::class, RegistrationWindowPolicy::class);
+        Gate::policy(RegistrationApplication::class, RegistrationApplicationPolicy::class);
+        Gate::policy(ApplicationDocument::class, ApplicationDocumentPolicy::class);
 
         Route::middleware('api')
             ->prefix('api')
