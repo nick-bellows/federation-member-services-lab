@@ -14,3 +14,7 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Seeder idempotency** — `NorthgateDemoSeeder` guards on the federation's existence only; a partial run has to be cleaned by hand. Make each entity `firstOrCreate` or wrap the seed in a transaction if it is reused beyond demos.
 - **Database `CHECK` constraint on application status** — MariaDB and PostgreSQL syntax differ and Laravel's builder has no portable `check()`; decide per engine in the PostgreSQL milestone.
 - **Audit retention** — `audit_entries` grows without bound; define retention before any production-like deployment.
+- **Upstream dependency advisories** — `composer audit` reports 13 advisories across `filament/filament`, `league/commonmark` and `livewire/livewire` in upstream's lock file (`docs/baseline/composer_audit.txt`). A bounded dependency update with the test suite as the gate; candidate upstream contribution.
+- **API entrypoint caching in development** — the container caches config, routes and events on every start; consider caching only when `APP_ENV=production` (INCIDENT-000 follow-up).
+- **OIDC session lifetime** — no refresh-token handling yet; the member page sends visitors back to sign-in when the access token has expired.
+- **Auth0 walkthrough** — needs the owner's tenant; document callback URLs, audience and screenshots once created.

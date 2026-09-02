@@ -240,3 +240,6 @@ Seeded data: 6 clubs (the demo club "TSV Muster", id 1, plus 5 fake), 19 users, 
 - `php artisan test --no-interaction` is rejected by PHPUnit 12; use `php artisan test`.
 - Sanctum plain-text tokens contain `|`; writing one into `.env.local` with `sed 's|…|…|'` fails. A small PHP one-liner wrote it instead.
 - `curl` treats `filter[slug]` as a glob pattern and exits with code 3; pass `-g`.
+- `next dev` inside the `tooling` container does not see file changes on a Windows bind mount (no inotify events): new routes and edits appear only after a restart. Start it with `WATCHPACK_POLLING=true npx next dev` (added in M3).
+- Running `php artisan test` while the `api` container restarts wiped the development database once (M3, `docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md`). `phpunit.xml` now isolates the test process from the container's caches; the "run `config:clear` before tests" rule above is no longer needed.
+- The federation's OIDC issuer is addressed as `http://host.docker.internal:3004/default`, a name both the browser and the containers resolve on Docker Desktop; the compose file adds `extra_hosts` for Linux hosts (M3).

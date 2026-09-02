@@ -86,3 +86,30 @@ _Pending; recorded in the internal review file._
 4. The seeder's guard is coarse (it checks the federation exists), so a partial first run had to be cleaned by hand before the second. Noted in `docs/future-work.md`.
 
 **Evidence.** `docs/baseline/northgate_seed_run.txt` (migration and seed timings on MariaDB), `docs/baseline/northgate_seed_rows.txt` (the seeded applications and the 15-row audit trail).
+
+## 2026-09-02 — Milestone 3: the identity boundary
+
+**Goal.** Sign in with OpenID Connect, validate access tokens in Laravel, keep authorization in the database, touch none of upstream's login paths.
+
+**Built.** Backend: `config/oidc.php`, the `oidc` request guard in `App\Federation\FederationServiceProvider`, `OidcTokenVerifier` (JWKS discovery, cache, one refresh on an unknown key id, issuer, audience, subject), `OidcUserResolver` (known subject, link by verified e-mail, provision), `FederationScopes`, `GET /api/v1/federation/me`, `users.oidc_issuer`/`oidc_subject`. Frontend: next-auth providers `northgate-id` and `auth0`, the access token kept server-side in the encrypted cookie, `/member/sign-in` and `/member` pages, middleware protection, en/de translations. Stack: `oidc` service (`mock-oauth2-server`) with personas in `docker/oidc/config.json`. Tests: 20 PHPUnit tests for the verifier and guard with an in-test RSA issuer, 3 Playwright tests including axe scans. ADR-0007.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Full PHP suite with the API's config cache deliberately present | `docs/baseline/phpunit_after_m3.txt` | 147 passed, 538 assertions; development database rows unchanged afterwards |
+| Browser flow: redirect, mock sign-in, member page, sign-out, anonymous API 401 | `docs/baseline/playwright_m3.txt` | 3 passed, no serious or critical axe violations |
+| Persona token straight at the API | Laravel log, audit entry 16 `user.identity_linked` | 200; Alex's identity linked to the seeded user |
+| Dependency advisories in upstream's lock file | `docs/baseline/composer_audit.txt` | 13 across filament, league/commonmark, livewire; not touched in this milestone |
+
+**What went wrong, in order.**
+
+1. Composer refused `firebase/php-jwt` 6.x because of a published advisory. Installed 7.1.0 instead of ignoring the advisory.
+2. The key-rotation test kept failing: Laravel's `Http::fake` answers with the *first* matching stub, so re-registering the issuer never served the new keys. The stub now reads the key set from a property at request time.
+3. **INCIDENT-000.** Restarting the API container while the suite ran in the background wrote a config cache onto the shared bind mount; the next test booted with `DB_CONNECTION=mysql` and its `migrate:fresh` dropped the development database. Rebuilt from seed. Permanent fix: `phpunit.xml` relocates every Laravel cache path for tests, with a regression test. The first attempt used paths relative to the wrong base directory and made every test fail at boot, which is how the mechanism was proven to work before the paths were corrected. Full write-up in `docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md`.
+4. next-auth rejected the mock provider's ID token: the catch-all mapping had stamped the API audience onto it, and an ID token's audience must be the client. Tokens now carry both audiences with `azp`, which both next-auth and Laravel accept.
+5. `next dev` inside the container never saw file changes: Windows bind mounts do not deliver file events, so routes and class changes appeared only after restarts. Started with `WATCHPACK_POLLING=true`; recorded as a deviation.
+6. The member page bounced back to sign-in after a successful callback: `getToken()` did not find the session cookie in the request shape it was given. It now receives both a cookies object and the header.
+7. The axe scan failed the first page on contrast: upstream's Tailwind theme redefines `slate-600` as `#8c9da6`, 2.8:1 on white. Switched to `slate-700`. A default-palette assumption would have shipped.
+
+**Not done in this milestone.** The Auth0 tenant walkthrough (owner action); the CI end-to-end job has been written but not run; refresh tokens and session expiry.

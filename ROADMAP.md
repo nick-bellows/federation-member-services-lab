@@ -6,10 +6,10 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` — M0 (archaeology) and M1 (baseline fix, line endings, draft CI) complete except the first CI run; M2 (federation domain, application state machine, audit trail) complete with 30 tests; no user-facing federation feature yet |
+| Lifecycle | `DRAFT` — M0, M1, M2 complete; M3 (OIDC identity boundary) complete in compose with browser tests, CI job unrun; first user-facing federation surface is the member sign-in and identity page |
 | Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
-| Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11 |
+| Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, mock OIDC provider, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11; seed with `NorthgateDemoSeeder` |
 | Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
 | Original product claim | Domain layer only: hierarchy, application state machine and audit trail exist and are tested; no API or UI for them yet |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
@@ -67,6 +67,8 @@ Goal: separate "who are you" from "what may you do" before the federation workfl
 5. Adapter tests against fixture tokens and the self-hosted provider; privilege-boundary tests for every role pair; ADR-0005 (identity provider separated from application authorization).
 
 Acceptance: a member can sign in through OIDC in compose and in CI; token validation failures are tested; no upstream login path regressed.
+
+**Status 2026-09-02: done in compose; CI job written, not run.** `oidc` guard on `firebase/php-jwt` 7.1 with JWKS discovery, cache and rotation; subject-to-user resolution with verified-e-mail linking and optional provisioning; scopes from database roles; `GET /api/v1/federation/me`; next-auth providers for the mock issuer and Auth0 with the access token server-side only; `/member` pages; `mock-oauth2-server` in compose with personas. 20 PHPUnit tests, 3 Playwright tests with axe (`docs/baseline/playwright_m3.txt`), full suite 147/147. ADR-0007. INCIDENT-000 (development database wiped by the config-cache trap) fixed permanently in `phpunit.xml` with a regression test. Open: the Auth0 tenant walkthrough (owner creates the tenant), the first CI run, refresh-token handling.
 
 ### A4 — One complete registration-review slice (M4 in the brief) — size L
 

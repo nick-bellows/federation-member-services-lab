@@ -110,3 +110,37 @@ Two vocabularies for "member" coexist; clubs may have no organization; the trans
 3. Why not a package for the state machine or the activity log?
 4. Why should eligibility never be a boolean column, and where will it be computed?
 5. What did running the migrations on MariaDB teach you that SQLite could not?
+
+## M3 — The identity boundary
+
+### What it does
+
+Federation users sign in through OpenID Connect (a mock provider in compose and CI, Auth0 when configured) with the authorization-code flow and PKCE. Next.js keeps the access token in an encrypted server-side cookie and sends it to Laravel as a bearer credential for federation routes. Laravel validates it itself against the issuer's keys and maps the subject to a user; what the user may do comes from the database.
+
+### Why we built it this way
+
+"Who are you" and "what may you do" are different questions with different owners. The provider answers the first; this application answers the second and must not let a token's claims answer it. Doing the validation in the API rather than exchanging for a Sanctum token keeps the boundary enforced on every request.
+
+### Alternatives considered
+
+Auth0's Laravel SDK; Auth0's Next.js SDK; token exchange for Sanctum; trusting roles from claims; Keycloak or Dex locally (ADR-0007).
+
+### Failure modes
+
+Wrong issuer or audience, expired token, forged signature, algorithm confusion, unknown key id, key rotation, unverified e-mail claims, an e-mail already linked elsewhere, provisioning disabled, provider unreachable (cached keys keep existing tokens valid until the cache expires; new sign-ins fail), token in logs (never logged), ID token audience conflicts (multi-audience with `azp`).
+
+### Tradeoffs
+
+Two identity systems coexist; `host.docker.internal` is a Docker Desktop convention that CI must reproduce; multi-audience tokens must be configured on the provider; verified e-mail linking trades a little friction for closing an account-takeover path.
+
+### Code to locate immediately
+
+`api/app/Federation/Auth/OidcTokenVerifier.php` · `api/app/Federation/Auth/OidcUserResolver.php` · `api/app/Federation/FederationServiceProvider.php` (the guard) · `api/app/Federation/Auth/FederationScopes.php` · `api/config/oidc.php` · `api/tests/Feature/Federation/OidcTokenVerifierTest.php` · `api/tests/Feature/Federation/OidcGuardTest.php` · `web_application/src/lib/federation/providers.ts` · `web_application/src/lib/federation/session.ts` · `web_application/src/utils/auth.ts` · `docker/oidc/config.json` · `e2e/tests/member-sign-in.spec.ts` · `api/phpunit.xml` and `docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md`
+
+### Likely interviewer questions
+
+1. Walk me through the sign-in flow and say where each token lives at every step.
+2. Why don't you trust the roles or scopes in the token?
+3. What happens if the identity provider is down?
+4. How do you handle key rotation, and what could an attacker do with your refresh logic?
+5. Tell me about a time you broke your own environment. What did you change so it cannot happen again?
