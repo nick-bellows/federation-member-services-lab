@@ -1,68 +1,143 @@
 # Roadmap
 
-Last verified: 2026-09-02
+Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed by the workspace `AGENTS.md` and the central portfolio roadmap; where they conflict, the central roadmap wins.
 
 ## Handoff snapshot
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` - Milestone 0 engineering archaeology only |
-| Visibility | Local workspace only; no configured remote |
-| Portfolio role | Future modernization, Laravel/Next.js, registration, review, and organization-aware workflow evidence |
-| Upstream | Fork of `vereinfacht/vereinfacht`; upstream behavior and authorship must remain explicit |
-| Original product claim | None yet; no federation workflow has been implemented |
+| Lifecycle | `DRAFT` — Milestone 0 (engineering archaeology) complete; no product behaviour changed |
+| Branch | `m0/engineering-archaeology`, three commits ahead of upstream `main` (`dca9be3`): M0 docs, this roadmap's predecessor, one correction after a live probe |
+| Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
+| Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11 |
+| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite); Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; no CI that runs tests |
+| Original product claim | None. Nothing federation-specific exists yet |
+| Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
-Start with `docs/UPSTREAM_ANALYSIS.md` and `docs/adr/`. The sibling `learning-center-reference` owns education, certification, and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review, and audit, and may consume credentials through an HTTP contract only.
+Start with `docs/UPSTREAM_ANALYSIS.md`, then `docs/adr/`. The sibling Learning Center owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and consumes credentials over an HTTP contract only. The two never share a database.
 
-## Current milestone - M1 baseline and one safe modernization change
+## The goal this roadmap serves
 
-Goal: prove the inherited system can be understood, tested, and improved without a rewrite before adding a federation workflow.
+Get the repository in front of a technical recruiter and the federation's engineers as early as it can be **credible**, then deepen it. Credible means: a reviewer can tell in one minute what is upstream and what was added, in five minutes see one real feature with tests and a decision record, and at any depth find nothing claimed that is not implemented.
 
-### Work
+That fixes the order. Everything that makes the repository readable and truthful comes first; everything that makes it impressive at depth comes after the public gate, one bounded milestone at a time.
 
-1. Reproduce and record the upstream API and web test/build baseline from a clean checkout-equivalent environment.
-2. Inventory authentication, tenancy scopes, authorization, seeded credentials, environment handling, uploads, and existing API contracts.
-3. Fix one bounded, defensible issue already identified in `docs/UPSTREAM_ANALYSIS.md`, preferably the `env()`/configuration-cache behavior or development config-cache trap.
-4. Add a regression test that fails before the fix and passes after it.
-5. Record whether the change should be offered upstream; do not imply upstream acceptance.
-6. Decide and document the end-to-end test tool for the fork's future critical path.
+Sizes below are planning estimates, not commitments: **S** = one working session, **M** = two to three, **L** = four or more.
 
-### Acceptance criteria
+## Phase A — reach the public gate
 
-- Baseline commands, versions, failures, and environmental assumptions are retained.
-- The selected change is small enough to explain line by line and does not alter unrelated upstream behavior.
-- A regression test demonstrates the issue and fix.
-- Fork attribution, license, and original-versus-upstream diff remain obvious.
-- No product milestone is claimed complete.
+Public visibility is allowed only when A1–A4 are done and the acceptance checklist at the end of Phase A passes. Until then: no fork, no `origin`, no push.
 
-## Next product milestone - one registration review slice
+### A1 — Baseline quality and one defensible fix (M1) — size M
 
-Only after M1:
+Goal: prove the inherited system can be tested and improved safely before any federation code exists.
+
+1. CI workflow in the fork: PHPUnit on SQLite **and** on MariaDB (so MySQL-only SQL is exercised on the real engine), Pint, `tsc --noEmit`, ESLint, `next build`. Watch each gate fail once before trusting it.
+2. One bounded fix from `docs/UPSTREAM_ANALYSIS.md` §8, with a regression test that fails before and passes after. Candidates, in recommended order: (a) `env()` calls outside `config/` that return production defaults once configuration is cached; (b) the development entrypoint's config-cache trap.
+3. `.gitattributes` with LF normalisation, so Windows checkouts do not break the API container.
+4. Decide and record the end-to-end tool for the fork's critical path (recommendation: Playwright, because upstream's Cypress project never existed, Playwright carries axe accessibility checks well, and the Learning Center already uses it).
+5. Record in an ADR whether the fix and the CI workflow will be offered upstream. Offer at most one, after reading the issue thread; never imply acceptance.
+
+Acceptance: CI green in the fork on the milestone branch; the fix explained line by line in `docs/LEARNING_LOG.md`; no unrelated upstream behaviour changed.
+
+### A2 — Federation domain and the application state machine (M2) — size L
+
+Goal: the one high-value backend feature a senior reviewer opens first.
+
+1. Model Federation → Member Organization → Club → Member, plus member roles (participant, coach, referee, club admin, organization admin, federation admin). Keep upstream's `clubs` and `members` tables as the club and member; add the two levels above them rather than replacing anything.
+2. `registration_applications` with explicit states `DRAFT`, `SUBMITTED`, `UNDER_REVIEW`, `NEEDS_INFORMATION`, `APPROVED`, `REJECTED`, `CANCELLED`; transitions governed by a single transition table in code, checked by the model, never set by controllers; every transition writes an audit row with actor, action, previous and new state, reason, timestamp and request id.
+3. Proper foreign keys and indexes on every new table, and an ADR explaining why the upstream tables are left as they are for now.
+4. Duplicate-submission protection at the database (unique constraint per member, organization and season) and at the API (idempotency key on submit). This is Incident 2 from the brief, done as a feature with its regression test.
+5. Domain unit tests for every legal and illegal transition; feature tests for authorization of each transition by role.
+
+Acceptance: state machine and audit trail covered by tests; `docs/DOMAIN_MODEL.md` and `docs/DATABASE_BASELINE.md` completed; ADR-0002 (preserve Laravel), ADR-0003 (derive status, do not store an editable flag), ADR-0004 (state machine over booleans) written.
+
+### A3 — One complete registration-review slice (M4 in the brief) — size L
+
+Goal: the workflow a product reviewer can follow end to end.
 
 ```text
-fictional organization admin starts registration
--> participant submits synthetic application metadata
--> reviewer requests or approves one requirement
--> registration status is derived
--> immutable audit entry is visible to authorized roles
+organization admin opens a registration window
+→ participant creates a profile and starts an application
+→ participant provides required information and document metadata (synthetic)
+→ participant submits
+→ reviewer sees the queue, opens the application, requests information or approves
+→ status is derived and shown to the participant with an explanation
+→ audit history visible to authorized roles
 ```
 
-Keep organization boundaries explicit. Use document metadata or safe generated fixtures; do not begin with general-purpose uploads. Define the Learning Center credential API contract without sharing databases.
+1. Backend: JSON:API resources for applications, requirements and document metadata in the upstream style (schemas, requests, policies), reusing upstream's tenancy pattern and extending it with the organization level.
+2. Frontend: member pages (start, fill, submit, status) and administrator pages (queue, detail, decision, history) in the upstream Next.js conventions, with server actions and Zod schemas; keyboard-navigable, labelled forms, error announcements.
+3. Authentication stays on upstream's Sanctum tokens for this phase, extended with the new roles and permissions. The OIDC boundary comes in Phase B (see the decision below).
+4. Playwright critical-path test for the whole slice; axe checks on every new page.
+5. Screenshots and a short GIF of the slice, generated from the running application and checked into `docs/assets/`.
 
-## Presentation and hosting decision
+Acceptance: the slice runs from a cold clone by following the README; E2E and accessibility checks green in CI; `docs/incidents/INCIDENT-002.md` (duplicate submission) written from the actual regression test.
 
-Do not deploy this repository yet. A public upstream application with only archaeology notes would confuse authorship and add little hiring value. Once the original registration-review slice, tests, and attribution are complete, build a static modernization case study first. A small container host such as Railway can be evaluated later, but account creation, a public remote, and any cost require explicit approval.
+### A4 — Publication (M11 brought forward) — size M
 
-Vercel may eventually host the Next.js frontend, but splitting the inherited Laravel/Next.js system across services is not useful before the workflow exists. Replit is not appropriate for establishing a faithful upstream baseline.
+1. README rewritten for the five-minute path: what upstream is and what was added, the modernization problem, architecture diagram (before and after), the one feature to open, the tests to open, the ADRs, the incident report, the upstream contribution status, explicit attribution, test instructions.
+2. Upstream-versus-fork manifest generated in CI and linked from the README.
+3. Publish pre-flight per the portfolio house rules: clean tree, tracked-file audit, gitleaks over history, no seeded credentials described as production-safe, logged-out README review.
+4. **Only on explicit approval:** create the GitHub fork, add `origin`, push, merge the milestone branches through pull requests, enable Actions. Pins and profile changes are separate manual approvals.
+
+### Phase A acceptance checklist
+
+- [ ] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs
+- [ ] Cold-clone verification recorded in `docs/LEARNING_LOG.md`
+- [ ] One feature (state machine + review slice) with unit, feature, authorization and E2E tests
+- [ ] ADR-0000 to ADR-0004, `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
+- [ ] README passes the one-minute and five-minute reads; attribution and license unchanged
+- [ ] One upstream contribution offered, status recorded truthfully
+- [ ] Explicit approval for visibility received
+
+## Phase B — depth, after the public gate
+
+Each milestone is bounded, starts with its lesson and decision, and updates this roadmap on completion. Order is a recommendation; each is independently valuable.
+
+| Milestone | Delivers | Size | Notes |
+| --- | --- | --- | --- |
+| B1 Identity boundary (M3) | OIDC-compatible login for the member and reviewer surfaces; JWT validation (issuer, audience, JWKS, expiry); scopes such as `application:create`, `application:review`, `organization:manage`; adapter tests; privilege-boundary tests | L | Auth0 free tier needs account approval; a self-hosted OIDC container is the no-account fallback. ADR-0005 |
+| B2 Learning Center contract (M5) | `GET /v1/members/{id}/credentials` contract with fixtures and a mock server; derived participation status from approval + credentials + holds; timeout, stale-data and reconciliation behaviour; Incident 1 (slow credential service) | M | Contract must be authenticated and use non-enumerable ids. Decide whether the Learning Center adds the endpoint or this repo consumes its eligibility. ADR-0006 |
+| B3 Events and reliability (M6) | Transactional outbox, worker, retries, idempotent consumers; domain events for submit, approve, reject, credential change; Incident 3 (worker fails after approval) | M | Database queue locally; explain the mapping to SQS, RabbitMQ or Kafka in one ADR, implement none of them. ADR-0007 |
+| B4 PostgreSQL (M7) | CI matrix on MariaDB and PostgreSQL; the MySQL-only constructs fixed or isolated; differences documented, none hidden | M | Candidate for a second upstream contribution |
+| B5 Operability (M8) | Structured logs with correlation ids, health and readiness endpoints, basic metrics, OpenTelemetry traces to a local Jaeger, `docs/OBSERVABILITY.md`, `docs/RUNBOOK.md`; the three incident exercises run against it | M | Expose the upstream health checks that exist but have no route |
+| B6 Accessibility and performance (M9) | Manual WCAG 2.1 AA review of the slice, fixes, low-bandwidth review of the member flow, synthetic load on three endpoints with before/after measurements | M | Numbers only from retained runs; the missing `club_id` indexes are the obvious first finding |
+| B7 Security review | `docs/THREAT_MODEL.md` covering the brief's list; JSON Patch on one resource with field-level authorization | S–M | Threat model can start earlier and grow |
+| B8 Release engineering (M10) | Production images, deployment architecture document (CloudFront, load balancer, containers, RDS PostgreSQL, S3, queue, worker, CloudWatch), rollback plan, release checklist; Terraform only if labelled untested | M | No provisioning, no cost, without approval. Kubernetes only if everything else works and only as a documented exercise |
+| B9 Case study and demo | Static modernization case study page, demo video, final README pass, interview guide complete | S–M | Hosting a live demo is a separate cost decision, evaluated only after B8 |
+
+## Continuous tracks
+
+- **Upstream contributions:** one at a time, generic only, after reading the issue and asking the maintainers. Queue from `docs/UPSTREAM_ANALYSIS.md` §10: CI workflow (#7), locale header matching (#125), `.gitattributes`, transaction around the apply action, configurable demo-club check plus Mailpit.
+- **Teaching record:** every milestone opens with its lesson and closes with quiz, exercises and interview questions recorded in the internal review file kept outside this repository; `docs/LEARNING_LOG.md` records what was done and observed; `docs/INTERVIEW_GUIDE.md` grows one section per milestone.
+- **Evidence discipline:** every number in the docs comes from a retained run under `docs/baseline/` or a CI artifact; lifecycle vocabulary `draft / planned / validated`; "CI" until an automated deployment exists.
+
+## What a reviewer sees at each gate
+
+| When | Recruiter, one minute | Engineer, five minutes | Product reviewer |
+| --- | --- | --- | --- |
+| After Phase A | Fork of a real open-source system, modernized; Laravel, Next.js, TypeScript, PostgreSQL planned, CI badges backed by real jobs; screenshots of the review slice | State machine with transition tests, audit trail, idempotent submit, ADRs, one incident report, the upstream PR | A registration flow with roles, review, explanations and an audit history |
+| After B1–B3 | OIDC, integration contract, event-driven processing | Token validation tests, contract tests with a mock, outbox with failure exercises, three incident reports | Degraded behaviour when the credential service is slow; nothing lost when a worker dies |
+| After B4–B9 | PostgreSQL, observability, accessibility, deployment architecture | Traces, metrics, load measurements, threat model, runbook | Accessibility review, performance budgets, case study |
+
+## Decisions for review
+
+1. **Sequencing:** review slice before the OIDC boundary (recommended, shortest path to the public gate) versus the brief's order of identity first.
+2. **The M1 fix:** `env()` outside config (recommended) versus the development config-cache trap.
+3. **E2E tool:** Playwright (recommended) versus Cypress.
+4. **Fictional federation name and branding** for A2 onwards; must not resemble any real federation's marks.
+5. **Auth0 account** for B1: approve creating a free-tier tenant, or use a self-hosted OIDC provider.
+6. **Learning Center side of B2:** add a credentials endpoint there, or consume its eligibility endpoint and label credentials `planned`.
 
 ## Stop conditions
 
-- Do not publish or deploy until Nick approves the remote and visibility.
-- Do not retain or expose upstream default credentials in a public deployment.
-- Do not claim original authorship of upstream code or a completed federation platform.
-- Do not duplicate Learning Center domains or share its database.
-- Do not broaden beyond one registration-review path.
+- No fork, remote, push, deployment, pin, account or paid resource without explicit approval.
+- Do not claim original authorship of upstream code, a completed federation platform, production usage, or upstream acceptance.
+- Do not duplicate Learning Center domains or read its database.
+- Do not broaden Phase A beyond the one registration-review path.
+- Do not present seeded credentials or the super-admin bearer token as production-safe.
 
 ## Verification before changing status
 
-Run the recorded upstream and fork API/web tests, dependency/security checks, OpenAPI validation, and the new regression test. A local build does not establish a deployable or publicly secure system. Deferred ideas remain in `docs/future-work.md`.
+Run the fork's CI jobs locally through the tooling container (PHPUnit on both engines, Pint, `tsc`, ESLint, `next build`, Playwright, axe), the dependency and secret scans, and the cold-clone check. A local run establishes local behaviour only; CI on the fork establishes reproducibility; neither establishes a deployable or publicly secure system. Deferred ideas go to `docs/future-work.md`; completed lessons go to `docs/LEARNING_LOG.md`; this file is updated when a gate or status changes.
