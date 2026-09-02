@@ -101,6 +101,8 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 3. Publish pre-flight per the portfolio house rules: clean tree, tracked-file audit, gitleaks over history, no seeded credentials described as production-safe, logged-out README review.
 4. **Only on explicit approval:** create the GitHub fork, add `origin`, push, merge the milestone branches through pull requests, enable Actions. Pins and profile changes are separate manual approvals.
 
+**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`.** Still open before the fork: cold-clone verification of the README instructions on this machine, the publish pre-flight (clean tree, tracked-file audit, gitleaks over history, logged-out README view), and the owner's explicit go for the fork itself.
+
 ### Phase A acceptance checklist
 
 - [ ] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs
