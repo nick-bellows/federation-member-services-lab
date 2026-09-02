@@ -1,0 +1,12 @@
+# Regression tests run against MariaDB 11.8 instead of SQLite (2026-09-02, tooling container)
+# Purpose: validate the CI job "backend-mariadb" mechanism locally before the workflow can run on GitHub.
+# Method: DB_CONNECTION=mysql DB_HOST=database DB_DATABASE=verein_test (created for this purpose,
+#         granted to the verein user) exported into the process environment, which takes precedence
+#         over .env.testing; php artisan test --filter=WebApplicationUrlConfigTest
+Tests:    4 passed (7 assertions)
+Duration: 382.78s
+wall_seconds=384
+# Each test runs migrate:fresh (tests/TestCase.php uses DatabaseMigrations); on this Docker Desktop
+# host a full migrate:fresh on MariaDB takes roughly 95 s, so the complete 91-test suite was NOT run
+# on MariaDB locally (estimated hours). The same suite takes 58 s on SQLite in memory. The MariaDB
+# job therefore remains unverified until the workflow runs on a GitHub runner.

@@ -60,6 +60,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Web Application (Next.js) URL
+    |--------------------------------------------------------------------------
+    |
+    | Public base URL of the Next.js web application and the path of its club
+    | admin login. Used to build the public apply URL of a club, password reset
+    | and welcome mail links, and the health check pings. Read these through
+    | config() only: env() returns null once configuration is cached.
+    |
+    */
+
+    'web_application_url' => env('WEB_APPLICATION_URL', 'https://app.vereinfacht.digital'),
+
+    'club_admin_login_path' => env('CLUB_ADMIN_LOGIN_PATH', '/admin/login'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

@@ -1,0 +1,10 @@
+# Same probe as env_bug_before_fix.txt, after reading settings through config(), 2026-09-02T17:15:13Z
+WEB_APPLICATION_URL in .env: WEB_APPLICATION_URL=http://localhost:3000
+
+## With cached config
+apply_url = http://localhost:3000/de/tsv-muster/apply
+mailable url = http://localhost:3000/admin/login
+env(WEB_APPLICATION_URL) = NULL
+config(app.web_application_url) = http://localhost:3000
+Club management login -> http://localhost:3000/de/admin/auth/login
+Demo club apply form -> http://localhost:3000/de/tsv-muster/apply

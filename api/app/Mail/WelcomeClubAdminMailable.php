@@ -23,9 +23,8 @@ class WelcomeClubAdminMailable extends Mailable implements ShouldQueue
      */
     public function __construct()
     {
-        $this->url = env('WEB_APPLICATION_URL', 'http://app.vereinfacht.digital')
-            . env('CLUB_ADMIN_LOGIN_PATH', '/admin/login');
-        $this->supportEmail = env('MAIL_FROM_ADDRESS', 'hello@vereinfacht.digital');
+        $this->url = config('app.web_application_url').config('app.club_admin_login_path');
+        $this->supportEmail = config('mail.from.address');
     }
 
     /**

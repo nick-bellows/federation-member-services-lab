@@ -164,7 +164,7 @@ class Club extends Authenticatable implements HasAvatar, HasLocalePreference, Ha
 
     public function applyUrl(): Attribute
     {
-        $url = env('WEB_APPLICATION_URL', 'https://app.vereinfacht.digital');
+        $url = config('app.web_application_url');
         $url .= '/de/';
         $url .= $this->slug;
         $url .= '/apply';

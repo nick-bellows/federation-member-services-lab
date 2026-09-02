@@ -30,7 +30,7 @@ class HealthCheckServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $webApplicationUrl = env('WEB_APPLICATION_URL', 'https://app.vereinfacht.digital');
+        $webApplicationUrl = config('app.web_application_url');
         $clubManagementLoginUrl = $webApplicationUrl.'/de/admin/auth/login';
         $demoClubApplyFormUrl = $webApplicationUrl.'/de/tsv-muster/apply';
 

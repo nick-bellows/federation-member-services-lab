@@ -1,0 +1,157 @@
+
+   PASS  Tests\Unit\DivisionTest
+  ✓ division can have many membership types                              1.87s  
+  ✓ division membership type can have monthly fee                        0.54s  
+
+   PASS  Tests\Unit\FinanceAccountTest
+  ✓ a finance account can be created                                     0.56s  
+  ✓ a finance account has many statements                                0.55s  
+  ✓ current balance is calculated correctly                              0.55s  
+
+   PASS  Tests\Unit\MembershipTest
+  ✓ membership monthly fee includes membership type fee                  0.56s  
+  ✓ membership monthly fee excludes membership type admission fee        0.53s  
+  ✓ membership monthly fee includes voluntary contribution               0.56s  
+  ✓ membership monthly fee includes selected divisions                   0.55s  
+
+   PASS  Tests\Unit\MembershipTypeTest
+  ✓ membership type can have many divisions                              0.53s  
+
+   PASS  Tests\Unit\WebApplicationUrlConfigTest
+  ✓ club apply url uses the configured web application url               0.52s  
+  ✓ welcome mail login url and support address come from config          0.53s  
+  ✓ password reset link uses the configured web application url          0.54s  
+  ✓ health ping checks target the configured web application url         0.52s  
+
+   PASS  Tests\Feature\ClubAdmin\ClubTest
+  ✓ admin user can get own club                                          1.10s  
+  ✓ admin user cannot get other clubs                                    0.57s  
+  ✓ admin user can edit own club                                         0.64s  
+  ✓ admin user cannot edit other club                                    0.53s  
+  ✓ admin user cannot edit any field of own club                         0.55s  
+
+   PASS  Tests\Feature\ClubAdmin\DivisionTest
+  ✓ admin user can edit divisions                                        0.59s  
+  ✓ admin user cannot edit other clubs divisions                         0.53s  
+
+   PASS  Tests\Feature\ClubAdmin\FinanceContactTest
+  ✓ admin user cannot edit external finance contacts                     0.58s  
+
+   PASS  Tests\Feature\ClubAdmin\MembershipTest
+  ✓ admin user can edit memberships                                      0.59s  
+  ✓ admin user cannot edit other clubs memberships                       0.55s  
+
+   PASS  Tests\Feature\ClubAdmin\MembershipTypeTest
+  ✓ admin user can edit membership types                                 0.59s  
+  ✓ admin user cannot edit other clubs membership types                  0.54s  
+  ✓ admin user can set only minimum number of divisions                  0.57s  
+  ✓ admin user can set only maximum number of divisions                  0.54s  
+
+   PASS  Tests\Feature\ClubPermissionsTest
+  ✓ club admins default club is set in session by middleware             0.56s  
+  ✓ club set in session by middleware                                    0.54s  
+
+   PASS  Tests\Feature\ClubTest
+  ✓ clubs generate slugs automatically on create                         0.53s  
+  ✓ can manually set club slug                                           0.52s  
+  ✓ super admin can get clubs                                            0.59s  
+  ✓ super admin can get clubs filtered by slug                           0.55s  
+  ✓ other user cannot get clubs                                          0.54s  
+
+   PASS  Tests\Feature\DivisionTest
+  ✓ club can only get own divisions                                      0.54s  
+  ✓ club can attach member to division of own club                       0.64s  
+  ✓ admin user can only get current clubs divisions                      0.54s  
+
+   PASS  Tests\Feature\Filters\QueryFilterCurrencyTest
+  ✓ query filter converts formatted amounts to cents                     0.54s  
+  ✓ query filter handles multiple currency formats                       0.55s  
+  ✓ query filter works with mixed columns                                0.53s  
+
+   PASS  Tests\Feature\Filters\QueryFilterTest
+  ✓ query filter searches multiple transaction columns                   0.56s  
+
+   PASS  Tests\Feature\FinanceAccountTest
+  ✓ api can get finance accounts for club                                0.56s  
+  ✓ api can get statements for a finance account                         0.58s  
+
+   PASS  Tests\Feature\FinanceContactTest
+  ✓ club can only get own finance contacts                               0.54s  
+  ✓ club can edit external finance contacts                              0.54s  
+  ✓ creating non external finance contacts requires many fields          0.54s  
+  ✓ creating external finance contacts bypasses most required rules      0.52s  
+
+   PASS  Tests\Feature\LoginTest
+  ✓ successful login attempt returns token                               0.57s  
+  ✓ login requires club role association                                 0.52s  
+
+   PASS  Tests\Feature\MediaTest
+  ✓ user cannot upload media for other club                              0.65s  
+  ✓ user can upload media for own club                                   0.85s  
+  ✓ unauthenticated user cannot upload media                             0.67s  
+  ✓ user can download media for own club                                 0.66s  
+  ✓ user cannot download media for other club                            0.64s  
+  ✓ unauthenticated user cannot download media                           0.58s  
+  ✓ user can preview media for own club                                  0.65s  
+  ✓ user cannot preview media for other club                             0.63s  
+  ✓ unauthenticated user cannot preview media                            0.61s  
+
+   PASS  Tests\Feature\MemberTest
+  ✓ club can create new member                                           0.60s  
+  ✓ cannot create member for other club                                  0.54s  
+  ✓ consent boolean mutates timestamp column                             0.53s  
+  ✓ cannot create member when membership has no capacity                 0.56s  
+  ✓ cannot update member to membership with no capacity                  0.55s  
+
+   PASS  Tests\Feature\MembershipApplicationTest
+  ✓ can apply completed membership                                       1.89s  
+  ✓ cannot apply for membership if status wasnt null                     0.53s  
+  ✓ cannot apply for membership if owner is missing                      0.54s  
+  ✓ cannot apply for membership if members count is above maximum membe… 0.53s  
+  ✓ cannot apply for membership if members count is below minimum membe… 0.52s  
+  ✓ club is notified on membership application                           0.54s  
+  ✓ all members are notified on membership application                   0.52s  
+  ✓ api can apply for membership                                         1.51s  
+
+   PASS  Tests\Feature\MembershipTest
+  ✓ club can create new membership                                       0.56s  
+  ✓ club can create new membership with payment period                   0.58s  
+  ✓ club can set owner                                                   0.55s  
+  ✓ club cannot update memberships for other club                        0.56s  
+  ✓ club cannot create membership for other club                         0.53s  
+
+   PASS  Tests\Feature\MembershipTypeTest
+  ✓ club can only get own membership types                               0.55s  
+
+   PASS  Tests\Feature\PasswordResetTest
+  ✓ forgot password sends reset notification                             0.78s  
+  ✓ forgot password with non existing email returns generic error        0.75s  
+  ✓ forgot password fails when reaches rate limiting                     1.68s  
+  ✓ reset password updates database                                      0.57s  
+  ✓ reset password fails with invalid token                              0.77s  
+  ✓ reset password fails with expired token                              0.79s  
+
+   PASS  Tests\Feature\PaymentPeriodTest
+  ✓ cannot apply membership with unattached payment period               0.57s  
+
+   PASS  Tests\Feature\ReceiptTest
+  ✓ club can only get own receipts                                       0.56s  
+  ✓ can create receipt with media                                        0.56s  
+  ✓ can update receipt with existing media                               0.56s  
+
+   PASS  Tests\Feature\StatementTest
+  ✓ club can only get own statements                                     0.61s  
+
+   PASS  Tests\Feature\TaxAccountTest
+  ✓ club can only get related tax accounts                               0.55s  
+  ✓ club can get custom tax accounts with null chart relation            0.54s  
+  ✓ club without chart can only get custom tax accounts                  0.54s  
+
+   PASS  Tests\Feature\UserTest
+  ✓ club can only get own users                                          0.55s  
+  ✓ admin can create new user with roles                                 0.56s  
+  ✓ admin can update user with roles                                     0.55s  
+
+  Tests:    95 passed (345 assertions)
+  Duration: 59.86s
+
