@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Filament\Panel;
+use App\Federation\Concerns\AdministersFederationEntities;
 use App\Models\Scopes\ClubScope;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -22,6 +23,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 class User extends Authenticatable implements FilamentUser, HasLocalePreference, HasTenants
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, PrefersLocale, CanResetPassword;
+    use AdministersFederationEntities;
 
     /**
      * The attributes that are mass assignable.
