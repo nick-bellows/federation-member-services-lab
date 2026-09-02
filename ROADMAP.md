@@ -6,11 +6,11 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` — Milestone 0 (engineering archaeology) complete; no product behaviour changed |
+| Lifecycle | `DRAFT` — Milestone 0 (archaeology) complete; Milestone 1 (baseline fix, line endings, draft CI) complete except the first CI run; one behaviour fix landed (ADR-0002) |
 | Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11 |
-| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite); Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; no CI that runs tests |
+| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
 | Original product claim | None. Nothing federation-specific exists yet |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
@@ -39,6 +39,8 @@ Goal: prove the inherited system can be tested and improved safely before any fe
 5. Record in an ADR whether the fix and the CI workflow will be offered upstream. Offer at most one, after reading the issue thread; never imply acceptance.
 
 Acceptance: CI green in the fork on the milestone branch; the fix explained line by line in `docs/LEARNING_LOG.md`; no unrelated upstream behaviour changed.
+
+**Status 2026-09-02: done except the CI run.** Fix landed with fail-then-pass evidence (ADR-0002, `docs/baseline/env_*`), full suite 95/95 on SQLite, regression tests also pass on MariaDB; `.gitattributes` in place; workflow written and its commands validated locally but **DRAFT until it runs on GitHub**, which requires the fork (A5). Playwright recorded in ADR-0003; upstream offer policy in ADR-0004. Open: the first CI run, and the upstream issue and pull request once a remote exists.
 
 ### A2 — Federation domain and the application state machine (M2) — size L
 

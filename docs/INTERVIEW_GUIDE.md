@@ -43,3 +43,36 @@ The project's thesis is incremental modernization of a system with existing user
 3. API tests exist but there is no CI and no frontend testing. Which pipeline would be added first, and what would be refused for merge without it?
 4. What was wrong with the upstream implementation, and what was right?
 5. Why does a state stored as a nullable string with rules only in PHP become a problem as the domain grows?
+
+## M1 — Baseline quality and one defensible fix
+
+### What it does
+
+Reads the web application URL, the admin login path and the sender address through Laravel's configuration instead of `env()`, so they survive configuration caching; normalises line endings; adds a CI workflow (draft until it runs on GitHub) and records the end-to-end tool and the upstream-contribution policy.
+
+### Why we built it
+
+The first change to an inherited system should be small, provably correct and behaviour-preserving in the common path. This one was reproduced on the running container before touching code, tested red-then-green, and re-verified live.
+
+### Alternatives considered
+
+Leave `env()` and stop caching configuration (hides the defect); export variables in the entrypoint (works around the misuse); a dedicated config file (larger than needed). Cypress instead of Playwright. Offering all three M1 changes upstream at once.
+
+### Failure modes
+
+Configuration caching in any environment; a fifth `env()` call added later (guarded by a grep in CI); Pint enforced blindly would reformat 400 upstream files.
+
+### Tradeoffs
+
+Two extra config keys versus four hard-coded fallbacks; running the suite twice in CI (SQLite for speed, MariaDB for fidelity) versus once; Pint as a report versus a gate.
+
+### Code to locate immediately
+
+`api/config/app.php` (the two keys) · `api/app/Models/Club.php::applyUrl` · `api/app/Providers/HealthCheckServiceProvider.php` · `api/app/Providers/AppServiceProvider.php` · `api/app/Mail/WelcomeClubAdminMailable.php` · `api/tests/Unit/WebApplicationUrlConfigTest.php` · `.github/workflows/ci.yml` · `.gitattributes` · `docs/adr/0002` to `0004`
+
+### Likely interviewer questions
+
+1. How does configuration reach your code in a production Laravel deployment, and what changes when it is cached?
+2. How do you know a fix is real? Walk through fail-then-pass for this one.
+3. Your CI runs the suite on SQLite and on MariaDB. Why both, and what would you do about the cost?
+4. Why is Pint a report and not a gate, and how would you enforce style on new code without reformatting upstream?
