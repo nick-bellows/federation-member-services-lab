@@ -13,7 +13,7 @@
 |
 | Auth0:            OIDC_ISSUER=https://<tenant>.<region>.auth0.com/
 |                   OIDC_AUDIENCE=https://api.northgate.example
-| Compose / CI:     OIDC_ISSUER=http://localhost:3004/default
+| Compose / CI:     OIDC_ISSUER=http://host.docker.internal:3004/default
 |                   OIDC_JWKS_URI=http://oidc:8080/default/jwks
 |                   (the issuer string is what the browser saw; the JWKS is
 |                   fetched over the compose network)

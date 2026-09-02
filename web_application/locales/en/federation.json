@@ -1,0 +1,21 @@
+{
+    "sign_in": {
+        "heading": "Sign in to Northgate",
+        "intro": "Use your Northgate ID to view your registrations. Your password is never shared with this application.",
+        "providers": "Identity providers",
+        "with": "Continue with {{provider}}",
+        "none_configured": "No identity provider is configured. Set OIDC_ISSUER or AUTH0_ISSUER in the web application environment."
+    },
+    "sign_out": "Sign out",
+    "me": {
+        "heading": "Hello, {{name}}",
+        "identity": "Your identity",
+        "email": "E-mail",
+        "issuer": "Signed in through",
+        "subject": "Subject",
+        "scopes": "What you can do here",
+        "scopes_help": "Derived from your roles in the federation database, not from your sign-in token.",
+        "administered": "Bodies you administer",
+        "administered_none": "You do not administer any organization."
+    }
+}

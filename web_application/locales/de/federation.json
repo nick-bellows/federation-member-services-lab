@@ -1,0 +1,21 @@
+{
+    "sign_in": {
+        "heading": "Bei Northgate anmelden",
+        "intro": "Melde dich mit deiner Northgate-ID an, um deine Registrierungen zu sehen. Dein Passwort wird nie an diese Anwendung weitergegeben.",
+        "providers": "Identitätsanbieter",
+        "with": "Weiter mit {{provider}}",
+        "none_configured": "Es ist kein Identitätsanbieter konfiguriert. Setze OIDC_ISSUER oder AUTH0_ISSUER in der Umgebung der Web-Anwendung."
+    },
+    "sign_out": "Abmelden",
+    "me": {
+        "heading": "Hallo, {{name}}",
+        "identity": "Deine Identität",
+        "email": "E-Mail",
+        "issuer": "Angemeldet über",
+        "subject": "Subjekt",
+        "scopes": "Was du hier tun kannst",
+        "scopes_help": "Abgeleitet aus deinen Rollen in der Verbandsdatenbank, nicht aus deinem Anmelde-Token.",
+        "administered": "Von dir verwaltete Organisationen",
+        "administered_none": "Du verwaltest keine Organisation."
+    }
+}
