@@ -1,0 +1,17 @@
+# Normalise line endings to LF on checkout and commit.
+# The api image copies shell scripts from this repository (docker/api/entrypoint.sh,
+# docker/api/startup.sh) and runs them with bash; a CRLF checkout, the default on
+# Git for Windows, breaks the container before it starts.
+* text=auto eol=lf
+
+# Binary assets: never normalise.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary
