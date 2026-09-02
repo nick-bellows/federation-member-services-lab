@@ -1,0 +1,167 @@
+# Continuous integration for the fork.
+#
+# Status: DRAFT until it has run on GitHub. This repository has no remote yet;
+# every command below was validated inside the `tooling` container on
+# 2026-09-02 (see docs/LEARNING_LOG.md), but the workflow itself has not
+# executed on a runner. The first run is expected to fail somewhere; each gate
+# is watched failing once before it is trusted.
+#
+# Jobs: backend tests on SQLite (upstream's test configuration) and on MariaDB
+# (the runtime engine, so MySQL-only SQL is exercised), Pint as a report,
+# frontend type-check, lint and production build, an env() misuse guard, and an
+# upstream-versus-fork manifest published to the job summary.
+
+name: CI
+
+on:
+  push:
+    branches: [main, "m*/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: "8.3"
+  NODE_VERSION: "20"
+  PHP_EXTENSIONS: mbstring, intl, gd, imagick, zip, bcmath, exif, pdo_sqlite, sqlite3, pdo_mysql
+
+jobs:
+  backend-sqlite:
+    name: Backend tests (SQLite, upstream configuration)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+      - name: Install Ghostscript (PDF preview conversions in media tests)
+        run: sudo apt-get update -q && sudo apt-get install -y -q ghostscript
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('api/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test
+
+  backend-mariadb:
+    name: Backend tests (MariaDB 11.8, runtime engine)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    services:
+      database:
+        image: mariadb:11.8
+        env:
+          MARIADB_RANDOM_ROOT_PASSWORD: "true"
+          MARIADB_DATABASE: verein_test
+          MARIADB_USER: verein
+          MARIADB_PASSWORD: verein
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      # Real process environment wins over .env.testing, so the suite runs on MariaDB.
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_DATABASE: verein_test
+      DB_USERNAME: verein
+      DB_PASSWORD: verein
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ghostscript
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('api/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test
+
+  backend-style:
+    name: Backend style (Pint, report only) and env() guard
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('api/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Pint (upstream carries 215 pre-existing style issues; reported, not enforced yet)
+        continue-on-error: true
+        run: |
+          vendor/bin/pint --test 2>&1 | tail -n 5 | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: env() must not be used outside config/ (ADR-0002)
+        run: |
+          if grep -rn "env(" app routes database resources | grep -v "config("; then
+            echo "::error::env() called outside config/. Read settings through config() instead (ADR-0002)."
+            exit 1
+          fi
+          echo "No env() calls outside config/." | tee -a "$GITHUB_STEP_SUMMARY"
+
+  frontend:
+    name: Frontend type-check, lint, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web_application
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: web_application/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - name: Production build (no API needed; validated locally 2026-09-02)
+        run: npx next build
+
+  upstream-manifest:
+    name: Upstream-versus-fork manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Diff against upstream main
+        run: |
+          git fetch --quiet https://github.com/vereinfacht/vereinfacht.git main
+          {
+            echo "## Files that differ from upstream vereinfacht/vereinfacht@main"
+            echo
+            echo '```'
+            git diff --stat FETCH_HEAD...HEAD
+            echo '```'
+            echo
+            echo "## Commits not in upstream"
+            echo
+            git log --oneline FETCH_HEAD..HEAD | sed 's/^/- /'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
