@@ -70,7 +70,7 @@ test('the API refuses an anonymous call to the identity endpoint', async ({ requ
     // The member page relies on this refusal to send visitors back to sign-in.
     // Wrong issuer, audience, expiry and signature cases are covered in PHPUnit
     // (OidcTokenVerifierTest, OidcGuardTest) where tokens can be forged at will.
-    const response = await request.get(`${process.env.API_URL ?? 'http://localhost:3001'}/api/v1/federation/me`, {
+    const response = await request.get(`${process.env.API_URL ?? 'http://localhost:3001'}/api/v1/federation-identity/me`, {
         headers: { Accept: 'application/json' },
     });
 
