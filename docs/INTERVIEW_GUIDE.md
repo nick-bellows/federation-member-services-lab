@@ -20,7 +20,7 @@ The project's thesis is incremental modernization of a system with existing user
 ### Failure modes found in the inherited code
 
 - Non-atomic application: three writes and a synchronous notification with no transaction (`api/app/Actions/Membership/ApplyMembershipAction.php`).
-- Silent tenant re-association for club-admin tokens; super-admin token for anonymous traffic (`api/app/JsonApi/V1/Server.php::handleClubAssociation`, `web_application/src/services/club-api.ts`).
+- Super-admin token for anonymous traffic (`web_application/src/services/club-api.ts`); tenant writes by club admins are blocked by relationship validation through the scope, not by the club-association hook in `api/app/JsonApi/V1/Server.php`, whose fallback branch is dead for memberships and members.
 - Exception messages returned to clients (`api/app/Http/Controllers/Api/V1/MembershipController.php`).
 - Test engine (SQLite) differs from runtime engine (MariaDB), hiding MySQL-only SQL.
 - Development container caches configuration onto the shared bind mount, so tests can point at the wrong database.

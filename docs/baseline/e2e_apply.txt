@@ -22,3 +22,8 @@ id	club_id	status	owner_member_id	membership_type_id
 61	1	applied	117	1
 id	club_id	membership_id	status
 117	1	61	inactive
+== 8. cross-tenant WRITE probe (club-admin-1, club 1) — POST memberships with club=2 (2026-09-02)
+http=404 errors: "The related resource does not exist." for /data/relationships/club (and for membershipType when it belongs to club 2)
+No memberships row was created (SELECT ... WHERE bank_account_holder='Probe' returned nothing).
+Conclusion: relationship existence validation runs through ClubScope before Server::handleClubAssociation; the hook's
+"associate with getPermissionsTeamId()" branch is not reachable for memberships/members because their requests require the club relationship.
