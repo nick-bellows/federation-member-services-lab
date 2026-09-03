@@ -24,10 +24,25 @@ class TestEnvironmentIsolationTest extends TestCase
         $this->assertFalse($this->app->eventsAreCached());
     }
 
-    public function test_the_test_database_is_sqlite_in_memory(): void
+    /**
+     * The suite runs on SQLite in memory locally and on MariaDB in CI; the
+     * invariant is that the database in use is the one the testing environment
+     * names (.env.testing, phpunit.xml or the CI job), never a cached
+     * development configuration.
+     */
+    public function test_the_test_database_is_the_one_the_testing_environment_names(): void
     {
         $this->assertSame('testing', $this->app->environment());
-        $this->assertSame('sqlite', config('database.default'));
-        $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+
+        $connection = config('database.default');
+        $database = config("database.connections.{$connection}.database");
+
+        $this->assertSame(env('DB_CONNECTION', 'sqlite'), $connection);
+        $this->assertSame(env('DB_DATABASE', ':memory:'), $database);
+        $this->assertNotSame('verein', $database);
+
+        if ($connection === 'sqlite') {
+            $this->assertSame(':memory:', $database);
+        }
     }
 }

@@ -159,13 +159,15 @@ jobs:
 
   e2e:
     name: End-to-end (Playwright + axe) against the compose stack
-    # DRAFT: written from the local run recorded in docs/baseline/playwright_m3.txt;
-    # not yet executed on a runner. Expected first-run risks: host.docker.internal
-    # on Linux (covered by extra_hosts in docker-compose.yml), image build time.
+    # The browser runs on the runner, outside Docker: extra_hosts in
+    # docker-compose.yml resolves host.docker.internal for containers only, so the
+    # runner needs its own entry for the OIDC issuer host (first run, 2026-09-03).
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - name: Resolve the OIDC issuer host for the runner's browser
+        run: echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
       - name: Start database, API, mock OIDC provider and tooling
         run: |
           printf 'USER_ID=1001\nGROUP_ID=1001\n' > .env
