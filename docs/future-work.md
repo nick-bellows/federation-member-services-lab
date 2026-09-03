@@ -29,3 +29,7 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Log file shared across containers** — the api and tooling containers write the same bind-mounted `storage/logs/laravel.log`; a root-owned file made every logged request answer 500 during INCIDENT-001's setup. Tests now log to the null channel; give each process its own log path or log to stderr in development.
 - **Service token cache across processes** — the client-credentials token is cached in Laravel's cache store (file in Compose); document the shared store for production in B8.
 - **Credential contract v2 candidates** — a `changed_since` or webhook path so the federation is told about hold and credential changes instead of polling; the provider's `credentials.changed` event would feed the outbox.
+- **Notifications surface** — `federation_notifications` rows exist for every published fact; a member page or a mailer that reads them is the next step (B5 or B9).
+- **Per-consumer attempts** — attempts are counted per outbox row across consumers; a per-consumer view if consumer counts grow.
+- **Broker adapter** — the relay dispatches to Laravel's queue; a SQS, RabbitMQ or Kafka adapter behind the same relay when one is chosen (B8), per the table in ADR-0010.
+- **Worker as a Compose service** — the worker is started by hand in the api container as the PHP-FPM user; a dedicated service on the api image with the entrypoint's migration made opt-in would remove the manual step.

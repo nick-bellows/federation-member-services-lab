@@ -65,23 +65,26 @@ class OidcUserResolver
             throw new OidcException('Unknown subject and provisioning is disabled.');
         }
 
-        $user = new User([
-            'name' => $identity->name ?? $identity->email,
-            'email' => $identity->email,
-            'password' => Str::password(48),
-        ]);
+        // A person's first page fans out into parallel requests, each of which
+        // may arrive here before the other has committed. createOrFirst turns
+        // the loser's unique-key violation into a lookup of the winner's row.
+        $user = User::unguarded(fn () => User::withoutGlobalScopes()->createOrFirst(
+            ['oidc_issuer' => $identity->issuer, 'oidc_subject' => $identity->subject],
+            [
+                'name' => $identity->name ?? $identity->email,
+                'email' => $identity->email,
+                'password' => Str::password(48),
+            ],
+        ));
 
-        $user->forceFill([
-            'oidc_issuer' => $identity->issuer,
-            'oidc_subject' => $identity->subject,
-        ])->save();
-
-        $this->audit->record(
-            actor: $user,
-            action: 'user.provisioned',
-            auditable: $user,
-            new: ['oidc_issuer' => $identity->issuer, 'email' => $identity->email],
-        );
+        if ($user->wasRecentlyCreated) {
+            $this->audit->record(
+                actor: $user,
+                action: 'user.provisioned',
+                auditable: $user,
+                new: ['oidc_issuer' => $identity->issuer, 'email' => $identity->email],
+            );
+        }
 
         return $user;
     }

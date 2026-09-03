@@ -30,6 +30,7 @@ class ParticipationHttpTest extends FederationHttpTestCase
         parent::setUp();
 
         $this->app->forgetInstance(CredentialsClient::class);
+        config()->set('queue.default', 'database');
         config()->set('learning_center.base_url', self::PROVIDER);
         config()->set('learning_center.token.endpoint', self::TOKEN_ENDPOINT);
         config()->set('learning_center.token.client_secret', 'test-only');
@@ -164,6 +165,9 @@ class ParticipationHttpTest extends FederationHttpTestCase
         $this->request($this->organizationAdmin, 'POST', self::BASE."/registration-applications/{$id}/-actions/approve")
             ->assertOk()
             ->assertJsonPath('data.attributes.status', 'approved');
+
+        // The approval only wrote the outbox row; the worker delivers it (ADR-0010).
+        $this->artisan('federation:work', ['--once' => true])->assertSuccessful();
 
         return $id;
     }

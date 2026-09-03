@@ -236,3 +236,36 @@ _Pending; recorded in the internal review file._
 3. Under a slow dependency the honest answer is the last one, with its age. Reads never wait; the one path that does wait says so with a code and a sentence.
 
 **Deferred.** Scheduling and alerting for reconciliation (B5), retry with jitter and the outbox for `credentials.changed` (B3), a per-process log path, the shared-issuer case across both stacks (the demo namespaces differ until Auth0 at B9).
+
+## 2026-09-03 — B3 (M6): events and reliability
+
+**Goal.** Make side effects survive the process that caused them: facts durable with the state change, delivered at least once, acted on exactly once, retried, parked visibly, replayable. Turn B2's best-effort credential refresh into the real failing path of Incident 3.
+
+**Decisions (owner, at the start).** Outbox plus Laravel's database queue; a processed-events ledger per consumer; four facts and two consumers. ADR-0010 records the alternatives and the mapping to SQS, RabbitMQ and Kafka.
+
+**Built.** `outbox_events`, `processed_events` and `federation_notifications`; `OutboxRecorder` (refuses to run outside a transaction); facts written by `TransitionApplication` and `CredentialSnapshots`; `federation:outbox-relay` (one job per event and consumer, row lock, refuses the sync driver); `ProcessOutboxEvent` (insert-or-ignore ledger inside the consumer's transaction, four tries, backoff 2/10/60 s, attempts and errors mirrored on the row, parked on final failure); consumers `notifications` and `credential-refresh`; `federation:work` (relay + drain, survives a bad pass), `federation:outbox-status` (exit code for schedulers), `federation:outbox-replay`. The synchronous approval listener is gone. The development queue is the database driver; the worker runs in the api container as the PHP-FPM user, in Compose and in the CI browser job.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Backend suite | `docs/baseline/phpunit_after_b3_backend.txt` | 210 passed, 918 assertions (8 new) |
+| Browser journeys | `docs/baseline/playwright_b3.txt` | 7 passed with the worker delivering |
+| Incident 3 rehearsal | `docs/baseline/incident_003_2026-09-03.txt` | notification written 1 s after approval; refresh retried through 2/10/60 s and parked at attempt four with the consumer named; status exit non-zero; one replay after recovery delivered it; the ledger kept the notification single |
+
+**What went wrong, in order.**
+
+1. The first rehearsal exercised nothing: the API container still ran the cached `sync` driver, so the relay's dispatch ran the consumers inside the relay's transaction; the refresh timed out, the exception unwound the publication, and the worker loop died. Hardened: the relay refuses the sync driver; the loop survives one bad pass; the container was restarted so the environment applied.
+2. The worker started in the tooling container, then as `www-data` in the api container. Each left cache and log files the web process could not write; the pages answered 500 and looked broken for application reasons. The FPM user is `verein`; the worker runs as it. INCIDENT-000, INCIDENT-001 and this are one family: two writers on one bind-mounted storage directory.
+3. The detached worker died silently because its log file in the container's temp directory belonged to the earlier attempt; it logs under the storage directory now.
+4. A brand-new identity's first page fans out into parallel API requests; both provisioned the user and one hit the unique email key. Provisioning is create-or-first now, audited once.
+5. Two `expectsOutputToContain` on one output line fail in Laravel's command tests, which match expectations in order against separate writes. One expectation per line.
+6. Attempts on the outbox row count every consumer's try; the assertion expected only the failing consumer's four.
+
+**Three lessons.**
+
+1. "After commit" is not "durable". The process is part of the failure model; the outbox takes it out.
+2. Idempotency is a table, not an intention. The ledger row commits with the effect; everything else is hope.
+3. A daemon's environment is part of its correctness: the queue driver it was started with, the user it runs as, the file it logs to. Each of those failed once today before the design did.
+
+**Deferred.** Scheduling and alerting (B5); a notifications surface; per-consumer attempts; a broker adapter behind the relay (B8); the worker as a Compose service once the entrypoint's migration is opt-in.

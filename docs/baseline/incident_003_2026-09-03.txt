@@ -1,0 +1,25 @@
+[19:48:02] # INCIDENT-003 rehearsal on the compose stack. Worker: federation:work in the api container as the PHP-FPM user (verein), one relay pass and one queue drain per second. The Learning Center mock answers after 2000 ms; the client timeout is 800 ms; the refresh job has 4 tries with backoff 2/10/60 s.
+[19:48:02] step 1: slow the mock
+{"status":"ok","subjects":3,"delayMs":2000}[19:48:21] step 2: approve a fresh referee application through the real actions (applicant sam.coach, reviewer nasl-admin)
+> [19:48:23] step 3: outbox status while the worker retries (every ~12 s)
+  [19:48:36] unpublished=0 oldest=- queued_jobs=1 failed_jobs=0 failed_events=0 processed=14
+  [19:48:49] unpublished=0 oldest=- queued_jobs=1 failed_jobs=0 failed_events=0 processed=14
+  [19:49:03] unpublished=0 oldest=- queued_jobs=1 failed_jobs=0 failed_events=0 processed=14
+  [19:49:16] unpublished=0 oldest=- queued_jobs=1 failed_jobs=0 failed_events=0 processed=14
+  [19:49:30] unpublished=0 oldest=- queued_jobs=1 failed_jobs=0 failed_events=0 processed=14
+  [19:49:44] unpublished=0 oldest=- queued_jobs=0 failed_jobs=1 failed_events=1 processed=14
+  [19:49:44] failed application.approved 59ec27b2-33a1-4996-af06-4f4478813067 attempts=5 at 2026-09-03 19:49:39: credential-refresh: Learning Center unreachable or too slow: cURL error 28: Operation timed out after 802 milliseconds with 0 bytes received (see https://curl.se/libcurl/c/libcurl-errors.html) for http://learning-center:3005/v1/members/mock%7Csam/credentials
+  [19:49:57] unpublished=0 oldest=- queued_jobs=0 failed_jobs=1 failed_events=1 processed=14
+  [19:49:57] failed application.approved 59ec27b2-33a1-4996-af06-4f4478813067 attempts=5 at 2026-09-03 19:49:39: credential-refresh: Learning Center unreachable or too slow: cURL error 28: Operation timed out after 802 milliseconds with 0 bytes received (see https://curl.se/libcurl/c/libcurl-errors.html) for http://learning-center:3005/v1/members/mock%7Csam/credentials
+  [19:50:11] unpublished=0 oldest=- queued_jobs=0 failed_jobs=1 failed_events=1 processed=14
+  [19:50:11] failed application.approved 59ec27b2-33a1-4996-af06-4f4478813067 attempts=5 at 2026-09-03 19:49:39: credential-refresh: Learning Center unreachable or too slow: cURL error 28: Operation timed out after 802 milliseconds with 0 bytes received (see https://curl.se/libcurl/c/libcurl-errors.html) for http://learning-center:3005/v1/members/mock%7Csam/credentials
+[19:50:12] step 4: the notification consumer of the same event was not held hostage
+latest approval notification: user 25 at 2026-09-03 19:48:24
+failed_jobs=1 parked_events=1
+[19:50:14] step 5: restore the mock
+{"status":"ok","subjects":3,"delayMs":0}[19:50:31] step 6: an operator replays the parked event; the worker picks it up
+replayed 1
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=1 failed_events=0 processed=15
+sam snapshot after replay: suspended
+failed_jobs=1
+[19:50:44] helper removed; failed_jobs flushed after the successful replay
