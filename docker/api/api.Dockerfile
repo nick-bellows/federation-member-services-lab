@@ -49,6 +49,8 @@ RUN apk update && apk add \
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql
+# PostgreSQL driver for the compatibility matrix (docs/DATABASE_COMPATIBILITY.md)
+RUN apk add --no-cache postgresql-dev && docker-php-ext-install pdo_pgsql
 RUN docker-php-ext-configure intl && docker-php-ext-install intl zip
 RUN docker-php-ext-install opcache zip
 

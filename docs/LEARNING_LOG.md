@@ -269,3 +269,32 @@ _Pending; recorded in the internal review file._
 3. A daemon's environment is part of its correctness: the queue driver it was started with, the user it runs as, the file it logs to. Each of those failed once today before the design did.
 
 **Deferred.** Scheduling and alerting (B5); a notifications surface; per-consumer attempts; a broker adapter behind the relay (B8); the worker as a Compose service once the entrypoint's migration is opt-in.
+
+## 2026-09-03 — B4 (M7): PostgreSQL through a compatibility matrix
+
+**Goal.** Make "runs on PostgreSQL" a tested claim: the whole suite and the demo seeder on PostgreSQL 16 in CI, upstream's MySQL-only SQL made portable where cheap, every difference written down.
+
+**Decisions (owner, at the start).** A compatibility matrix with MariaDB still the default; fix in place where a portable form is cheap and behaviour-preserving, isolate only where it is not. ADR-0011 records the alternatives.
+
+**Built.** `backend-postgres` CI job (suite plus `NorthgateDemoSeeder`, `pdo_pgsql` added to the extension list); `pdo_pgsql` in the tooling and api images; an optional `postgres` Compose service under a profile; `App\Support\OrderByIdList` replacing `FIELD(id, …)` in seven export actions, with `ExportOrderTest` on all engines; `CAST(… AS INTEGER)` in the membership fee scope (probed on MariaDB 11.8 first); the double-quoted literal in a 2025 migration replaced by the query builder; `docs/DATABASE_COMPATIBILITY.md` with the constructs, treatments, evidence and the differences that are not bugs.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| SQLite suite after the fixes | `docs/baseline/phpunit_after_b4_backend.txt` | 212 passed, 921 assertions (2 new) |
+| PostgreSQL suite, local | `docs/baseline/phpunit_after_b4_postgres.txt` | in progress at commit time: 35 tests in 11 minutes, about 19 s each, because upstream's test base runs `migrate:fresh` with 81 migrations per test and PostgreSQL DDL in Docker Desktop is not free; the file is retained when the run ends |
+| PostgreSQL suite, CI | `backend-postgres` job on pull request #7 | the matrix's evidence; recorded below when the run completes |
+
+**What went wrong, in order.**
+
+1. The export-order test failed at teardown, not in the assertion: the per-test rollback runs an upstream migration's `down()` that makes `membership_type_id` NOT NULL again, and the membership factory sets no type. Upstream's own tests always create a type; the fixture now does too.
+2. The local PostgreSQL run is slow for the same reason the MariaDB run is: `DatabaseMigrations` per test. The CI runner does it in minutes; the laptop in an hour. Recorded, not hidden; `RefreshDatabase` for the fork's tests stays in future work.
+
+**Three lessons.**
+
+1. A dialect is a set of things the other engines let you get away with. Only the strict engine finds them, so it has to be in CI, not in a document.
+2. Fix in place is a contribution; isolate is a maintenance debt. Choose per construct and write down which.
+3. A test that fails at teardown is still telling you about your fixture.
+
+**Deferred.** `CHECK (amount >= 0)` per engine for money columns; the default engine question until B8; the portability fixes travel with the upstream offer at B9.

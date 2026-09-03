@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('voluntary_contribution')->after('owner_member_id')->nullable();
         });
 
-        DB::statement('UPDATE clubs SET membership_start_cycle_type = "daily"');
+        DB::table('clubs')->update(['membership_start_cycle_type' => 'daily']);
     }
 
     public function down(): void

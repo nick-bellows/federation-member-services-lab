@@ -248,3 +248,36 @@ Participation after an approval is unknown for a second or two instead of immedi
 3. You used a database queue. What changes, and what does not, when this moves to SQS or Kafka?
 4. The worker fails after an approval. Walk me through what the reviewer sees, what the operator sees, and how it is repaired.
 5. Why one job per consumer rather than one job per event?
+
+## M7 / B4 — PostgreSQL
+
+### What it does
+
+The suite runs on three engines in CI: SQLite (upstream's configuration), MariaDB (the runtime) and PostgreSQL 16 (the strict one, with the demo seeder). Upstream's MySQL-only SQL was replaced in place by portable forms with a regression test, and every construct, treatment and known engine difference is written down in one matrix.
+
+### Why we built it this way
+
+SQLite hides dialect bugs by type affinity; only the real engine tells the truth. A matrix with evidence beats a claim; fixing in place beats two code paths and gives upstream something usable.
+
+### Alternatives considered
+
+Switching the default to PostgreSQL; PostgreSQL for the federation tables only; isolating every construct behind a driver switch; marking features MariaDB-only (ADR-0011).
+
+### Failure modes
+
+`FIELD()` and `CAST AS UNSIGNED` rejected outright; a double-quoted literal read as an identifier; strict `GROUP BY` on a future query; `LIKE` case; `NULL` ordering on nullable sort columns; unsigned money columns becoming plain integers.
+
+### Tradeoffs
+
+Three CI jobs instead of two; MariaDB stays the default so the demo stack is still upstream's; a `CHECK` per engine deferred.
+
+### Code to locate immediately
+
+`docs/DATABASE_COMPATIBILITY.md` · `api/app/Support/OrderByIdList.php` · `api/tests/Feature/Export/ExportOrderTest.php` · `api/app/Models/Membership.php` (`scopeWithMembersDivisionsFee`) · `.github/workflows/ci.yml` (`backend-postgres`) · `docker-compose.yml` (`postgres` profile)
+
+### Likely interviewer questions
+
+1. You added PostgreSQL support to an application written for MySQL. What did you find, and how did you decide what to fix and what to isolate?
+2. What does "supported on PostgreSQL" mean in your README, and what evidence backs it?
+3. Which engine would you run in production for this system, and what would make you change your mind?
+4. Why did the export ordering have no test before, and what does the new one prove on each engine?

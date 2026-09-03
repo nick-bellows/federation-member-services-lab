@@ -97,6 +97,21 @@ services:
       - 3004:8080
     restart: always
 
+  # Third engine of the compatibility matrix (docs/DATABASE_COMPATIBILITY.md).
+  # Off by default: `docker compose --profile postgres up -d postgres`, then run
+  # the suite from tooling with DB_CONNECTION=pgsql DB_HOST=postgres (see README).
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    environment:
+      - POSTGRES_DB=verein_test
+      - POSTGRES_USER=verein
+      - POSTGRES_PASSWORD=verein
+    networks:
+      - stack
+    ports:
+      - 5432:5432
+
   # Mock of the Learning Center credentials contract (ADR-0009). Serves the
   # fixture files that are the contract's source of truth; MOCK_DELAY_MS
   # reproduces INCIDENT-001. The API reaches it as http://learning-center:3005.

@@ -3,6 +3,7 @@
 namespace App\Actions\Export;
 
 use App\Models\Receipt;
+use App\Support\OrderByIdList;
 use Illuminate\Database\Eloquent\Builder;
 
 class ExportReceiptResource extends ExportResourceCsv
@@ -13,10 +14,7 @@ class ExportReceiptResource extends ExportResourceCsv
             ->where('club_id', $clubId)
             ->with(['financeContact', 'taxAccount']);
 
-        if (!empty($ids)) {
-            $idsString = implode(',', array_map('intval', $ids));
-            $query->orderByRaw("FIELD(id, $idsString)");
-        }
+        OrderByIdList::apply($query, $ids);
 
         return $query;
     }

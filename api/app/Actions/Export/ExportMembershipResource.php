@@ -3,6 +3,7 @@
 namespace App\Actions\Export;
 
 use App\Models\Membership;
+use App\Support\OrderByIdList;
 use Illuminate\Database\Eloquent\Builder;
 
 class ExportMembershipResource extends ExportResourceCsv
@@ -14,10 +15,7 @@ class ExportMembershipResource extends ExportResourceCsv
             ->where('club_id', $clubId)
             ->with(['owner', 'membershipType', 'paymentPeriod', 'members']);
 
-        if (!empty($ids)) {
-            $idsString = implode(',', array_map('intval', $ids));
-            $query->orderByRaw("FIELD(id, $idsString)");
-        }
+        OrderByIdList::apply($query, $ids);
 
         return $query;
     }

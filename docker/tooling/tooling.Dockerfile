@@ -70,6 +70,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
 # Install PHP extensions
 RUN docker-php-ext-install gd zip pdo_mysql bcmath exif
+# PostgreSQL driver for the compatibility matrix (docs/DATABASE_COMPATIBILITY.md)
+RUN apk add --no-cache postgresql-dev && docker-php-ext-install pdo_pgsql
 
 # Install intl extension
 RUN docker-php-ext-configure intl && docker-php-ext-install intl

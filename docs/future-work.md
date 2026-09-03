@@ -33,3 +33,5 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Per-consumer attempts** — attempts are counted per outbox row across consumers; a per-consumer view if consumer counts grow.
 - **Broker adapter** — the relay dispatches to Laravel's queue; a SQS, RabbitMQ or Kafka adapter behind the same relay when one is chosen (B8), per the table in ADR-0010.
 - **Worker as a Compose service** — the worker is started by hand in the api container as the PHP-FPM user; a dedicated service on the api image with the entrypoint's migration made opt-in would remove the manual step.
+- **Money columns on PostgreSQL** — `unsignedInteger` maps to a plain integer there; a `CHECK (amount >= 0)` per engine would restore the constraint (B4 finding).
+- **Default engine** — MariaDB remains the development default; switching the Compose stack to PostgreSQL is a documented option once B8 chooses a production engine.
