@@ -172,6 +172,19 @@ jobs:
         run: |
           printf 'USER_ID=1001\nGROUP_ID=1001\n' > .env
           docker compose up -d --build database api oidc tooling
+      - name: Wait for the API container to finish its own migration
+        # docker/api/entrypoint.sh migrates the empty database at start-up. A
+        # migrate:fresh from tooling at the same time waits on MariaDB metadata
+        # locks with no timeout; the second run on 2026-09-03 hung there for 45
+        # minutes. Same ordering as the README's run instructions.
+        run: |
+          for i in $(seq 1 100); do
+            if docker compose logs api 2>&1 | grep -q "Starting the app"; then exit 0; fi
+            sleep 3
+          done
+          echo "The API container did not report 'Starting the app' within five minutes"
+          docker compose logs --tail=60 api
+          exit 1
       - name: Install and seed inside the tooling container
         run: |
           docker compose exec -T tooling bash -lc '
@@ -180,7 +193,7 @@ jobs:
             composer install --no-interaction --prefer-dist --no-progress
             cp .env.example .env && php artisan key:generate --no-interaction
             sed -i "s/^MAIL_MAILER=smtp/MAIL_MAILER=log/" .env
-            until php artisan migrate:status >/dev/null 2>&1; do sleep 2; done
+            php artisan migrate:status | tail -n 2
             php artisan migrate:fresh --seeder=NorthgateDemoSeeder --no-interaction
             php artisan filament:assets && npm ci && npm run build
             cd ../web_application
@@ -207,8 +220,8 @@ jobs:
           name: playwright-report
           path: e2e/playwright-report
           retention-days: 7
-      - name: Logs on failure
-        if: failure()
+      - name: Logs on failure or cancellation
+        if: failure() || cancelled()
         run: |
           docker compose logs --tail=100 api
           docker compose exec -T tooling bash -lc 'tail -n 100 /tmp/next-dev.log' || true
