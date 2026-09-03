@@ -1,11 +1,9 @@
-# Playwright run, 2026-09-02T21:52:30Z, host Chromium against the compose stack (next dev :3000, api :3001, mock OIDC :3004), seeded with NorthgateDemoSeeder
 Running 7 tests using 2 workers
-  ✓  2 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (2.6s)
-  ✓  3 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (11.8s)
-  ✓  4 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (318ms)
-  ✓  1 [chromium] › tests\registration-review.spec.ts:48:9 › registration review slice › an applicant starts, completes and submits an application (27.4s)
-  ✓  5 [chromium] › tests\registration-review.spec.ts:87:9 › registration review slice › a reviewer works the queue and approves (24.4s)
-  ✓  6 [chromium] › tests\registration-review.spec.ts:113:9 › registration review slice › the applicant sees the decision and the history (13.8s)
-  ✓  7 [chromium] › tests\registration-review.spec.ts:132:9 › registration review slice › an organization administrator can open a registration window (11.9s)
-  7 passed (1.3m)
-playwright_exit=0
+  ✓  1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (1.8s)
+  ✓  3 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (13.7s)
+  ✓  4 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (829ms)
+  ✓  2 [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application (48.4s)
+  ✓  5 [chromium] › tests\registration-review.spec.ts:104:9 › registration review slice › a reviewer works the queue and approves (20.9s)
+  ✓  6 [chromium] › tests\registration-review.spec.ts:130:9 › registration review slice › the applicant sees the decision and the history (9.8s)
+  ✓  7 [chromium] › tests\registration-review.spec.ts:149:9 › registration review slice › an organization administrator can open a registration window (10.2s)
+  7 passed (1.5m)

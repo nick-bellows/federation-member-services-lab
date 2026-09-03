@@ -93,7 +93,8 @@ cd api
 composer install
 cp .env.example .env && php artisan key:generate
 sed -i 's/^MAIL_MAILER=smtp/MAIL_MAILER=log/' .env          # no mailpit service in compose
-# wait until `docker compose logs api` shows the entrypoint's migration result, then:
+# The api container migrates the empty database on its own first start. Wait until
+# `docker compose logs api` shows "Starting the app" (several minutes), then:
 php artisan migrate:fresh --seeder=NorthgateDemoSeeder      # upstream's fake clubs + the Northgate federation
 php artisan filament:assets && npm ci && npm run build
 cd ../web_application
@@ -121,7 +122,7 @@ docker compose exec tooling bash -lc 'cd api && php artisan test'          # 168
 cd e2e && npm ci && npx playwright install chromium && npx playwright test   # 7 browser journeys with axe, against the running stack
 ```
 
-Measured on 2026-09-02 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 168 passed (674 assertions); Playwright 7 passed. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff; it is marked draft until its first run.
+Measured on 2026-09-02 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 168 passed (674 assertions); Playwright 7 passed. The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff; it is marked draft until its first run.
 
 ## Upstream contributions
 

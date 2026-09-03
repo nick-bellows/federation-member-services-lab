@@ -140,3 +140,33 @@ _Pending; recorded in the internal review file._
 7. Playwright's `selectOption` takes a string label, not a pattern; reference-data sorts were rejected with 400 because the schemas had not declared those fields sortable, and the page helper swallowed that into an empty list, which hid the window form; the applicant journey collided with its own previous run because an approved application is live, so the spec now signs in a fresh identity per run.
 
 **Decisions recorded.** ADR-0008 (documents as metadata, second JSON:API server, merged OpenAPI). Incident write-up: INCIDENT-002 (duplicate submission), designed and reproduced rather than suffered.
+
+## 2026-09-02 — A5: cold-clone verification of the README
+
+**Goal.** Prove that the README's run instructions work from nothing: a fresh clone into a scratch directory, a separate Compose project with fresh volumes, no reuse of the working stack's database or dependencies. The working stack was stopped first because both use the same ports. Log: `docs/baseline/cold_clone_2026-09-02.txt`.
+
+**Measured.**
+
+| Step | Wall clock |
+|---|---|
+| `git clone` of the local repository | 5 s |
+| `docker compose up -d --build` (images cached from the working stack; a fresh machine builds for minutes) | 60 s |
+| `composer install`, `.env`, `key:generate` | 27 s |
+| wait for the API container's own migration to finish | 45 s |
+| `migrate:fresh --seeder=NorthgateDemoSeeder` | 332 s |
+| Filament assets, API `npm ci` and build, web `npm ci` | 25 s |
+| sign-in page, identity endpoint with a persona token | 200, 200 |
+| Playwright, first run | member sign-in 3 passed; registration review 1 failed, 3 skipped |
+| Playwright, after the fix below | 7 passed |
+
+**What the first run found.** The applicant journey failed on its first page with an axe colour-contrast violation. The offending element was not the application: it was the Next.js development overlay's red "2 errors" badge. The Playwright trace held the real error, a React hydration mismatch in the start form: the server had rendered "closes 11/3/2026" and the browser "closes 11/2/2026". Every date in the member pages was formatted with `toLocaleDateString()` and no options, so the server (UTC) and the browser (this machine's zone) disagreed about the calendar day of a window that closes shortly after midnight UTC. The working stack had passed the same test all day because its seed had been written at a time of day where both zones agreed. A cold clone seeded at a different hour exposed it.
+
+**Fix.** `web_application/src/lib/federation/format.ts` formats with `Intl.DateTimeFormat` in the page language and in UTC at all six call sites; a server component's history list now receives the language explicitly. The spec `e2e/tests/registration-review.spec.ts` collects hydration warnings, console errors about server and client mismatch, and uncaught page errors, and fails on any of them, so the guard no longer depends on the overlay tripping a contrast rule. Prettier, `tsc` and ESLint clean; both specs rerun green on the clone, then the clone and its volumes were removed and the working stack restored.
+
+**Three lessons.**
+
+1. A cold clone is not a formality. Same code, same tests, different clock: the working stack could not have found this.
+2. Anything rendered on both the server and in the browser must be deterministic across machines: locale, time zone, random values and the current time are all inputs. Format with explicit options, or format on the server and pass strings down.
+3. When an accessibility scan fails on tooling rather than on the page, read the trace before touching colours. The contrast rule was the messenger.
+
+**Deferred.** Registration windows in a federation-defined time zone rather than UTC display, recorded in `docs/future-work.md`.

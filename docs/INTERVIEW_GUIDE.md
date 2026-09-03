@@ -161,7 +161,7 @@ Extending upstream's `v1` server; plain JSON controllers; real uploads via media
 
 ### Failure modes
 
-Double submission (idempotency key, 409 on a new key, unique `active_key`); submitting an incomplete application (422 with what is missing); a reviewer from another organization (404 through scoping, 403 on the action); a stale route cache in the API container after adding routes; OpenAPI drift between the merged document and the code; a rejected sort silently emptying a page.
+Double submission (idempotency key, 409 on a new key, unique `active_key`); submitting an incomplete application (422 with what is missing); a reviewer from another organization (404 through scoping, 403 on the action); a stale route cache in the API container after adding routes; OpenAPI drift between the merged document and the code; a rejected sort silently emptying a page; a date that hydrates with a different calendar day on the server (UTC) and in the browser (local zone), found only by the cold-clone verification.
 
 ### Tradeoffs
 
@@ -169,7 +169,7 @@ Documents are promises until object storage exists; the OpenAPI document is part
 
 ### Code to locate immediately
 
-`api/app/Federation/JsonApi/Server.php` · `api/routes/federation.php` · `api/app/Federation/Http/Controllers/RegistrationApplicationController.php` · `api/app/Federation/Http/Controllers/Concerns/RendersDomainExceptions.php` · `api/app/Federation/JsonApi/RegistrationApplications/RegistrationApplicationSchema.php` (scoping, history) · `api/app/Federation/Actions/AttachDocumentMetadata.php` · `api/app/Federation/Console/GenerateFederationOpenApi.php` · `api/tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php` · `web_application/src/actions/federation/actions.ts` · `web_application/src/app/[lang]/member/applications/[id]/DocumentsPanel.tsx` · `e2e/tests/registration-review.spec.ts` · `docs/incidents/INCIDENT-002-duplicate-submission.md`
+`api/app/Federation/JsonApi/Server.php` · `api/routes/federation.php` · `api/app/Federation/Http/Controllers/RegistrationApplicationController.php` · `api/app/Federation/Http/Controllers/Concerns/RendersDomainExceptions.php` · `api/app/Federation/JsonApi/RegistrationApplications/RegistrationApplicationSchema.php` (scoping, history) · `api/app/Federation/Actions/AttachDocumentMetadata.php` · `api/app/Federation/Console/GenerateFederationOpenApi.php` · `api/tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php` · `web_application/src/actions/federation/actions.ts` · `web_application/src/app/[lang]/member/applications/[id]/DocumentsPanel.tsx` · `web_application/src/lib/federation/format.ts` · `e2e/tests/registration-review.spec.ts` · `docs/incidents/INCIDENT-002-duplicate-submission.md`
 
 ### Likely interviewer questions
 
@@ -178,3 +178,4 @@ Documents are promises until object storage exists; the OpenAPI document is part
 3. Where is authorization enforced for the review queue, and how would you test that a reviewer cannot see another organization's applications?
 4. Why a second JSON:API server instead of extending the existing one?
 5. What did the OpenAPI generator not do for you, and how did you keep the frontend typed anyway?
+6. The working stack passed every browser test and a fresh clone failed the first page. What class of bug behaves like that, and what would you check before blaming the environment?

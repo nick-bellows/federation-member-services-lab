@@ -1,0 +1,42 @@
+[00:30:26] # Cold-clone verification of README run instructions (fresh compose project 'fmsl-coldclone', fresh volumes)
+[00:30:26] # Source of the clone: the local repository (the GitHub fork does not exist yet); branch checked out = m0/engineering-archaeology
+[00:30:26] phase 1: stop the working stack
+[00:31:01] git clone: 5s, branch=m0/engineering-archaeology, head=b49d01f
+ Container fmsl-coldclone-api-docs-1 Starting 
+ Container fmsl-coldclone-api-docs-1 Started 
+[00:32:01] compose up --build: 60s (images cached from the working stack; a truly fresh machine builds ~8 min)
+Use the `composer fund` command to find out more!
+
+[00:32:28] composer install + env: 27s
+[00:32:29] waiting for the api entrypoint's migration result (README instruction)
+api-1  |    INFO  Running migrations.  
+[00:33:14] api entrypoint migration wait: 45s
+[00:35:02] phase 2: migrate:fresh --seeder=NorthgateDemoSeeder
+   INFO  Seeding database.  
+seed_exit=0
+[00:40:34] migrate:fresh + seed: 332s
+[00:41:00] phase 3: assets, web install, next dev, api restart, verification
+
+npm notice
+✓ built in 1.68s
+added 665 packages in 17s
+[00:41:25] assets + npm installs: 25s
+[00:41:55] sign-in page: http=200
+[00:42:13] identity endpoint with persona token: http=200
+[00:42:13] windows endpoint with persona token: http=
+  ✓  1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (1.6s)
+  ✓  3 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (17.6s)
+  ✓  4 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (334ms)
+  ✘  2 [chromium] › tests\registration-review.spec.ts:48:9 › registration review slice › an applicant starts, completes and submits an application (20.2s)
+    test-results\registration-review-regist-955c9--and-submits-an-application-chromium\test-failed-1.png
+  1 failed
+  3 passed (21.1s)
+[00:42:41] playwright: 28s
+[first run] registration-review.spec.ts test 1 FAILED, 3 skipped: axe color-contrast on the Next.js dev-overlay toast ("2 errors"), i.e. the page raised runtime errors.
+[diagnosis] Playwright trace: React hydration mismatch in StartApplicationForm — server rendered "closes 11/3/2026", browser rendered "closes 11/2/2026". The server formats in UTC, the browser in the machine's local zone; the seeded closes_at fell shortly after midnight UTC. The working stack never hit it because its seed timestamps fell on the same calendar day in both zones.
+[fix] web_application/src/lib/federation/format.ts: dates formatted with Intl.DateTimeFormat in the page language and timeZone UTC at all six call sites; e2e spec now fails on hydration/console/page errors explicitly. Files synced into the clone; prettier/tsc/eslint clean there.
+--- rerun after fix (clone): 7 passed (1.4m) — member-sign-in 3/3, registration-review 4/4
+[00:51:10] phase 4: tear down the cold clone (volumes removed) and restore the working stack
+ Volume fmsl-coldclone_web_node_modules Removed 
+ Container vereinfacht-api-docs-1 Started 
+[00:52:46] working stack restored: sign-in http=200, api http=200

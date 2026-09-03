@@ -92,7 +92,7 @@ organization admin opens a registration window
 
 Acceptance: the slice runs from a cold clone by following the README; E2E and accessibility checks green in CI; `docs/incidents/INCIDENT-002.md` (duplicate submission) written from the actual regression test.
 
-**Status 2026-09-02: done in compose; CI unrun; README rewrite pending (A5).** Backend: registration windows, application details, document metadata with required types per role, second JSON:API server `federation` (seven schemas, six transition actions, stable error codes, request ids, HTTP idempotency), `php artisan federation:openapi`. Frontend: generated typed client, server actions, member pages (list, start, detail with local file hashing, submit and withdraw, history), reviewer pages (queue, detail with document decisions), window page, navigation by capability, en and de. Tests: 168 PHPUnit (19 HTTP tests for the slice), 7 Playwright journeys with axe (`docs/baseline/playwright_m4.txt`), screenshots in `docs/assets/`. ADR-0008, INCIDENT-002. Open: cold-clone verification through the README (A5), the first CI run, a GIF or short demo.
+**Status 2026-09-02: done in compose; CI unrun; README rewrite pending (A5).** Backend: registration windows, application details, document metadata with required types per role, second JSON:API server `federation` (seven schemas, six transition actions, stable error codes, request ids, HTTP idempotency), `php artisan federation:openapi`. Frontend: generated typed client, server actions, member pages (list, start, detail with local file hashing, submit and withdraw, history), reviewer pages (queue, detail with document decisions), window page, navigation by capability, en and de. Tests: 168 PHPUnit (19 HTTP tests for the slice), 7 Playwright journeys with axe (`docs/baseline/playwright_m4.txt`), screenshots in `docs/assets/`. ADR-0008, INCIDENT-002. Open: the first CI run, a GIF or short demo. Cold-clone verification done under A5.
 
 ### A5 — Publication (M11 brought forward) — size M
 
@@ -101,12 +101,12 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 3. Publish pre-flight per the portfolio house rules: clean tree, tracked-file audit, gitleaks over history, no seeded credentials described as production-safe, logged-out README review.
 4. **Only on explicit approval:** create the GitHub fork, add `origin`, push, merge the milestone branches through pull requests, enable Actions. Pins and profile changes are separate manual approvals.
 
-**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`.** Still open before the fork: cold-clone verification of the README instructions on this machine, the publish pre-flight (clean tree, tracked-file audit, gitleaks over history, logged-out README view), and the owner's explicit go for the fork itself.
+**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`; cold-clone verification done.** The README instructions were followed from a fresh clone in a separate Compose project with fresh volumes (`docs/baseline/cold_clone_2026-09-02.txt`, lesson in `docs/LEARNING_LOG.md`). The first run found a React hydration defect in date formatting (server in UTC, browser in the local zone); it is fixed, guarded by the browser spec, and the rerun passed 7 of 7. Pre-flight run once on the earlier tree (clean tree, tracked-file audit, gitleaks over 24 commits: nothing found) and to be repeated on the final commit. Still open: the owner's explicit go for the fork itself, then the first CI run.
 
 ### Phase A acceptance checklist
 
 - [ ] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs
-- [ ] Cold-clone verification recorded in `docs/LEARNING_LOG.md`
+- [x] Cold-clone verification recorded in `docs/LEARNING_LOG.md` (2026-09-02; log in `docs/baseline/cold_clone_2026-09-02.txt`)
 - [ ] One feature (state machine + review slice) with unit, feature, authorization and E2E tests
 - [ ] OIDC sign-in working against the self-hosted provider in CI and against the Auth0 tenant in the documented walkthrough; privilege-boundary tests
 - [ ] ADR-0000 to ADR-0005, `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
@@ -128,7 +128,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 | B6 Accessibility and performance (M9) | Manual WCAG 2.1 AA review of the slice, fixes, low-bandwidth review of the member flow, synthetic load on three endpoints with before/after measurements | M | Numbers only from retained runs; the missing `club_id` indexes are the obvious first finding |
 | B7 Security review | `docs/THREAT_MODEL.md` covering the brief's list; JSON Patch on one resource with field-level authorization | S–M | Threat model can start earlier and grow |
 | B8 Release engineering (M10) | Production images, deployment architecture document (CloudFront, load balancer, containers, RDS PostgreSQL, S3, queue, worker, CloudWatch), rollback plan, release checklist; Terraform only if labelled untested | M | No provisioning, no cost, without approval. Kubernetes only if everything else works and only as a documented exercise |
-| B9 Case study and demo | Static modernization case study page, demo video, final README pass, interview guide complete | S–M | Hosting a live demo is a separate cost decision, evaluated only after B8 |
+| B9 Case study and demo | Static modernization case study page, demo video, final README pass, interview guide complete; **the Auth0 tenant walkthrough with screenshots (owner decision 2026-09-02: deferred to the very end; the mock provider covers development and CI until then)** | S–M | Hosting a live demo is a separate cost decision, evaluated only after B8 |
 
 ## Continuous tracks
 
