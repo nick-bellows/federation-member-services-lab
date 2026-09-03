@@ -4,6 +4,7 @@ import { requiredDocumentsByRole } from '@/lib/federation/types';
 import createTranslation from 'next-translate/createTranslation';
 import { notFound } from 'next/navigation';
 import HistoryList from '../../components/HistoryList';
+import ParticipationPanel from '../../components/ParticipationPanel';
 import { ApplicationStatusBadge } from '../../components/StatusBadge';
 import DocumentReviewList from './DocumentReviewList';
 import ReviewActions from './ReviewActions';
@@ -66,6 +67,13 @@ export default async function ReviewApplicationPage({ params }: PageProps) {
                     </p>
                 )}
             </section>
+
+            <ParticipationPanel
+                lang={params.lang}
+                applicationId={view.id}
+                participation={attributes.participation}
+                canRefresh
+            />
 
             <section aria-labelledby="applicant-heading" className="mt-8">
                 <h2 id="applicant-heading" className="text-lg font-semibold">

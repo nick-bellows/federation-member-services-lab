@@ -26,6 +26,7 @@ class GenerateFederationOpenApi extends Command
         'request-information' => 'Send the application back to the applicant with a reason (reviewer).',
         'approve' => 'Approve an application under review (reviewer).',
         'reject' => 'Reject an application under review with a reason (reviewer).',
+        'refresh-credentials' => 'Ask the Learning Center for the applicant\'s current credentials and store the snapshot (reviewer, approved applications). 503 when the Learning Center is unavailable.',
     ];
 
     public function handle(): int

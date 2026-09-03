@@ -3,12 +3,14 @@
 namespace App\Federation\JsonApi\RegistrationApplications;
 
 use App\Federation\Enums\DocumentType;
+use App\Federation\LearningCenter\ParticipationResolver;
 use App\Federation\Models\RegistrationApplication;
 use App\JsonApi\V1\PagePagination;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
+use LaravelJsonApi\Eloquent\Fields\ArrayHash;
 use LaravelJsonApi\Eloquent\Fields\ArrayList;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
@@ -25,6 +27,14 @@ class RegistrationApplicationSchema extends Schema
     public static string $model = RegistrationApplication::class;
 
     protected $defaultSort = '-createdAt';
+
+    /**
+     * Participation reads the applicant's snapshot; loading it with the
+     * application keeps a queue page at one query per relation, not per row.
+     *
+     * @var array<int, string>
+     */
+    protected array $with = ['applicant.credentialSnapshot'];
 
     public function fields(): array
     {
@@ -70,6 +80,9 @@ class RegistrationApplicationSchema extends Schema
             BelongsTo::make('season')->type('seasons')->readOnly(),
             BelongsTo::make('applicant')->type('federation-users')->readOnly(),
             HasMany::make('documents')->type('application-documents')->readOnly(),
+            ArrayHash::make('participation')->readOnly()->extractUsing(
+                static fn (RegistrationApplication $application) => app(ParticipationResolver::class)->for($application)->toArray(),
+            ),
         ];
     }
 

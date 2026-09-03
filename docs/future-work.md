@@ -25,3 +25,7 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **History pagination** — the `history` attribute grows with every transition; cap or paginate before long-lived applications exist.
 - **Review queue as its own endpoint** — today the queue is the scoped applications index filtered by status; a dedicated resource could add assignment, ageing and counts.
 - **Registration side effects** — approval does not yet create a registration record or link the applicant to upstream's `members`; decide with the Learning Center contract.
+- **Reconciliation scheduling and retry** — `federation:reconcile-credentials` runs by hand; schedule it (B5) and alert on its non-zero exit; add retry with jitter per user (B3, with the outbox for `credentials.changed`).
+- **Log file shared across containers** — the api and tooling containers write the same bind-mounted `storage/logs/laravel.log`; a root-owned file made every logged request answer 500 during INCIDENT-001's setup. Tests now log to the null channel; give each process its own log path or log to stderr in development.
+- **Service token cache across processes** — the client-credentials token is cached in Laravel's cache store (file in Compose); document the shared store for production in B8.
+- **Credential contract v2 candidates** — a `changed_since` or webhook path so the federation is told about hold and credential changes instead of polling; the provider's `credentials.changed` event would feed the outbox.

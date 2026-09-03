@@ -20,5 +20,6 @@ class ApplicationTransitioned
         public readonly ApplicationStatus $from,
         public readonly ApplicationStatus $to,
         public readonly ?int $actorUserId,
+        public readonly ?string $requestId = null,
     ) {}
 }

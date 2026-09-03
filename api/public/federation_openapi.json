@@ -2342,6 +2342,118 @@
                     }
                 }
             }
+        },
+        "/registration-applications/{registration_application}/-actions/refresh-credentials": {
+            "post": {
+                "summary": "Ask the Learning Center for the applicant's current credentials and store the snapshot (reviewer, approved applications). 503 when the Learning Center is unavailable.",
+                "operationId": "registration-applications.RefreshCredentials",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "3": {
+                                "value": "3"
+                            },
+                            "4": {
+                                "value": "4"
+                            },
+                            "5": {
+                                "value": "5"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": false,
+                        "description": "Retrying with the same key returns the current state instead of failing.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/vnd.api+json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meta": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "Required for request-information and reject."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in user may not perform this transition on this application."
+                    },
+                    "409": {
+                        "description": "The transition is not legal from the current status."
+                    },
+                    "422": {
+                        "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
         }
     },
     "components": {

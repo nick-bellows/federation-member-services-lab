@@ -56,6 +56,7 @@ JsonApiRoute::server('federation')
                 $actions->withId()->post('request-information');
                 $actions->withId()->post('approve');
                 $actions->withId()->post('reject');
+                $actions->withId()->post('refresh-credentials');
             });
 
         $server->resource('application-documents', ApplicationDocumentController::class)

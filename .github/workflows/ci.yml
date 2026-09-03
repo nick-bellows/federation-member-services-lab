@@ -171,7 +171,7 @@ jobs:
       - name: Start database, API, mock OIDC provider and tooling
         run: |
           printf 'USER_ID=1001\nGROUP_ID=1001\n' > .env
-          docker compose up -d --build database api oidc tooling
+          docker compose up -d --build database api oidc learning-center tooling
       - name: Wait for the API container to finish its own migration
         # docker/api/entrypoint.sh migrates the empty database at start-up. A
         # migrate:fresh from tooling at the same time waits on MariaDB metadata

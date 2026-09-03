@@ -339,6 +339,50 @@ export async function transitionApplication(
     };
 }
 
+const refreshCredentialsSchema = z.object({
+    applicationId: z.string().min(1),
+    lang: z.string().min(2).max(5),
+});
+
+/**
+ * A reviewer asks the API to fetch the applicant's credentials from the
+ * Learning Center now. The only user action that reaches the provider;
+ * a 503 from the API means "not now", and the page keeps the last snapshot.
+ */
+export async function refreshCredentials(
+    input: z.infer<typeof refreshCredentialsSchema>,
+): Promise<ActionResult> {
+    const parsed = refreshCredentialsSchema.safeParse(input);
+
+    if (!parsed.success) {
+        return { ok: false, code: 'invalid_input' };
+    }
+
+    const auth = await tokenOrFail();
+    if ('failure' in auth) return auth.failure;
+
+    const client = createFederationClient(auth.token);
+    const { data, error, response } = await client.POST(
+        '/registration-applications/{registration_application}/-actions/refresh-credentials',
+        {
+            params: {
+                path: { registration_application: parsed.data.applicationId },
+            },
+        },
+    );
+
+    if (error || !data) {
+        return failureFrom(error, response);
+    }
+
+    const { lang, applicationId } = parsed.data;
+    revalidatePath(`/${lang}/member/applications/${applicationId}`);
+    revalidatePath(`/${lang}/member/review`);
+    revalidatePath(`/${lang}/member/review/${applicationId}`);
+
+    return { ok: true, id: applicationId };
+}
+
 const reviewDocumentSchema = z.object({
     documentId: z.string().min(1),
     applicationId: z.string().min(1),

@@ -10,6 +10,7 @@ import { notFound } from 'next/navigation';
 import HistoryList from '../../components/HistoryList';
 import { ApplicationStatusBadge } from '../../components/StatusBadge';
 import ApplicantControls from './ApplicantControls';
+import ParticipationPanel from '../../components/ParticipationPanel';
 import DetailsForm from './DetailsForm';
 import DocumentsPanel from './DocumentsPanel';
 
@@ -78,6 +79,13 @@ export default async function ApplicationPage({ params }: PageProps) {
                     </p>
                 )}
             </section>
+
+            <ParticipationPanel
+                lang={params.lang}
+                applicationId={view.id}
+                participation={attributes.participation}
+                canRefresh={false}
+            />
 
             <section aria-labelledby="details-heading" className="mt-8">
                 <h2 id="details-heading" className="text-lg font-semibold">

@@ -8,11 +8,16 @@ use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
 use App\Federation\Http\Controllers\Concerns\RendersDomainExceptions;
 use App\Federation\Http\Middleware\AssignRequestId;
+use App\Federation\LearningCenter\CredentialSnapshots;
+use App\Federation\LearningCenter\Exceptions\LearningCenterException;
+use App\Federation\LearningCenter\Exceptions\LearningCenterUnavailableException;
 use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Support\AuditRecorder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Laravel\Http\Controllers\Actions\FetchMany;
 use LaravelJsonApi\Laravel\Http\Controllers\Actions\FetchOne;
@@ -102,6 +107,36 @@ class RegistrationApplicationController extends Controller
     public function reject(Request $request, RegistrationApplication $application, TransitionApplication $transition): DataResponse
     {
         return $this->transition($request, $application, $transition, ApplicationStatus::REJECTED);
+    }
+
+    /**
+     * A reviewer asks the Learning Center for the applicant's current
+     * credentials. The only path that calls the provider during a request;
+     * an unavailable provider is a 503 with a stable code, never a hang.
+     */
+    public function refreshCredentials(Request $request, RegistrationApplication $application, CredentialSnapshots $snapshots): DataResponse
+    {
+        $this->authorize('review', $application);
+
+        try {
+            $snapshots->refresh($application->applicant, $request->user(), AssignRequestId::current($request));
+        } catch (LearningCenterUnavailableException $exception) {
+            throw new JsonApiException(Error::fromArray([
+                'status' => '503',
+                'code' => 'learning_center_unavailable',
+                'title' => 'Learning Center unavailable',
+                'detail' => 'The credential service did not answer in time; the last snapshot, if any, is still shown.',
+            ]));
+        } catch (LearningCenterException $exception) {
+            throw new JsonApiException(Error::fromArray([
+                'status' => '502',
+                'code' => 'learning_center_error',
+                'title' => 'Learning Center error',
+                'detail' => 'The credential service answered in a way this application cannot use.',
+            ]));
+        }
+
+        return DataResponse::make($application->fresh(['applicant.credentialSnapshot']));
     }
 
     private function transition(Request $request, RegistrationApplication $application, TransitionApplication $transition, ApplicationStatus $to): DataResponse

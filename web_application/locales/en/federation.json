@@ -164,7 +164,29 @@
             "application_cancelled": "Withdrawn",
             "application_details_updated": "Details updated",
             "document_attached": "Document recorded",
-            "document_reviewed": "Document reviewed"
+            "document_reviewed": "Document reviewed",
+            "credentials_recorded": "Credentials recorded",
+            "credentials_changed": "Credentials changed"
         }
+    },
+    "participation": {
+        "heading": "Participation",
+        "statuses": {
+            "may_participate": "May participate",
+            "blocked": "Blocked",
+            "unknown": "Unknown"
+        },
+        "stale": "Stale answer",
+        "reasons": {
+            "not_approved": "The application is not approved.",
+            "no_snapshot": "The Learning Center has not been asked yet.",
+            "no_learning_center_record": "The Learning Center has no record for this person.",
+            "hold_active": "An active hold blocks participation.",
+            "credential_lapsed": "A required credential has lapsed.",
+            "role_credential_missing": "No valid credential for this role."
+        },
+        "fetched_at": "Fetched {{fetched}}; evaluated by the Learning Center {{asOf}}.",
+        "never_fetched": "Not fetched yet. Credentials are fetched after an approval, on request, and by the daily reconciliation.",
+        "refresh": "Refresh from Learning Center"
     }
 }

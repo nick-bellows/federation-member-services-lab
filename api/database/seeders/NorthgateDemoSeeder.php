@@ -69,17 +69,17 @@ class NorthgateDemoSeeder extends Seeder
             'roles' => ApplicationRole::values(),
         ]);
 
-        $federationAdmin = $this->user('Federation Admin', 'federation-admin@northgate.example');
+        $federationAdmin = $this->user('Federation Admin', 'federation-admin@northgate.example', 'mock|federation-admin');
         $federation->administrators()->attach($federationAdmin);
 
-        $youth->administrators()->attach($this->user('NYSA Admin', 'nysa-admin@northgate.example'));
-        $adult->administrators()->attach($this->user('NASL Admin', 'nasl-admin@northgate.example'));
-        $referees->administrators()->attach($this->user('NRA Admin', 'nra-admin@northgate.example'));
+        $youth->administrators()->attach($this->user('NYSA Admin', 'nysa-admin@northgate.example', 'mock|nysa-admin'));
+        $adult->administrators()->attach($this->user('NASL Admin', 'nasl-admin@northgate.example', 'mock|nasl-admin'));
+        $referees->administrators()->attach($this->user('NRA Admin', 'nra-admin@northgate.example', 'mock|nra-admin'));
 
-        $alex = $this->user('Alex Participant', 'alex.participant@northgate.example');
-        $sam = $this->user('Sam Coach', 'sam.coach@northgate.example');
-        $riley = $this->user('Riley Referee', 'riley.referee@northgate.example');
-        $jordan = $this->user('Jordan Newcomer', 'jordan.newcomer@northgate.example');
+        $alex = $this->user('Alex Participant', 'alex.participant@northgate.example', 'mock|alex');
+        $sam = $this->user('Sam Coach', 'sam.coach@northgate.example', 'mock|sam');
+        $riley = $this->user('Riley Referee', 'riley.referee@northgate.example', 'mock|riley');
+        $jordan = $this->user('Jordan Newcomer', 'jordan.newcomer@northgate.example', 'mock|jordan');
 
         $start = app(StartApplication::class);
         $move = app(TransitionApplication::class);
@@ -162,12 +162,26 @@ class NorthgateDemoSeeder extends Seeder
         $clubs->slice(3, 2)->each(fn (Club $club) => $club->memberOrganization()->associate($adult)->save());
     }
 
-    private function user(string $name, string $email): User
+    /**
+     * Personas carry the subject the mock identity provider issues for them
+     * (docker/oidc/config.json), so the credentials contract can be exercised
+     * against seeded data before anyone signs in.
+     */
+    private function user(string $name, string $email, ?string $subject = null): User
     {
-        return User::factory()->create([
+        $user = User::factory()->create([
             'name' => $name,
             'email' => $email,
             'password' => self::PASSWORD,
         ]);
+
+        if ($subject !== null) {
+            $user->forceFill([
+                'oidc_issuer' => config('oidc.issuer'),
+                'oidc_subject' => $subject,
+            ])->save();
+        }
+
+        return $user;
     }
 }

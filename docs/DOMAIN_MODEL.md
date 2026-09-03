@@ -106,9 +106,13 @@ Every transition also writes one audit entry and, after the transaction commits,
 
 Rows are append-only: the model throws on update and delete; the table has no `updated_at`.
 
-## Derived status (planned, M5)
+## Derived status (M5 / B2)
 
-Whether a person may participate is **not** a column. It will be computed from: an approved application for the season and role, valid credentials from the Learning Center contract, and no blocking hold. That computation, its caching and its explanation to the member are the subject of the Learning Center milestone; nothing in M2 pre-empts it, and no editable "eligible" flag exists anywhere in the schema.
+Whether a person may participate is **not** a column. It is computed on read (`ParticipationResolver`) from three inputs: the application's status (approved or not), the provider's `eligibility.status` in the applicant's stored credential snapshot, and, for coach and referee applications, a valid role credential in that snapshot. The result is the `participation` attribute of a registration application: `may_participate`, `blocked` or `unknown`, with every reason listed (`not_approved`, `no_snapshot`, `no_learning_center_record`, `hold_active`, `credential_lapsed`, `role_credential_missing`), the provider's `as_of`, this side's `fetched_at`, and a `stale` marker when the snapshot is older than the configured limit. No editable "eligible" flag exists anywhere in the schema.
+
+| Entity | Meaning | Rules |
+|---|---|---|
+| **Credential snapshot** (`credential_snapshots`) | The last answer of the Learning Center credentials contract for one user: the payload verbatim, the provider's `as_of`, this side's `fetched_at`, and the provider's eligibility status or `not_found`. | One row per user; written only by `CredentialSnapshots::refresh` after an approval, on a reviewer's `refresh-credentials` action, or by `federation:reconcile-credentials`. A change of eligibility status is audited on the user as `credentials.changed`; the first record as `credentials.recorded`. Reads never call the provider (ADR-0009). |
 
 ## Registration windows and documents (M4)
 

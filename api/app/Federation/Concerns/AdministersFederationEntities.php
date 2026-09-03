@@ -2,9 +2,11 @@
 
 namespace App\Federation\Concerns;
 
+use App\Federation\Models\CredentialSnapshot;
 use App\Federation\Models\Federation;
 use App\Federation\Models\MemberOrganization;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Added to App\Models\User. Administrative roles above the club level live in
@@ -20,6 +22,11 @@ trait AdministersFederationEntities
     public function administeredMemberOrganizations(): BelongsToMany
     {
         return $this->belongsToMany(MemberOrganization::class, 'organization_administrators')->withTimestamps();
+    }
+
+    public function credentialSnapshot(): HasOne
+    {
+        return $this->hasOne(CredentialSnapshot::class);
     }
 
     public function administersMemberOrganization(MemberOrganization $organization): bool

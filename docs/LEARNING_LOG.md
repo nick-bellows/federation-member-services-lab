@@ -199,3 +199,40 @@ _Pending; recorded in the internal review file._
 3. One green run proves nothing about ordering. Two runs of the same commit are the cheapest race detector available, and a silent unbounded loop turns a race into a timeout with no diagnosis. Bound the wait, print what it saw, and capture logs when the job is cancelled, not only when it fails.
 
 **Deferred.** Making the entrypoint's migration opt-in for development and CI (`docs/future-work.md`); the upstream issue and pull request (ADR-0004), which are outward-facing and wait for the owner's go; a short demo.
+
+## 2026-09-03 — B2 (M5): the Learning Center contract
+
+**Goal.** Answer "may this approved person take part" from two systems that share no database: credential facts and eligibility in the Learning Center, applications here. Do it with an executable contract, a service identity, and an honest answer under a slow provider.
+
+**Decisions (owner, at the start).** The contract is keyed by the OIDC subject; the federation calls with a client-credentials service token; participation is derived on read from a stored snapshot with its age. ADR-0009 records the alternatives.
+
+**Built, provider side (`learning-center-reference`, pull request #1, merged).** `GET /v1/members/{subject}/credentials` for tokens carrying the `credentials:read` scope, a service-token verifier path beside the person path, a store query by subject, the expiry rule exposed once (`safeguarding.Current`) and used by both eligibility and the new endpoint, OpenAPI, handler and contract-shape tests, an e2e step, and subjects for the two seeded referees. Built by a delegated agent from the contract document and the fixtures; its four CI jobs were green before the merge.
+
+**Built, consumer side (this repository).** The contract document and four fixtures; a Node mock in Compose that serves the fixtures verbatim and takes a delay; a service-token provider with a cached client-credentials token; an HTTP client with 300 ms connect and 800 ms total timeouts; `credential_snapshots` with one writer; `ParticipationResolver`; the `participation` attribute on registration applications; a `refresh-credentials` action for reviewers (503 with a stable code when the provider is away); a listener that refreshes after approval, best effort; `federation:reconcile-credentials`; seeded personas with their mock subjects; the participation panel on the member and reviewer pages with the reviewer's refresh button, in English and German; two browser journeys extended.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Backend suite | `docs/baseline/phpunit_after_b2_backend.txt` | 202 passed, 861 assertions (34 new) |
+| Browser journeys | `docs/baseline/playwright_b2.txt` | 7 passed, participation panel and refresh included |
+| Incident 1 rehearsal | `docs/baseline/incident_001_2026-09-03.txt` | refresh under a slow provider: 503 `learning_center_unavailable`; page answers from the snapshot; reconciliation counts the unavailable and repairs after recovery; changes audited |
+| Client timeout | same log, measured from both containers | cut at 802 ms |
+| Provider | `learning-center-reference` pull request #1 | api, e2e, oidc-e2e, web green; merged |
+
+**What went wrong, in order.**
+
+1. The HTTP fake keeps the first stub registered for a URL, so a second fake in the same test never applied. Same trap as in M3. One fake per test now reads its scenario from properties.
+2. Counting "requests sent" counted the test issuer's discovery and key-set fetches for the personas' own tokens. The assertion now counts provider requests only.
+3. The working stack's untracked env file had no client secret, so the token endpoint answered 401 and the approval listener logged "unavailable" on every approval. The example env had it; the running stack did not.
+4. A root-owned log file shared across the api and tooling containers made every request that tried to log answer 500, which looked like an authorisation bug until the error body was read. Tests log to the null channel now; the file was made writable; a per-process log path is future work.
+5. A rehearsal script measured the timeout through the API and saw two seconds; measured at the client it was 802 ms. The difference was this development stack's own latency.
+6. A probe used a persona the mock provider does not know, and its 401 was hidden behind the log failure above. Two faults, one symptom.
+
+**Three lessons.**
+
+1. A contract is fixtures both sides execute, not a document both sides read. The provider's tests assert shape equality against copies that name this repository as the source of truth; a renamed field fails there first.
+2. A service needs its own identity. The reviewer's queue and the nightly job have no applicant behind them, so the applicant's token was never an option.
+3. Under a slow dependency the honest answer is the last one, with its age. Reads never wait; the one path that does wait says so with a code and a sentence.
+
+**Deferred.** Scheduling and alerting for reconciliation (B5), retry with jitter and the outbox for `credentials.changed` (B3), a per-process log path, the shared-issuer case across both stacks (the demo namespaces differ until Auth0 at B9).

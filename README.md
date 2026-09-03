@@ -23,8 +23,9 @@ The sibling project [learning-center-reference](https://github.com/nick-bellows/
 | M2 Federation domain | Federation → member organization → club → member; a seven-state application lifecycle whose only writer is one transition service; an append-only audit trail; duplicate protection at two layers | [`docs/DOMAIN_MODEL.md`](docs/DOMAIN_MODEL.md), [ADR-0005](docs/adr/0005-federation-hierarchy-above-upstream-clubs.md), [ADR-0006](docs/adr/0006-application-state-machine-and-audit-trail.md) |
 | M3 Identity | OpenID Connect sign-in (authorization code + PKCE) with the access token kept server-side; Laravel validates tokens against the issuer's keys and derives capabilities from the database, never from claims; a mock provider in compose, Auth0 when configured | [ADR-0007](docs/adr/0007-oidc-identity-boundary.md), [INCIDENT-000](docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md) |
 | M4 Review slice | Registration windows, applications with details and document metadata, a second JSON:API server with generated TypeScript types, idempotent submission, correlation ids on every audit entry, member and reviewer pages, browser tests with accessibility scans | [ADR-0008](docs/adr/0008-document-metadata-without-file-storage.md), [INCIDENT-002](docs/incidents/INCIDENT-002-duplicate-submission.md), [`docs/assets/`](docs/assets/) |
+| M5 Learning Center contract | A versioned credentials contract keyed by OIDC subject, executable as fixtures on both sides and served by a mock in Compose; the federation calls with its own client-credentials service token; participation derived on read from a stored snapshot with its age, refreshed after approval, on a reviewer's request and by reconciliation; Incident 1 rehearsed against a slowed provider | [`docs/contracts/learning-center-credentials-v1.md`](docs/contracts/learning-center-credentials-v1.md), [ADR-0009](docs/adr/0009-learning-center-credentials-contract.md), [INCIDENT-001](docs/incidents/INCIDENT-001-slow-credential-service.md), `docs/baseline/incident_001_2026-09-03.txt`, [learning-center-reference PR #1](https://github.com/nick-bellows/learning-center-reference/pull/1) |
 
-Planned, not built: the Learning Center credential contract and derived participation status, a transactional outbox with a worker, PostgreSQL support, structured logs and traces, the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
+Planned, not built: a transactional outbox with a worker, PostgreSQL support, structured logs and traces, the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Architecture
 
@@ -85,7 +86,7 @@ cd federation-member-services-lab
 git remote add upstream https://github.com/vereinfacht/vereinfacht.git && git fetch upstream   # only for the upstream-versus-fork diff above
 cp docker-compose.override.example.yml docker-compose.override.yml   # Windows/NTFS: dependency trees in named volumes
 printf 'USER_ID=1000\nGROUP_ID=1000\n' > .env
-docker compose up -d --build database api api-docs oidc tooling
+docker compose up -d --build database api api-docs oidc learning-center tooling
 docker compose exec tooling bash
 ```
 
@@ -99,6 +100,7 @@ sed -i 's/^MAIL_MAILER=smtp/MAIL_MAILER=log/' .env          # no mailpit service
 # The api container migrates the empty database on its own first start. Wait until
 # `docker compose logs api` shows "Starting the app" (several minutes), then:
 php artisan migrate:fresh --seeder=NorthgateDemoSeeder      # upstream's fake clubs + the Northgate federation
+php artisan federation:reconcile-credentials --all         # credential snapshots from the Learning Center mock for approved applicants
 php artisan filament:assets && npm ci && npm run build
 cd ../web_application
 cp .env.local.example .env.local
@@ -115,17 +117,18 @@ Then restart the API once so it loads the environment: `docker compose restart a
 | http://localhost:3000/de/admin/auth/login | Upstream's club management, unchanged (`club-admin-1@example.org` / `password`; needs the super-admin token step from [`docs/UPSTREAM_README.md`](docs/UPSTREAM_README.md)) |
 | http://localhost:3001/federation_openapi.json | The federation API contract |
 | http://localhost:3004/default/.well-known/openid-configuration | The mock identity provider |
+| http://localhost:3005/health | The Learning Center credentials mock; it serves the contract fixtures and takes `LEARNING_CENTER_MOCK_DELAY_MS` for the Incident 1 rehearsal |
 
 Every deviation from upstream's own instructions, and why, is in [`docs/UPSTREAM_ANALYSIS.md` §11](docs/UPSTREAM_ANALYSIS.md).
 
 ## Tests
 
 ```sh
-docker compose exec tooling bash -lc 'cd api && php artisan test'          # 168 tests, SQLite in memory
+docker compose exec tooling bash -lc 'cd api && php artisan test'          # 202 tests, SQLite in memory
 cd e2e && npm ci && npx playwright install chromium && npx playwright test   # 7 browser journeys with axe, against the running stack
 ```
 
-Measured on 2026-09-02 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 168 passed (674 assertions); Playwright 7 passed. The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
+Measured on 2026-09-03 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 202 passed (861 assertions, `phpunit_after_b2_backend.txt`); Playwright 7 passed (`playwright_b2.txt`). The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
 
 ## Upstream contributions
 
