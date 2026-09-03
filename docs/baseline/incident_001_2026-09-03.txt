@@ -1,0 +1,19 @@
+[17:38:24] # INCIDENT-001 rehearsal on the compose stack: the Learning Center mock answers after 2000 ms; the consumer's timeout is 800 ms (connect 300 ms). Reviewer = federation-admin persona over the API.
+[17:38:27] approved application: id=11
+[17:38:27] step 0: baseline with a healthy mock
+REFRESH http=200 time=0.516409s participation={"status": "unknown", "reasons": ["no_learning_center_record"], "asOf": null, "fetchedAt": "2026-09-03T17:38:27+00:00", "stale": false}
+[17:38:28] step 1: slow the mock (LEARNING_CENTER_MOCK_DELAY_MS=2000)
+{"status":"ok","subjects":3,"delayMs":2000}[17:38:47] step 2: the reviewer clicks refresh
+REFRESH http=503 time=2.002518s error=learning_center_unavailable | The credential service did not answer in time; the last snapshot, if any, is still shown.
+[17:38:50] step 3: the page still answers from the snapshot
+GET http=200 time=1.008636s participation={"status": "unknown", "reasons": ["no_learning_center_record"], "asOf": null, "fetchedAt": "2026-09-03T17:38:27+00:00", "stale": false}
+[17:38:51] step 4: reconciliation while the provider is slow
+refreshed=1 changed=0 unavailable=6 skipped=0 (cutoff 2026-09-03T05:38:56+00:00)
+[17:39:02] step 5: mock restored (delay 0)
+{"status":"ok","subjects":3,"delayMs":0}[17:39:19] step 6: reconciliation repairs
+refreshed=7 changed=0 unavailable=0 skipped=0 (cutoff 2026-09-03T05:39:21+00:00)
+[17:39:21] step 7: refresh and read after the repair
+REFRESH http=200 time=1.155843s participation={"status": "unknown", "reasons": ["no_learning_center_record"], "asOf": null, "fetchedAt": "2026-09-03T17:39:23+00:00", "stale": false}
+GET http=200 time=0.356375s participation={"status": "unknown", "reasons": ["no_learning_center_record"], "asOf": null, "fetchedAt": "2026-09-03T17:39:23+00:00", "stale": false}
+[17:39:24] step 8: credential audit rows
+7 rows; actions: {"credentials.recorded":7}

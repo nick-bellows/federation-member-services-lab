@@ -7,6 +7,7 @@ use App\Federation\Actions\TransitionApplication;
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
 use App\Federation\Enums\DocumentType;
+use App\Federation\LearningCenter\CredentialsClient;
 use App\Federation\Models\ApplicationDocument;
 use App\Federation\Models\Federation;
 use App\Federation\Models\MemberOrganization;
@@ -14,6 +15,7 @@ use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Models\Season;
 use App\Models\User;
+use Tests\Support\UnavailableCredentialsClient;
 use Tests\TestCase;
 
 /**
@@ -46,6 +48,10 @@ abstract class FederationTestCase extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // The Learning Center is absent unless a test fakes it: approvals must
+        // succeed without it and no HTTP may leave the process.
+        $this->app->instance(CredentialsClient::class, new UnavailableCredentialsClient);
 
         $this->federation = Federation::factory()->create(['name' => 'Northgate Soccer Federation', 'code' => 'NSF']);
         $this->season = Season::factory()->create(['federation_id' => $this->federation->getKey(), 'label' => '2026/27']);

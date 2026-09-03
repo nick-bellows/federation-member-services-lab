@@ -4,6 +4,7 @@ namespace Tests\Feature\Federation\Http;
 
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\DocumentType;
+use App\Federation\LearningCenter\CredentialsClient;
 use App\Federation\Models\Federation;
 use App\Federation\Models\MemberOrganization;
 use App\Federation\Models\RegistrationWindow;
@@ -11,6 +12,7 @@ use App\Federation\Models\Season;
 use App\Models\User;
 use Illuminate\Testing\TestResponse;
 use Tests\Feature\Federation\OidcTestCase;
+use Tests\Support\UnavailableCredentialsClient;
 
 /**
  * The federation world (one federation, two organizations, open windows,
@@ -44,6 +46,10 @@ abstract class FederationHttpTestCase extends OidcTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // The Learning Center is absent unless a test fakes it: approvals must
+        // succeed without it and no HTTP may leave the process.
+        $this->app->instance(CredentialsClient::class, new UnavailableCredentialsClient);
 
         $this->federation = Federation::factory()->create(['name' => 'Northgate Soccer Federation', 'code' => 'NSF']);
         $this->season = Season::factory()->create(['federation_id' => $this->federation->getKey(), 'label' => '2026/27']);

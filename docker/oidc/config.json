@@ -82,6 +82,17 @@
           }
         },
         {
+          "requestParam": "scope",
+          "match": "credentials:read",
+          "claims": {
+            "aud": [
+              "https://learning-center.northgate.example"
+            ],
+            "scope": "credentials:read",
+            "azp": "federation-api"
+          }
+        },
+        {
           "requestParam": "grant_type",
           "match": "*",
           "claims": {

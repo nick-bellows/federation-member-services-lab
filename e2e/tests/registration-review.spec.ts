@@ -124,6 +124,14 @@ test.describe.serial('registration review slice', () => {
         await page.getByRole('button', { name: 'Approve' }).click();
         await expect(page.locator('[data-status="approved"]').first()).toBeVisible();
 
+        // A fresh identity is unknown to the Learning Center mock: the panel says
+        // so, with the reason, and a refresh asks the provider again.
+        await expect(page.getByRole('heading', { name: 'Participation' })).toBeVisible();
+        await expect(page.locator('[data-participation]')).toHaveAttribute('data-participation', 'unknown');
+        await page.getByRole('button', { name: 'Refresh from Learning Center' }).click();
+        await expect(page.getByText('The Learning Center has no record for this person.')).toBeVisible();
+        await expectAccessible(page);
+
         await signOut(page);
     });
 
@@ -141,6 +149,8 @@ test.describe.serial('registration review slice', () => {
         await expect(history).toContainText('Document reviewed');
         await expect(history).toContainText('Approved');
         await expect(page.getByRole('button', { name: 'Submit application' })).toHaveCount(0);
+        await expect(page.getByRole('heading', { name: 'Participation' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Refresh from Learning Center' })).toHaveCount(0);
         await expectAccessible(page);
 
         await signOut(page);

@@ -97,6 +97,25 @@ services:
       - 3004:8080
     restart: always
 
+  # Mock of the Learning Center credentials contract (ADR-0009). Serves the
+  # fixture files that are the contract's source of truth; MOCK_DELAY_MS
+  # reproduces INCIDENT-001. The API reaches it as http://learning-center:3005.
+  learning-center:
+    image: node:20-alpine
+    command: ["node", "/app/server.js"]
+    working_dir: /app
+    environment:
+      - PORT=3005
+      - MOCK_DELAY_MS=${LEARNING_CENTER_MOCK_DELAY_MS:-0}
+      - FIXTURES_DIR=/fixtures
+    volumes:
+      - ./docker/learning-center-mock:/app:ro
+      - ./api/tests/Fixtures/learning-center/credentials:/fixtures:ro
+    networks:
+      - stack
+    ports:
+      - 3005:3005
+
   tooling:
     build:
       context: .

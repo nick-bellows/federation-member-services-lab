@@ -180,3 +180,37 @@ Documents are promises until object storage exists; the OpenAPI document is part
 4. Why a second JSON:API server instead of extending the existing one?
 5. What did the OpenAPI generator not do for you, and how did you keep the frontend typed anyway?
 6. The working stack passed every browser test and a fresh clone failed the first page. What class of bug behaves like that, and what would you check before blaming the environment?
+
+## M5 / B2 — The Learning Center contract
+
+### What it does
+
+The federation asks the Learning Center, with its own service token, for a person's credential facts and derived eligibility, keyed by the OIDC subject both systems already hold. It stores the answer as a snapshot with the provider's evaluation time and its own fetch time, and derives participation on read: approved application, provider says eligible, and a valid role credential where the role needs one. Reviewers see the findings before deciding, can refresh on demand, and the nightly reconciliation repairs whatever the synchronous path missed. The provider side lives in `learning-center-reference` (pull request #1); the contract is a document plus fixture files both sides execute.
+
+### Why we built it this way
+
+Two systems, two databases, one person: the only safe shared thing is a contract. Keying on the subject avoids a stored foreign id; a service token gives the reviewer and the batch job an identity the applicant's token cannot; a snapshot with an age makes reads deterministic and honest under a slow provider, which is Incident 1.
+
+### Alternatives considered
+
+Learning Center member UUID as the key; forwarding the applicant's token; a static API key; a materialised participation column; a live call on every read (ADR-0009).
+
+### Failure modes
+
+Provider slow (timeout, 503 on explicit refresh, page answers from the snapshot); provider down during approval (approval succeeds, participation unknown, reconciliation repairs); provider says not found (recorded, not retried before the interval); contract drift (the consumer refuses another version or an unknown status); a root-owned log file shared across containers turning every logged request into a 500 (found while rehearsing the incident); the HTTP fake keeping the first stub per URL (a test trap, twice now).
+
+### Tradeoffs
+
+Freshness is a policy (limit and reconciliation interval), not a property of the page; the reviewer's refresh is the only user path that waits on the provider; subjects are provider-scoped, so the two demo stacks meet only under a shared issuer; free text in `eligibility.reason` is never parsed.
+
+### Code to locate immediately
+
+`docs/contracts/learning-center-credentials-v1.md` · `api/tests/Fixtures/learning-center/credentials/` · `api/app/Federation/LearningCenter/{HttpCredentialsClient,ServiceTokenProvider,CredentialSnapshots,ParticipationResolver}.php` · `api/app/Federation/Listeners/RefreshCredentialsOnApproval.php` · `api/app/Federation/Console/ReconcileCredentials.php` · `api/tests/Feature/Federation/Http/ParticipationHttpTest.php` · `docker/learning-center-mock/server.js` · `web_application/src/app/[lang]/member/components/ParticipationPanel.tsx` · in the Learning Center: `api/internal/httpapi/router.go` (`authenticateService`), `api/internal/credentials/`, `api/internal/safeguarding/eligibility.go` (`Current`)
+
+### Likely interviewer questions
+
+1. Two services, two databases, one person. How do you keep "may this person participate" correct without sharing tables?
+2. How does one service authenticate to another here, and why not forward the user's token?
+3. The credential service is slow for an hour. What does the member see, what does the reviewer see, and what repairs it?
+4. What does "the contract is executable on both sides" mean in this repository, and what breaks first when the provider renames a field?
+5. Why does the consumer never re-derive validity from the expiry dates it receives?

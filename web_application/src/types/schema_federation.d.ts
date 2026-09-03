@@ -316,6 +316,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/registration-applications/{registration_application}/-actions/refresh-credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the Learning Center for the applicant's current credentials and store the snapshot (reviewer, approved applications). 503 when the Learning Center is unavailable. */
+        post: operations["registration-applications.RefreshCredentials"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2477,6 +2494,72 @@ export interface operations {
         };
     };
     "registration-applications.Reject": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Retrying with the same key returns the current state instead of failing. */
+                "Idempotency-Key"?: string;
+                /** @description Correlation id echoed in the response and stored with the audit entry. */
+                "X-Request-Id"?: string;
+            };
+            path: {
+                registration_application: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/vnd.api+json": {
+                    meta?: {
+                        /** @description Required for request-information and reject. */
+                        reason?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Show registration-applications */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.api+json": {
+                        jsonapi: {
+                            /**
+                             * version
+                             * @example 1.0
+                             */
+                            version?: string;
+                        };
+                        data: components["schemas"]["resources.registration-applications.resource.fetch"];
+                    };
+                };
+            };
+            /** @description The signed-in user may not perform this transition on this application. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The transition is not legal from the current status. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A reason is required, or the application is incomplete (meta lists what is missing). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "registration-applications.RefreshCredentials": {
         parameters: {
             query?: never;
             header?: {

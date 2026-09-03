@@ -164,7 +164,29 @@
             "application_cancelled": "Zurückgezogen",
             "application_details_updated": "Angaben aktualisiert",
             "document_attached": "Dokument erfasst",
-            "document_reviewed": "Dokument geprüft"
+            "document_reviewed": "Dokument geprüft",
+            "credentials_recorded": "Nachweise erfasst",
+            "credentials_changed": "Nachweise geändert"
         }
+    },
+    "participation": {
+        "heading": "Teilnahme",
+        "statuses": {
+            "may_participate": "Darf teilnehmen",
+            "blocked": "Gesperrt",
+            "unknown": "Unbekannt"
+        },
+        "stale": "Veraltete Antwort",
+        "reasons": {
+            "not_approved": "Der Antrag ist nicht genehmigt.",
+            "no_snapshot": "Das Learning Center wurde noch nicht befragt.",
+            "no_learning_center_record": "Das Learning Center kennt diese Person nicht.",
+            "hold_active": "Eine aktive Sperre verhindert die Teilnahme.",
+            "credential_lapsed": "Ein erforderlicher Nachweis ist abgelaufen.",
+            "role_credential_missing": "Kein gültiger Nachweis für diese Rolle."
+        },
+        "fetched_at": "Abgerufen {{fetched}}; vom Learning Center bewertet {{asOf}}.",
+        "never_fetched": "Noch nicht abgerufen. Nachweise werden nach einer Genehmigung, auf Anfrage und beim täglichen Abgleich abgerufen.",
+        "refresh": "Vom Learning Center aktualisieren"
     }
 }

@@ -84,8 +84,8 @@ class TransitionApplication
                 requestId: $requestId,
             );
 
-            DB::afterCommit(function () use ($application, $from, $to, $actor): void {
-                ApplicationTransitioned::dispatch($application, $from, $to, $actor->getKey());
+            DB::afterCommit(function () use ($application, $from, $to, $actor, $requestId): void {
+                ApplicationTransitioned::dispatch($application, $from, $to, $actor->getKey(), $requestId);
             });
 
             return $application;

@@ -1,17 +1,17 @@
 # Roadmap
 
-Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed by the workspace `AGENTS.md` and the central portfolio roadmap; where they conflict, the central roadmap wins.
+Last verified: 2026-09-03. Supersedes the 2026-09-02 versions. Governed by the workspace `AGENTS.md` and the central portfolio roadmap; where they conflict, the central roadmap wins.
 
 ## Handoff snapshot
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `VALIDATED` in CI, not deployed — Phase A complete: M0 to M4 (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests), README, cold clone, public fork with CI green on `main` (2026-09-03). Phase B not started |
-| Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
-| Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
+| Lifecycle | `VALIDATED` in CI, not deployed — Phase A complete: M0 to M4 (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests), README, cold clone, public fork with CI green on `main` (2026-09-03). Phase B: B2 Learning Center contract done 2026-09-03 (ADR-0009, INCIDENT-001); B3 next |
+| Branch | `main` of the fork, merged through pull requests (#1 Phase A, #2 to #4 docs, #5 B2); 35+ commits ahead of upstream `main` (`dca9be3`) |
+| Remotes | `origin` = nick-bellows/federation-member-services-lab (public fork, created 2026-09-03 on the owner's instruction); `upstream` = vereinfacht/vereinfacht (read-only) |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, mock OIDC provider, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11; seed with `NorthgateDemoSeeder` |
-| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
-| Original product claim | One complete registration-review workflow: windows, applications with details and document metadata, review with decisions and reasons, audit history, over an OIDC-authenticated JSON:API and accessible member and reviewer pages; verified by PHPUnit and Playwright in compose, not yet in CI |
+| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork's workflow runs six jobs on GitHub (green on `main` since 2026-09-03) |
+| Original product claim | One complete registration-review workflow: windows, applications with details and document metadata, review with decisions and reasons, audit history, over an OIDC-authenticated JSON:API and accessible member and reviewer pages, plus participation derived from the Learning Center credentials contract (B2); verified by PHPUnit and Playwright in compose and in CI |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
 Start with `docs/UPSTREAM_ANALYSIS.md`, then `docs/adr/`. The sibling Learning Center owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and consumes credentials over an HTTP contract only. The two never share a database.
@@ -121,7 +121,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 | Milestone | Delivers | Size | Notes |
 | --- | --- | --- | --- |
 | B1 Identity boundary (M3) | Moved to Phase A as A3 by decision 1 on 2026-09-02 | — | — |
-| B2 Learning Center contract (M5) | `GET /v1/members/{id}/credentials` contract with fixtures and a mock server; derived participation status from approval + credentials + holds; timeout, stale-data and reconciliation behaviour; Incident 1 (slow credential service) | M | Contract must be authenticated and use non-enumerable ids. Decide whether the Learning Center adds the endpoint or this repo consumes its eligibility. ADR-0006 |
+| B2 Learning Center contract (M5) | `GET /v1/members/{id}/credentials` contract with fixtures and a mock server; derived participation status from approval + credentials + holds; timeout, stale-data and reconciliation behaviour; Incident 1 (slow credential service) | M | **Done 2026-09-03.** Decisions at the start: subject-keyed contract, client-credentials service token, snapshot with age (ADR-0009). Provider side merged in `learning-center-reference` pull request #1 (CI green). Consumer: contract doc and fixtures, mock in Compose, snapshots, participation attribute, reviewer refresh, reconciliation command, 34 new tests, browser journeys extended, INCIDENT-001 rehearsed (`docs/baseline/incident_001_2026-09-03.txt`). Open: scheduling the reconciliation (B5), retry with jitter (B3). |
 | B3 Events and reliability (M6) | Transactional outbox, worker, retries, idempotent consumers; domain events for submit, approve, reject, credential change; Incident 3 (worker fails after approval) | M | Database queue locally; explain the mapping to SQS, RabbitMQ or Kafka in one ADR, implement none of them. ADR-0007 |
 | B4 PostgreSQL (M7) | CI matrix on MariaDB and PostgreSQL; the MySQL-only constructs fixed or isolated; differences documented, none hidden | M | Candidate for a second upstream contribution |
 | B5 Operability (M8) | Structured logs with correlation ids, health and readiness endpoints, basic metrics, OpenTelemetry traces to a local Jaeger, `docs/OBSERVABILITY.md`, `docs/RUNBOOK.md`; the three incident exercises run against it | M | Expose the upstream health checks that exist but have no route |

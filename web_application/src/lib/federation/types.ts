@@ -53,6 +53,35 @@ export interface HistoryEntry {
     documentType: string | null;
 }
 
+export const participationStatuses = [
+    'may_participate',
+    'blocked',
+    'unknown',
+] as const;
+export type ParticipationStatus = (typeof participationStatuses)[number];
+
+export const participationReasons = [
+    'not_approved',
+    'no_snapshot',
+    'no_learning_center_record',
+    'hold_active',
+    'credential_lapsed',
+    'role_credential_missing',
+] as const;
+export type ParticipationReason = (typeof participationReasons)[number];
+
+/**
+ * Derived by the API from the application and the applicant's credential
+ * snapshot (docs/contracts/learning-center-credentials-v1.md).
+ */
+export interface Participation {
+    status: ParticipationStatus;
+    reasons: ParticipationReason[];
+    asOf: string | null;
+    fetchedAt: string | null;
+    stale: boolean;
+}
+
 export interface ApplicationAttributes extends Record<string, unknown> {
     role: ApplicationRole;
     status: ApplicationStatus;
@@ -62,6 +91,7 @@ export interface ApplicationAttributes extends Record<string, unknown> {
     applicantNotes: string | null;
     missingRequiredDocuments: DocumentType[];
     history: HistoryEntry[];
+    participation: Participation;
     submittedAt: string | null;
     decidedAt: string | null;
     cancelledAt: string | null;
