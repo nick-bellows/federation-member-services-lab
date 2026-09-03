@@ -24,8 +24,9 @@ The sibling project [learning-center-reference](https://github.com/nick-bellows/
 | M3 Identity | OpenID Connect sign-in (authorization code + PKCE) with the access token kept server-side; Laravel validates tokens against the issuer's keys and derives capabilities from the database, never from claims; a mock provider in compose, Auth0 when configured | [ADR-0007](docs/adr/0007-oidc-identity-boundary.md), [INCIDENT-000](docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md) |
 | M4 Review slice | Registration windows, applications with details and document metadata, a second JSON:API server with generated TypeScript types, idempotent submission, correlation ids on every audit entry, member and reviewer pages, browser tests with accessibility scans | [ADR-0008](docs/adr/0008-document-metadata-without-file-storage.md), [INCIDENT-002](docs/incidents/INCIDENT-002-duplicate-submission.md), [`docs/assets/`](docs/assets/) |
 | M5 Learning Center contract | A versioned credentials contract keyed by OIDC subject, executable as fixtures on both sides and served by a mock in Compose; the federation calls with its own client-credentials service token; participation derived on read from a stored snapshot with its age, refreshed after approval, on a reviewer's request and by reconciliation; Incident 1 rehearsed against a slowed provider | [`docs/contracts/learning-center-credentials-v1.md`](docs/contracts/learning-center-credentials-v1.md), [ADR-0009](docs/adr/0009-learning-center-credentials-contract.md), [INCIDENT-001](docs/incidents/INCIDENT-001-slow-credential-service.md), `docs/baseline/incident_001_2026-09-03.txt`, [learning-center-reference PR #1](https://github.com/nick-bellows/learning-center-reference/pull/1) |
+| M6 Events and reliability | A transactional outbox written with every state change, a relay onto Laravel's database queue with one job per event and consumer, a processed-events ledger that makes at-least-once delivery act once, retries with backoff and a parked state an operator can read and replay; two consumers (notification rows, the credential refresh after approval); Incident 3 rehearsed (the worker fails after an approval); the broker mapping documented, none provisioned | [ADR-0010](docs/adr/0010-transactional-outbox-and-consumers.md), [INCIDENT-003](docs/incidents/INCIDENT-003-worker-fails-after-approval.md), `docs/baseline/incident_003_2026-09-03.txt` |
 
-Planned, not built: a transactional outbox with a worker, PostgreSQL support, structured logs and traces, the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
+Planned, not built: PostgreSQL support, structured logs and traces, the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Architecture
 
@@ -108,7 +109,7 @@ npm ci
 WATCHPACK_POLLING=true npx next dev                          # polling: bind mounts on Windows deliver no file events
 ```
 
-Then restart the API once so it loads the environment: `docker compose restart api`.
+Then restart the API once so it loads the environment: `docker compose restart api`, and start the outbox relay and queue worker in the API container as its PHP-FPM user: `docker compose exec -d -u verein api php artisan federation:work` (ADR-0010; `php artisan federation:outbox-status` shows what it has done).
 
 | Where | What |
 |---|---|
@@ -124,11 +125,11 @@ Every deviation from upstream's own instructions, and why, is in [`docs/UPSTREAM
 ## Tests
 
 ```sh
-docker compose exec tooling bash -lc 'cd api && php artisan test'          # 202 tests, SQLite in memory
+docker compose exec tooling bash -lc 'cd api && php artisan test'          # 210 tests, SQLite in memory
 cd e2e && npm ci && npx playwright install chromium && npx playwright test   # 7 browser journeys with axe, against the running stack
 ```
 
-Measured on 2026-09-03 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 202 passed (861 assertions, `phpunit_after_b2_backend.txt`); Playwright 7 passed (`playwright_b2.txt`). The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
+Measured on 2026-09-03 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 210 passed (918 assertions, `phpunit_after_b3_backend.txt`); Playwright 7 passed (`playwright_b3.txt`). The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
 
 ## Upstream contributions
 

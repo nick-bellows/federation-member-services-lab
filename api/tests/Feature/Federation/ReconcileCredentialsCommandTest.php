@@ -34,6 +34,7 @@ class ReconcileCredentialsCommandTest extends FederationTestCase
         config()->set('learning_center.token.endpoint', 'http://oidc.test/default/token');
         config()->set('learning_center.token.client_secret', 'test-only');
         config()->set('learning_center.snapshot_ttl_minutes', 60);
+        config()->set('queue.default', 'database');
 
         $this->applicant->forceFill(['oidc_issuer' => 'https://issuer.test', 'oidc_subject' => 'mock|alex'])->save();
 
@@ -113,5 +114,7 @@ class ReconcileCredentialsCommandTest extends FederationTestCase
     private function approve(): void
     {
         $this->transition($this->applicationUnderReview(), ApplicationStatus::APPROVED, $this->organizationAdmin);
+        // The approval's refresh happens through the outbox worker (ADR-0010).
+        $this->artisan('federation:work', ['--once' => true])->assertSuccessful();
     }
 }

@@ -214,3 +214,37 @@ Freshness is a policy (limit and reconciliation interval), not a property of the
 3. The credential service is slow for an hour. What does the member see, what does the reviewer see, and what repairs it?
 4. What does "the contract is executable on both sides" mean in this repository, and what breaks first when the provider renames a field?
 5. Why does the consumer never re-derive validity from the expiry dates it receives?
+
+## M6 / B3 — Events and reliability
+
+### What it does
+
+Every state change that other parts of the system care about is written as a fact in the same transaction, in an outbox table. A relay turns facts into one job per consumer on Laravel's database queue; a worker runs them; each consumer records what it has processed so a second delivery does nothing. Failures retry with backoff, then park with a reason an operator can read, and a command replays them. Two consumers exist: notification rows for the person concerned, and the credential refresh after an approval, which used to be a synchronous listener.
+
+### Why we built it this way
+
+The dual-write problem is not solved by dispatching after commit; the process can still die in between. An outbox makes the fact durable with the change, and at-least-once delivery plus an idempotency ledger makes the effect happen once. One job per consumer keeps a slow provider from holding a notification hostage, which is exactly Incident 3.
+
+### Alternatives considered
+
+Queued listeners without an outbox; an outbox polled by a bespoke worker; one job fanning out to all consumers; natural unique keys as the only idempotency; mark-before-process (ADR-0010).
+
+### Failure modes
+
+A consumer that throws (retried, parked, replayed); a relay crash between dispatch and marking (the ledger absorbs the redelivery); the sync queue driver (refused by the relay, because a dispatch would run inside the relay's transaction); a worker running as a different user on the shared storage mount (the web process loses its cache and log writes); parallel first requests for a new identity (provisioning is create-or-first now).
+
+### Tradeoffs
+
+Participation after an approval is unknown for a second or two instead of immediately; attempts are counted per row, not per consumer; the notification rows have no surface yet; the worker loop is one process for development and CI, not the production shape.
+
+### Code to locate immediately
+
+`api/app/Federation/Outbox/{OutboxRecorder,ProcessOutboxEvent,ConsumerRegistry}.php` · `api/app/Federation/Outbox/Consumers/` · `api/app/Federation/Console/{OutboxRelay,FederationWork,OutboxStatus,OutboxReplay}.php` · `api/database/migrations/2026_09_03_110000_create_federation_outbox_tables.php` · `api/tests/Feature/Federation/OutboxTest.php` · `docs/incidents/INCIDENT-003-worker-fails-after-approval.md`
+
+### Likely interviewer questions
+
+1. How do you guarantee that a message is sent when a transaction commits, and only then?
+2. Your consumers are idempotent. Show me where, and tell me what breaks if you remove it.
+3. You used a database queue. What changes, and what does not, when this moves to SQS or Kafka?
+4. The worker fails after an approval. Walk me through what the reviewer sees, what the operator sees, and how it is repaired.
+5. Why one job per consumer rather than one job per event?

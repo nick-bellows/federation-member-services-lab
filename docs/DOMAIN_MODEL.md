@@ -131,3 +131,15 @@ Over HTTP the same rules appear as stable error codes: `window_closed`, `role_no
 - Documents: metadata and review arrive with the registration-review slice (A4), backed by synthetic files only.
 - Registration windows and fees: the roadmap's review slice opens a window per organization and season; the data model for it is added when the workflow needs it.
 - A federation-level "member" table: derived from approved applications instead (see above).
+
+## Facts and consumers (M6 / B3)
+
+State changes publish facts through a transactional outbox (ADR-0010). A fact is written in the same transaction as the change it describes and delivered later, at least once; consumers make that act once.
+
+| Entity | Meaning | Rules |
+|---|---|---|
+| **Outbox event** (`outbox_events`) | A fact: `application.submitted`, `application.approved`, `application.rejected` (from `TransitionApplication`), `credentials.changed` (from `CredentialSnapshots`). Carries the aggregate, a payload, the request id and `occurred_at`. | Written only inside the transaction that changes state (`OutboxRecorder` refuses otherwise). `published_at` is set by the relay; `attempts`, `last_error` and `failed_at` by the processing job. Never edited by hand; replayed by `federation:outbox-replay`. |
+| **Processed event** (`processed_events`) | The ledger: one row per consumer and event once the consumer's effect has committed. | Inserted in the consumer's own transaction with insert-or-ignore; a duplicate delivery finds the row and does nothing. |
+| **Notification** (`federation_notifications`) | One row per person and event, written by the `notifications` consumer in place of an email. | Unique per (user, event) as the second line behind the ledger. No surface yet; the rows are the deliverable. |
+
+Consumers today: `notifications` (all four facts) and `credential-refresh` (`application.approved` only). One job per event and consumer, four tries with backoff of 2, 10 and 60 seconds, then parked.

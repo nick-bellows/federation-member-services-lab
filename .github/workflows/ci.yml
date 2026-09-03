@@ -204,6 +204,11 @@ jobs:
           docker compose exec -d tooling bash -lc 'cd web_application && npx next dev > /tmp/next-dev.log 2>&1'
           for i in $(seq 1 60); do curl -sf http://localhost:3000/en/member/sign-in >/dev/null && break; sleep 3; done
           curl -sf -o /dev/null http://localhost:3000/en/member/sign-in
+      - name: Start the outbox relay and queue worker
+        # In the api container as its PHP-FPM user: the worker writes the same
+        # cache and log files as the web process, and a second user on the shared
+        # storage mount locks the web process out (INCIDENT-003 rehearsal).
+        run: docker compose exec -d -u verein api bash -lc 'php artisan federation:work > /tmp/federation-work.log 2>&1'
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}

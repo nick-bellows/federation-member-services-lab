@@ -9,6 +9,8 @@ use App\Federation\Exceptions\IllegalTransitionException;
 use App\Federation\Exceptions\ReasonRequiredException;
 use App\Federation\Exceptions\TransitionNotAllowedForActorException;
 use App\Federation\Models\RegistrationApplication;
+use App\Federation\Outbox\OutboxEventTypes;
+use App\Federation\Outbox\OutboxRecorder;
 use App\Federation\StateMachine\ApplicationTransitions;
 use App\Federation\Support\ApplicationActorResolver;
 use App\Federation\Support\AuditRecorder;
@@ -27,9 +29,17 @@ use Illuminate\Support\Facades\DB;
  */
 class TransitionApplication
 {
+    /** @var array<string, string> status => outbox event type (ADR-0010) */
+    private const OUTBOX_EVENTS = [
+        'submitted' => OutboxEventTypes::APPLICATION_SUBMITTED,
+        'approved' => OutboxEventTypes::APPLICATION_APPROVED,
+        'rejected' => OutboxEventTypes::APPLICATION_REJECTED,
+    ];
+
     public function __construct(
         private readonly ApplicationActorResolver $actors,
         private readonly AuditRecorder $audit,
+        private readonly OutboxRecorder $outbox,
     ) {}
 
     public function execute(
@@ -83,6 +93,20 @@ class TransitionApplication
                 reason: $reason,
                 requestId: $requestId,
             );
+
+            if (($eventType = self::OUTBOX_EVENTS[$to->value] ?? null) !== null) {
+                $this->outbox->record($eventType, $application, [
+                    'application_id' => $application->getKey(),
+                    'from' => $from->value,
+                    'to' => $to->value,
+                    'reason' => $reason,
+                    'actor_user_id' => $actor->getKey(),
+                    'applicant_user_id' => $application->applicant_user_id,
+                    'role' => $application->role->value,
+                    'member_organization_id' => $application->member_organization_id,
+                    'season_id' => $application->season_id,
+                ], $requestId);
+            }
 
             DB::afterCommit(function () use ($application, $from, $to, $actor, $requestId): void {
                 ApplicationTransitioned::dispatch($application, $from, $to, $actor->getKey(), $requestId);
