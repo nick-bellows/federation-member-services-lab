@@ -1,10 +1,10 @@
 # Continuous integration for the fork.
 #
-# Status: DRAFT until it has run on GitHub. This repository has no remote yet;
-# every command below was validated inside the `tooling` container on
-# 2026-09-02 (see docs/LEARNING_LOG.md), but the workflow itself has not
-# executed on a runner. The first run is expected to fail somewhere; each gate
-# is watched failing once before it is trusted.
+# First run on GitHub: 2026-09-03, pull request #1. The first two runs failed
+# on three things the local stack could not show (an engine assumption in a
+# test, name resolution for the runner's browser, a migration race in the
+# browser job); the fixes are in the history and in docs/LEARNING_LOG.md.
+# Green on both the push and the pull-request run since 99aca82, and on main.
 #
 # Jobs: backend tests on SQLite (upstream's test configuration) and on MariaDB
 # (the runtime engine, so MySQL-only SQL is exercised), Pint as a report,

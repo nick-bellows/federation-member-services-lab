@@ -1,10 +1,12 @@
 # Federation Member Services Lab
 
+[![CI](https://github.com/nick-bellows/federation-member-services-lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nick-bellows/federation-member-services-lab/actions/workflows/ci.yml)
+
 An engineering modernization lab: an existing open-source club-management platform, extended step by step into a member-services system for a fictional national soccer federation, without a rewrite.
 
 > **Fork notice.** This repository is a fork of [vereinfacht/vereinfacht](https://github.com/vereinfacht/vereinfacht) (MIT, © visuellverstehen GmbH). Upstream's history, license and attribution are preserved; upstream's own README is kept verbatim at [`docs/UPSTREAM_README.md`](docs/UPSTREAM_README.md). Everything the fork added is listed below and is visible with `git log upstream/main..main` and `git diff --stat upstream/main`.
 >
-> **Status: `draft`.** Everything described here runs in the local Docker Compose stack and is verified by the test suites named below. The CI workflow is written but has not yet run on GitHub. Nothing is deployed. The federation, its organizations and every person in the seed data are invented; this project is not affiliated with, endorsed by, or based on the internal systems of any real federation.
+> **Status: `validated` in CI, not deployed.** Everything described here runs in the local Docker Compose stack and in the CI workflow on GitHub (six jobs on every push and pull request; badge above). Nothing is deployed and nothing here has users. The federation, its organizations and every person in the seed data are invented; this project is not affiliated with, endorsed by, or based on the internal systems of any real federation.
 
 ## The problem this fork works on
 
@@ -122,7 +124,7 @@ docker compose exec tooling bash -lc 'cd api && php artisan test'          # 168
 cd e2e && npm ci && npx playwright install chromium && npx playwright test   # 7 browser journeys with axe, against the running stack
 ```
 
-Measured on 2026-09-02 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 168 passed (674 assertions); Playwright 7 passed. The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff; it is marked draft until its first run.
+Measured on 2026-09-02 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 168 passed (674 assertions); Playwright 7 passed. The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite and on MariaDB, Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
 
 ## Upstream contributions
 
