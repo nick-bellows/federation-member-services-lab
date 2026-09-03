@@ -16,9 +16,16 @@ class SeasonFactory extends Factory
     /**
      * @return array<string, mixed>
      */
+    /**
+     * Labels must be unique per federation; the test world also creates
+     * "2026/27" by hand, so generated seasons start above that range and
+     * count up instead of drawing at random (a random draw collided once in CI).
+     */
+    private static int $nextYear = 2100;
+
     public function definition(): array
     {
-        $year = $this->faker->unique()->numberBetween(2000, 2099);
+        $year = self::$nextYear++;
 
         return [
             'federation_id' => Federation::factory(),
