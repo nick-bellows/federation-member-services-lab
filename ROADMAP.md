@@ -111,7 +111,7 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 - [ ] OIDC sign-in working against the self-hosted provider in CI (done) and against the Auth0 tenant in the documented walkthrough (deferred to B9 by owner decision, 2026-09-02); privilege-boundary tests (done)
 - [x] ADR-0000 to ADR-0005 (through ADR-0008), `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
 - [ ] README passes the one-minute and five-minute reads (owner's read pending; anonymous view checked 2026-09-03); attribution and license unchanged (verified)
-- [ ] One upstream contribution offered, status recorded truthfully
+- [ ] One upstream contribution offered, status recorded truthfully — **not offered as of 2026-09-03.** The candidate is ready (the `env()` fix with `.gitattributes`, ADR-0004) and the fork makes it possible; opening an issue on another project is outward-facing and waits for the owner's explicit go. Until then this gate is open, not waived.
 - [ ] Explicit approval for visibility received
 
 ## Phase B — depth, after the public gate
