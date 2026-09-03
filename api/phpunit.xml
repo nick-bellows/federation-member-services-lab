@@ -10,6 +10,19 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
+    <!--
+      Fork: isolate the test process from the caches the api container writes
+      onto the shared bind mount (docker/api/entrypoint.sh runs config:cache,
+      route:cache, event:cache). With a cached config present, tests would
+      ignore .env.testing and run migrate:fresh against the development
+      database. These paths never exist, so tests always boot from source.
+      See docs/incidents/INCIDENT-000-dev-database-wiped-by-config-cache.md.
+    -->
+    <env name="APP_CONFIG_CACHE" value="bootstrap/cache/config-testing.php"/>
+    <env name="APP_ROUTES_CACHE" value="bootstrap/cache/routes-testing.php"/>
+    <env name="APP_EVENTS_CACHE" value="bootstrap/cache/events-testing.php"/>
+    <env name="APP_SERVICES_CACHE" value="bootstrap/cache/services-testing.php"/>
+    <env name="APP_PACKAGES_CACHE" value="bootstrap/cache/packages-testing.php"/>
     <env name="APP_MAINTENANCE_DRIVER" value="file"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_DRIVER" value="array"/>

@@ -1,0 +1,170 @@
+{
+    "nav": {
+        "label": "Member area",
+        "skip": "Skip to content",
+        "home": "Your identity",
+        "applications": "My applications",
+        "review": "Review queue",
+        "windows": "Registration windows"
+    },
+    "common": {
+        "working": "Working…",
+        "keep": "Keep it"
+    },
+    "sign_in": {
+        "heading": "Sign in to Northgate",
+        "intro": "Use your Northgate ID to view your registrations. Your password is never shared with this application.",
+        "providers": "Identity providers",
+        "with": "Continue with {{provider}}",
+        "none_configured": "No identity provider is configured. Set OIDC_ISSUER or AUTH0_ISSUER in the web application environment."
+    },
+    "sign_out": "Sign out",
+    "me": {
+        "heading": "Hello, {{name}}",
+        "identity": "Your identity",
+        "email": "E-mail",
+        "issuer": "Signed in through",
+        "subject": "Subject",
+        "scopes": "What you can do here",
+        "scopes_help": "Derived from your roles in the federation database, not from your sign-in token.",
+        "administered": "Bodies you administer",
+        "administered_none": "You do not administer any organization."
+    },
+    "fields": {
+        "organization": "Organization",
+        "season": "Season",
+        "role": "Role",
+        "status": "Status",
+        "date_of_birth": "Date of birth",
+        "phone": "Phone",
+        "notes": "Notes for the reviewer",
+        "applicant": "Applicant",
+        "name": "Name",
+        "submitted_at": "Submitted"
+    },
+    "roles": {
+        "participant": "Participant",
+        "coach": "Coach",
+        "referee": "Referee"
+    },
+    "statuses": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "under_review": "Under review",
+        "needs_information": "Needs information",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+    },
+    "status_explanations": {
+        "draft": "Not sent yet. Complete the details and documents, then submit.",
+        "submitted": "Waiting for a reviewer at the organization to pick it up.",
+        "under_review": "A reviewer is looking at your application and documents.",
+        "needs_information": "The reviewer needs something from you. Read the reason, update, and submit again.",
+        "approved": "Your registration for this season and role is approved.",
+        "rejected": "This application was not approved. The reason is shown above.",
+        "cancelled": "You withdrew this application. You can start a new one while the window is open."
+    },
+    "document_types": {
+        "proof_of_age": "Proof of age",
+        "photo": "Photo",
+        "coaching_licence": "Coaching licence",
+        "referee_certificate": "Referee certificate",
+        "background_check_consent": "Background check consent"
+    },
+    "document_statuses": {
+        "pending": "Pending review",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+    },
+    "applications": {
+        "heading": "My applications",
+        "start": "Start an application",
+        "none": "You have not started an application yet.",
+        "table_caption": "Your registration applications",
+        "open": "Open"
+    },
+    "start": {
+        "heading": "Start an application",
+        "intro": "Choose where you want to register and in which role. You can add details and documents afterwards.",
+        "window": "Organization and season",
+        "window_help": "Only organizations with an open registration window are listed.",
+        "closes": "closes {{date}}",
+        "no_windows": "No organization is accepting applications right now.",
+        "submit": "Start"
+    },
+    "application": {
+        "heading": "{{role}} application · {{organization}}",
+        "started": "started {{date}}",
+        "reason": "Reason",
+        "details": "Your details",
+        "save_details": "Save details",
+        "details_saved": "Details saved.",
+        "documents": "Documents",
+        "documents_help": "Choose a file for each required document. Only its name, type, size and checksum are recorded; the file itself stays on your device in this version.",
+        "actions": "Next step",
+        "incomplete_help": "Add your date of birth and every required document before submitting.",
+        "submit": "Submit application",
+        "resubmit": "Submit again",
+        "cancel": "Withdraw application",
+        "cancel_confirm": "Yes, withdraw it",
+        "history": "History"
+    },
+    "documents": {
+        "missing": "Not provided yet",
+        "choose": "Choose file",
+        "choose_for": "Choose a file for {{type}}",
+        "replace": "Replace",
+        "attached": "Document recorded.",
+        "format_error": "Only PDF, JPEG and PNG files are accepted.",
+        "note": "Reviewer note",
+        "accept": "Accept",
+        "reject": "Reject",
+        "reviewed": "Document decision saved."
+    },
+    "review": {
+        "heading": "Review queue",
+        "intro": "Applications filed with the organizations you administer that need a decision.",
+        "empty": "Nothing to review right now.",
+        "table_caption": "Applications awaiting review",
+        "open": "Review",
+        "application_heading": "Application from {{name}}",
+        "applicant": "Applicant",
+        "decision": "Decision",
+        "reason": "Reason",
+        "reason_help": "Required when you request information or reject. The applicant reads it.",
+        "start": "Start review",
+        "approve": "Approve",
+        "request_information": "Request information",
+        "reject": "Reject"
+    },
+    "windows": {
+        "heading": "Registration windows",
+        "none": "No registration window exists yet.",
+        "table_caption": "Registration windows by organization and season",
+        "opens": "Opens",
+        "closes": "Closes",
+        "roles": "Roles",
+        "state": "State",
+        "open": "Open",
+        "closed": "Closed",
+        "open_heading": "Open a registration window",
+        "open_submit": "Open window",
+        "opened": "Registration window opened."
+    },
+    "history": {
+        "none": "No history yet.",
+        "actions": {
+            "application_created": "Application started",
+            "application_submitted": "Submitted",
+            "application_under_review": "Review started",
+            "application_needs_information": "Information requested",
+            "application_approved": "Approved",
+            "application_rejected": "Rejected",
+            "application_cancelled": "Withdrawn",
+            "application_details_updated": "Details updated",
+            "document_attached": "Document recorded",
+            "document_reviewed": "Document reviewed"
+        }
+    }
+}

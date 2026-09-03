@@ -1,0 +1,197 @@
+
+   PASS  Tests\Unit\DivisionTest
+  ✓ division can have many membership types                              2.22s  
+  ✓ division membership type can have monthly fee                        0.58s  
+
+   PASS  Tests\Unit\Federation\ApplicationTransitionsTest
+  ✓ the transition table matches the documented rules                    0.02s  
+  ✓ every pair not in the table is illegal
+  ✓ terminal statuses have no outgoing transitions
+  ✓ applicants move their own application and reviewers decide
+  ✓ only information requests and rejections require a reason
+  ✓ asking for the rule of an illegal pair is a programming error
+
+   PASS  Tests\Unit\Federation\SchemaIdentifierLengthTest
+  ✓ every table index and foreign key name fits mysql limits             0.59s  
+
+   PASS  Tests\Unit\FinanceAccountTest
+  ✓ a finance account can be created                                     0.57s  
+  ✓ a finance account has many statements                                0.58s  
+  ✓ current balance is calculated correctly                              0.60s  
+
+   PASS  Tests\Unit\MembershipTest
+  ✓ membership monthly fee includes membership type fee                  0.61s  
+  ✓ membership monthly fee excludes membership type admission fee        0.57s  
+  ✓ membership monthly fee includes voluntary contribution               0.58s  
+  ✓ membership monthly fee includes selected divisions                   0.63s  
+
+   PASS  Tests\Unit\MembershipTypeTest
+  ✓ membership type can have many divisions                              0.58s  
+
+   PASS  Tests\Unit\WebApplicationUrlConfigTest
+  ✓ club apply url uses the configured web application url               0.58s  
+  ✓ welcome mail login url and support address come from config          0.59s  
+  ✓ password reset link uses the configured web application url          0.59s  
+  ✓ health ping checks target the configured web application url         0.57s  
+
+   PASS  Tests\Feature\ClubAdmin\ClubTest
+  ✓ admin user can get own club                                          0.71s  
+  ✓ admin user cannot get other clubs                                    0.59s  
+  ✓ admin user can edit own club                                         0.61s  
+  ✓ admin user cannot edit other club                                    0.59s  
+  ✓ admin user cannot edit any field of own club                         0.59s  
+
+   PASS  Tests\Feature\ClubAdmin\DivisionTest
+  ✓ admin user can edit divisions                                        0.67s  
+  ✓ admin user cannot edit other clubs divisions                         0.58s  
+
+   PASS  Tests\Feature\ClubAdmin\FinanceContactTest
+  ✓ admin user cannot edit external finance contacts                     0.62s  
+
+   PASS  Tests\Feature\ClubAdmin\MembershipTest
+  ✓ admin user can edit memberships                                      0.65s  
+  ✓ admin user cannot edit other clubs memberships                       0.59s  
+
+   PASS  Tests\Feature\ClubAdmin\MembershipTypeTest
+  ✓ admin user can edit membership types                                 0.64s  
+  ✓ admin user cannot edit other clubs membership types                  0.59s  
+  ✓ admin user can set only minimum number of divisions                  0.60s  
+  ✓ admin user can set only maximum number of divisions                  0.62s  
+
+   PASS  Tests\Feature\ClubPermissionsTest
+  ✓ club admins default club is set in session by middleware             0.59s  
+  ✓ club set in session by middleware                                    0.57s  
+
+   PASS  Tests\Feature\ClubTest
+  ✓ clubs generate slugs automatically on create                         0.57s  
+  ✓ can manually set club slug                                           0.59s  
+  ✓ super admin can get clubs                                            0.60s  
+  ✓ super admin can get clubs filtered by slug                           0.60s  
+  ✓ other user cannot get clubs                                          0.61s  
+
+   PASS  Tests\Feature\DivisionTest
+  ✓ club can only get own divisions                                      0.59s  
+  ✓ club can attach member to division of own club                       0.64s  
+  ✓ admin user can only get current clubs divisions                      0.59s  
+
+   PASS  Tests\Feature\Federation\HierarchyAndAuditTest
+  ✓ a club may belong to a member organization and defaults to none      0.63s  
+  ✓ deleting an organization detaches its clubs instead of deleting the… 0.59s  
+  ✓ an organization with applications cannot be deleted                  0.61s  
+  ✓ a member may be linked to a user                                     0.59s  
+  ✓ audit entries are append only                                        0.63s  
+
+   PASS  Tests\Feature\Federation\StartApplicationTest
+  ✓ a new application starts as a draft with an audit entry              0.59s  
+  ✓ a second live application for the same person organization season a… 0.61s  
+  ✓ a different role in the same season is a separate application        0.58s  
+  ✓ a new application is allowed after a cancellation                    0.57s  
+  ✓ the same idempotency key returns the existing application            0.57s  
+  ✓ the database rejects a duplicate that bypasses the action            0.61s  
+  ✓ the season must belong to the organizations federation               0.60s  
+
+   PASS  Tests\Feature\Federation\TransitionApplicationTest
+  ✓ the applicant submits a draft and the transition is audited          0.58s  
+  ✓ an illegal transition is rejected and leaves no trace                0.59s  
+  ✓ the applicant cannot perform reviewer transitions                    0.58s  
+  ✓ a reviewer cannot perform applicant transitions                      0.59s  
+  ✓ an administrator of another organization cannot review               0.59s  
+  ✓ a federation administrator can review for any organization           0.60s  
+  ✓ a rejection requires a reason and records it                         0.58s  
+  ✓ the happy path ends approved with a complete audit trail             0.59s  
+  ✓ an information request round trips back to review                    0.59s  
+  ✓ status cannot be assigned outside the transition service             0.59s  
+  ✓ the domain event carries the transition                              0.57s  
+
+   PASS  Tests\Feature\Filters\QueryFilterCurrencyTest
+  ✓ query filter converts formatted amounts to cents                     0.59s  
+  ✓ query filter handles multiple currency formats                       0.58s  
+  ✓ query filter works with mixed columns                                0.60s  
+
+   PASS  Tests\Feature\Filters\QueryFilterTest
+  ✓ query filter searches multiple transaction columns                   0.63s  
+
+   PASS  Tests\Feature\FinanceAccountTest
+  ✓ api can get finance accounts for club                                0.62s  
+  ✓ api can get statements for a finance account                         0.60s  
+
+   PASS  Tests\Feature\FinanceContactTest
+  ✓ club can only get own finance contacts                               0.61s  
+  ✓ club can edit external finance contacts                              0.62s  
+  ✓ creating non external finance contacts requires many fields          0.60s  
+  ✓ creating external finance contacts bypasses most required rules      0.59s  
+
+   PASS  Tests\Feature\LoginTest
+  ✓ successful login attempt returns token                               0.60s  
+  ✓ login requires club role association                                 0.61s  
+
+   PASS  Tests\Feature\MediaTest
+  ✓ user cannot upload media for other club                              0.64s  
+  ✓ user can upload media for own club                                   0.83s  
+  ✓ unauthenticated user cannot upload media                             0.73s  
+  ✓ user can download media for own club                                 0.70s  
+  ✓ user cannot download media for other club                            0.69s  
+  ✓ unauthenticated user cannot download media                           0.62s  
+  ✓ user can preview media for own club                                  0.68s  
+  ✓ user cannot preview media for other club                             0.73s  
+  ✓ unauthenticated user cannot preview media                            0.64s  
+
+   PASS  Tests\Feature\MemberTest
+  ✓ club can create new member                                           0.60s  
+  ✓ cannot create member for other club                                  0.62s  
+  ✓ consent boolean mutates timestamp column                             0.58s  
+  ✓ cannot create member when membership has no capacity                 0.59s  
+  ✓ cannot update member to membership with no capacity                  0.59s  
+
+   PASS  Tests\Feature\MembershipApplicationTest
+  ✓ can apply completed membership                                       1.70s  
+  ✓ cannot apply for membership if status wasnt null                     0.57s  
+  ✓ cannot apply for membership if owner is missing                      0.59s  
+  ✓ cannot apply for membership if members count is above maximum membe… 0.59s  
+  ✓ cannot apply for membership if members count is below minimum membe… 0.59s  
+  ✓ club is notified on membership application                           0.62s  
+  ✓ all members are notified on membership application                   0.57s  
+  ✓ api can apply for membership                                         1.57s  
+
+   PASS  Tests\Feature\MembershipTest
+  ✓ club can create new membership                                       0.59s  
+  ✓ club can create new membership with payment period                   0.60s  
+  ✓ club can set owner                                                   0.60s  
+  ✓ club cannot update memberships for other club                        0.59s  
+  ✓ club cannot create membership for other club                         0.59s  
+
+   PASS  Tests\Feature\MembershipTypeTest
+  ✓ club can only get own membership types                               0.66s  
+
+   PASS  Tests\Feature\PasswordResetTest
+  ✓ forgot password sends reset notification                             0.85s  
+  ✓ forgot password with non existing email returns generic error        0.88s  
+  ✓ forgot password fails when reaches rate limiting                     1.70s  
+  ✓ reset password updates database                                      0.64s  
+  ✓ reset password fails with invalid token                              0.81s  
+  ✓ reset password fails with expired token                              0.85s  
+
+   PASS  Tests\Feature\PaymentPeriodTest
+  ✓ cannot apply membership with unattached payment period               0.57s  
+
+   PASS  Tests\Feature\ReceiptTest
+  ✓ club can only get own receipts                                       0.60s  
+  ✓ can create receipt with media                                        0.62s  
+  ✓ can update receipt with existing media                               0.59s  
+
+   PASS  Tests\Feature\StatementTest
+  ✓ club can only get own statements                                     0.60s  
+
+   PASS  Tests\Feature\TaxAccountTest
+  ✓ club can only get related tax accounts                               0.60s  
+  ✓ club can get custom tax accounts with null chart relation            0.60s  
+  ✓ club without chart can only get custom tax accounts                  0.58s  
+
+   PASS  Tests\Feature\UserTest
+  ✓ club can only get own users                                          0.60s  
+  ✓ admin can create new user with roles                                 0.60s  
+  ✓ admin can update user with roles                                     0.61s  
+
+  Tests:    125 passed (479 assertions)
+  Duration: 78.20s
+

@@ -1,0 +1,53 @@
+   FAIL  Tests\Unit\WebApplicationUrlConfigTest
+  ⨯ club apply url uses the configured web application url               2.04s  
+  ⨯ welcome mail login url and support address come from config          0.54s  
+  ⨯ health ping checks target the configured web application url         0.55s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\WebApplicationUrlConfigTest > club apply url uses the…    
+  Failed asserting that two strings are identical.
+  -'https://members.example.test/de/northgate-united/apply'
+  +'https://app.vereinfacht.digital/de/northgate-united/apply'
+  at tests/Unit/WebApplicationUrlConfigTest.php:29
+     25▕         config(['app.web_application_url' => 'https://members.example.test']);
+     26▕ 
+     27▕         $club = Club::factory()->make(['slug' => 'northgate-united']);
+     28▕ 
+  ➜  29▕         $this->assertSame(
+     30▕             'https://members.example.test/de/northgate-united/apply',
+     31▕             $club->apply_url,
+     32▕         );
+     33▕     }
+  1   tests/Unit/WebApplicationUrlConfigTest.php:29
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\WebApplicationUrlConfigTest > welcome mail login url a…   
+  Failed asserting that two strings are identical.
+  -'https://members.example.test/de/admin/auth/login'
+  +'http://app.vereinfacht.digital/admin/login'
+  at tests/Unit/WebApplicationUrlConfigTest.php:45
+     41▕         ]);
+     42▕ 
+     43▕         $mailable = new WelcomeClubAdminMailable;
+     44▕ 
+  ➜  45▕         $this->assertSame('https://members.example.test/de/admin/auth/login', $mailable->url);
+     46▕         $this->assertSame('support@example.test', $mailable->supportEmail);
+     47▕     }
+     48▕ 
+     49▕     public function test_health_ping_checks_target_the_configured_web_application_url(): void
+  1   tests/Unit/WebApplicationUrlConfigTest.php:45
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\WebApplicationUrlConfigTest > health ping checks targe…   
+  Failed asserting that 'https://app.vereinfacht.digital/de/admin/auth/login' starts with "https://members.example.test/".
+  at tests/Unit/WebApplicationUrlConfigTest.php:63
+     59▕             ->values();
+     60▕ 
+     61▕         $this->assertCount(2, $urls);
+     62▕         foreach ($urls as $url) {
+  ➜  63▕             $this->assertStringStartsWith('https://members.example.test/', $url);
+     64▕         }
+     65▕     }
+     66▕ }
+     67▕
+  1   tests/Unit/WebApplicationUrlConfigTest.php:63
+  Tests:    3 failed (4 assertions)
+  Duration: 3.69s
+exit=1

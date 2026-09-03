@@ -1,0 +1,184 @@
+
+> web_application@0.1.0 lint
+> next lint
+
+
+./src/actions/base/create.ts
+12:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/base/delete.ts
+11:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/base/parser/formDataParser.ts
+3:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/base/update.ts
+18:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/divisionMembershipTypes/update.ts
+16:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/financeAccounts/list.ts
+26:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/users/forgotPassword.ts
+23:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/actions/users/resetPassword.ts
+26:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/[slug]/apply/components/AddPersonsForm.tsx
+205:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/[slug]/create-membership/route.ts
+30:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/EditView.tsx
+18:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/Fields/Detail/BelongsToManyField.tsx
+17:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/Fields/DetailField.tsx
+18:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/Form/EditForm.tsx
+59:8  Warning: React Hook useEffect has missing dependencies: 'id', 'resourceName', 'router', 't', and 'toast'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/[lang]/admin/(secure)/components/Form/FormStateHandler.tsx
+75:8  Warning: React Hook useEffect has missing dependencies: 'customNotificationTranslationKey', 'onSuccess', 'router', 'routingOnSuccess', 't', 'toast', 'translationKey', 'translationParams', and 'type'. Either include them or remove the dependency array. If 'onSuccess' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+
+./src/app/[lang]/admin/(secure)/components/Form/utils.ts
+10:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/Navigation/ClubLogo.tsx
+12:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/[lang]/admin/(secure)/components/Navigation/Title.tsx
+31:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/components/Relation/AttachResourceModal.tsx
+26:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/divisions/_components/create-form.tsx
+29:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/divisions/_components/divisions-table.tsx
+59:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/divisions/page.tsx
+28:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/contacts/page.tsx
+32:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/receipts/[id]/page.tsx
+82:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/receipts/_components/create-form.tsx
+104:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/receipts/_components/receipt-progress-bar.tsx
+46:8  Warning: React Hook useMemo has missing dependencies: 'difference', 'isOver', and 'isUnder'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/[lang]/admin/(secure)/finances/receipts/page.tsx
+48:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/statements/_components/statements-table.tsx
+54:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/finances/statements/page.tsx
+45:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/members/[id]/page.tsx
+191:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/members/page.tsx
+32:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/membership-types/_components/create-form.tsx
+31:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+39:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/membership-types/page.tsx
+29:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/memberships/[id]/page.tsx
+228:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/memberships/page.tsx
+33:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/[lang]/admin/(secure)/tax-accounts/page.tsx
+33:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Examples.tsx
+23:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Input/BelongsToMultiselectInput.tsx
+13:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+71:9  Warning: React Hook useCallback has a missing dependency: 'pivotAttributes'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+79:8  Warning: React Hook useEffect has a missing dependency: 'fetchOptions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/components/Input/BelongsToSelectInput.tsx
+13:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+70:8  Warning: React Hook useEffect has a missing dependency: 'fetchOptions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/components/Input/MediaInput.tsx
+152:8  Warning: React Hook useEffect has missing dependencies: 'setLoading' and 'uploadFile'. Either include them or remove the dependency array. If 'setLoading' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+
+./src/app/components/MultipleSections/MultipleSections.tsx
+11:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/MultiselectInput/MultiselectInput.tsx
+104:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Table/BelongsToCell.tsx
+5:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Table/BelongsToManyCell.tsx
+10:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Table/HeaderOptionFilter.tsx
+15:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Table/HeaderSort.tsx
+8:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/components/Table/PermissionTable.tsx
+110:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/resources/resource.ts
+39:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/api-endpoints.ts
+24:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/json-api.ts
+24:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+100:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/utils/auth.ts
+34:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+85:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/utils/form.ts
+51:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+68:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+74:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+117:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+141:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+195:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/utils/query-params.ts
+1:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+43:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+eslint_exit=0

@@ -12,6 +12,14 @@ return [
                 'version' => '1.0.0',
             ],
         ],
+        // Federation (fork)
+        'federation' => [
+            'info' => [
+                'title' => 'Northgate federation member services JSON:API',
+                'description' => 'Registration windows, applications, documents and review, authenticated with OpenID Connect bearer tokens.',
+                'version' => '0.1.0',
+            ],
+        ],
     ],
 
     /*

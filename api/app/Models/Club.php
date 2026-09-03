@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Classes\Sanitizer;
+use App\Federation\Models\MemberOrganization;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 use Filament\Facades\Filament;
 use Laravel\Sanctum\HasApiTokens;
@@ -149,6 +151,14 @@ class Club extends Authenticatable implements HasAvatar, HasLocalePreference, Ha
     }
 
     /**
+     * Federation hierarchy (fork): the member organization this club belongs to, if any.
+     */
+    public function memberOrganization(): BelongsTo
+    {
+        return $this->belongsTo(MemberOrganization::class);
+    }
+
+    /**
      * Attributes
      * ------------------------------------------------------------------------
      */
@@ -164,7 +174,7 @@ class Club extends Authenticatable implements HasAvatar, HasLocalePreference, Ha
 
     public function applyUrl(): Attribute
     {
-        $url = env('WEB_APPLICATION_URL', 'https://app.vereinfacht.digital');
+        $url = config('app.web_application_url');
         $url .= '/de/';
         $url .= $this->slug;
         $url .= '/apply';

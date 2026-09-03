@@ -1,0 +1,15 @@
+   PASS  Tests\Unit\WebApplicationUrlConfigTest
+  ✓ club apply url uses the configured web application url               1.87s  
+  ✓ welcome mail login url and support address come from config          0.58s  
+  ✓ password reset link uses the configured web application url          0.65s  
+  ✓ health ping checks target the configured web application url         0.54s  
+  Tests:    4 passed (7 assertions)
+  Duration: 3.84s
+exit=0
+--- pint on changed files
+  ⨯⨯..⨯.
+  ──────────────────────────────────────────────────────────────────── Laravel  
+    FAIL   ........................................... 6 files, 3 style issues  
+  ⨯ app/Mail/WelcomeClubAdminMailable.php        concat_space, ordered_imports  
+  ⨯ app/Models/Club.php function_declaration, not_operator_with_successor_spa…  
+  ⨯ config/app.php               fully_qualified_strict_types, ordered_imports  

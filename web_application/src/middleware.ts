@@ -1,6 +1,7 @@
 import { NextRequestWithAuth, withAuth } from 'next-auth/middleware';
 import { NextURL } from 'next/dist/server/web/next-url';
 import { handleAdminPaths } from './middlewares/auth';
+import { handleMemberPaths } from './middlewares/federation';
 import { localizePath, pathnameHasLocale } from './middlewares/localization';
 import { NextResponse } from 'next/server';
 
@@ -27,6 +28,11 @@ function middleware(request: NextRequestWithAuth) {
 function handleLocalizedPaths(request: NextRequestWithAuth, nextUrl: NextURL) {
     if (nextUrl.pathname.includes('/admin')) {
         return handleAdminPaths(request, nextUrl);
+    }
+
+    // Federation (fork)
+    if (nextUrl.pathname.includes('/member')) {
+        return handleMemberPaths(request, nextUrl);
     }
 }
 

@@ -1,0 +1,7 @@
+# Playwright run, 2026-09-02T18:27:45Z, host Chromium against the compose stack (next dev on :3000, api :3001, mock OIDC :3004)
+Running 3 tests using 1 worker
+  ✓  1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (1.5s)
+  ✓  2 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (6.2s)
+  ✓  3 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (657ms)
+  3 passed (9.1s)
+playwright_exit=0

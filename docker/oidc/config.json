@@ -1,0 +1,98 @@
+{
+  "interactiveLogin": true,
+  "loginPagePath": null,
+  "tokenCallbacks": [
+    {
+      "issuerId": "default",
+      "tokenExpiry": 3600,
+      "requestMappings": [
+        {
+          "requestParam": "scope",
+          "match": "persona:alex",
+          "claims": {
+            "sub": "mock|alex",
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "email": "alex.participant@northgate.example",
+            "email_verified": true,
+            "name": "Alex Participant",
+            "azp": "northgate-web"
+          }
+        },
+        {
+          "requestParam": "scope",
+          "match": "persona:sam",
+          "claims": {
+            "sub": "mock|sam",
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "email": "sam.coach@northgate.example",
+            "email_verified": true,
+            "name": "Sam Coach",
+            "azp": "northgate-web"
+          }
+        },
+        {
+          "requestParam": "scope",
+          "match": "persona:nysa-admin",
+          "claims": {
+            "sub": "mock|nysa-admin",
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "email": "nysa-admin@northgate.example",
+            "email_verified": true,
+            "name": "NYSA Admin",
+            "azp": "northgate-web"
+          }
+        },
+        {
+          "requestParam": "scope",
+          "match": "persona:federation-admin",
+          "claims": {
+            "sub": "mock|federation-admin",
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "email": "federation-admin@northgate.example",
+            "email_verified": true,
+            "name": "Federation Admin",
+            "azp": "northgate-web"
+          }
+        },
+        {
+          "requestParam": "scope",
+          "match": "persona:unverified",
+          "claims": {
+            "sub": "mock|unverified",
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "email": "unverified@northgate.example",
+            "email_verified": false,
+            "name": "Unverified Person",
+            "azp": "northgate-web"
+          }
+        },
+        {
+          "requestParam": "grant_type",
+          "match": "*",
+          "claims": {
+            "aud": [
+              "northgate-web",
+              "https://api.northgate.example"
+            ],
+            "azp": "northgate-web"
+          }
+        }
+      ]
+    }
+  ]
+}

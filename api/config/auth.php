@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Fork: OpenID Connect bearer tokens for federation routes (see config/oidc.php).
+        'oidc' => [
+            'driver' => 'oidc',
+            'provider' => 'users',
+        ],
     ],
 
     /*

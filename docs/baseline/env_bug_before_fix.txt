@@ -1,0 +1,18 @@
+# Reproduction of the env() bug in the running api container (before fix), 2026-09-02T17:12:33Z
+WEB_APPLICATION_URL in .env: WEB_APPLICATION_URL=http://localhost:3000
+CLUB_ADMIN_LOGIN_PATH in .env: CLUB_ADMIN_LOGIN_PATH=/admin/login
+
+## 1. Without cached config (env() reads .env)
+apply_url = http://localhost:3000/de/tsv-muster/apply
+mailable url = http://localhost:3000/admin/login
+env(WEB_APPLICATION_URL) = 'http://localhost:3000'
+
+## 2. With cached config (what the entrypoint does on every container start)
+apply_url = https://app.vereinfacht.digital/de/tsv-muster/apply
+mailable url = http://app.vereinfacht.digital/admin/login
+env(WEB_APPLICATION_URL) = NULL
+config(app.url) = http://localhost:3001
+
+## 3. Health check ping URLs registered at boot with cached config
+Club management login -> https://app.vereinfacht.digital/de/admin/auth/login
+Demo club apply form -> https://app.vereinfacht.digital/de/tsv-muster/apply

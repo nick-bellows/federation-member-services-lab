@@ -69,6 +69,14 @@ class Member extends Model implements HasLocalePreference, HasMedia
         return $this->belongsToMany(Division::class);
     }
 
+    /**
+     * Federation hierarchy (fork): the login principal this person is linked to, if any.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     protected function fullName(): Attribute
     {
         return Attribute::make(

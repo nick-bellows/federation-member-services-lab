@@ -1,0 +1,170 @@
+{
+    "nav": {
+        "label": "Mitgliederbereich",
+        "skip": "Zum Inhalt springen",
+        "home": "Deine Identität",
+        "applications": "Meine Anträge",
+        "review": "Prüfungsliste",
+        "windows": "Registrierungszeiträume"
+    },
+    "common": {
+        "working": "Bitte warten…",
+        "keep": "Behalten"
+    },
+    "sign_in": {
+        "heading": "Bei Northgate anmelden",
+        "intro": "Melde dich mit deiner Northgate-ID an, um deine Registrierungen zu sehen. Dein Passwort wird nie an diese Anwendung weitergegeben.",
+        "providers": "Identitätsanbieter",
+        "with": "Weiter mit {{provider}}",
+        "none_configured": "Es ist kein Identitätsanbieter konfiguriert. Setze OIDC_ISSUER oder AUTH0_ISSUER in der Umgebung der Web-Anwendung."
+    },
+    "sign_out": "Abmelden",
+    "me": {
+        "heading": "Hallo, {{name}}",
+        "identity": "Deine Identität",
+        "email": "E-Mail",
+        "issuer": "Angemeldet über",
+        "subject": "Subjekt",
+        "scopes": "Was du hier tun kannst",
+        "scopes_help": "Abgeleitet aus deinen Rollen in der Verbandsdatenbank, nicht aus deinem Anmelde-Token.",
+        "administered": "Von dir verwaltete Organisationen",
+        "administered_none": "Du verwaltest keine Organisation."
+    },
+    "fields": {
+        "organization": "Organisation",
+        "season": "Saison",
+        "role": "Rolle",
+        "status": "Status",
+        "date_of_birth": "Geburtsdatum",
+        "phone": "Telefon",
+        "notes": "Hinweise für die Prüfung",
+        "applicant": "Antragsteller:in",
+        "name": "Name",
+        "submitted_at": "Eingereicht"
+    },
+    "roles": {
+        "participant": "Spieler:in",
+        "coach": "Trainer:in",
+        "referee": "Schiedsrichter:in"
+    },
+    "statuses": {
+        "draft": "Entwurf",
+        "submitted": "Eingereicht",
+        "under_review": "In Prüfung",
+        "needs_information": "Angaben fehlen",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Zurückgezogen"
+    },
+    "status_explanations": {
+        "draft": "Noch nicht abgeschickt. Vervollständige Angaben und Dokumente und reiche dann ein.",
+        "submitted": "Wartet darauf, dass eine prüfende Person der Organisation den Antrag übernimmt.",
+        "under_review": "Dein Antrag und deine Dokumente werden geprüft.",
+        "needs_information": "Die prüfende Person braucht etwas von dir. Lies die Begründung, ergänze und reiche erneut ein.",
+        "approved": "Deine Registrierung für diese Saison und Rolle ist genehmigt.",
+        "rejected": "Dieser Antrag wurde nicht genehmigt. Die Begründung steht oben.",
+        "cancelled": "Du hast diesen Antrag zurückgezogen. Solange der Zeitraum offen ist, kannst du einen neuen stellen."
+    },
+    "document_types": {
+        "proof_of_age": "Altersnachweis",
+        "photo": "Foto",
+        "coaching_licence": "Trainerlizenz",
+        "referee_certificate": "Schiedsrichterzertifikat",
+        "background_check_consent": "Einwilligung Führungszeugnis"
+    },
+    "document_statuses": {
+        "pending": "Prüfung ausstehend",
+        "accepted": "Akzeptiert",
+        "rejected": "Abgelehnt"
+    },
+    "applications": {
+        "heading": "Meine Anträge",
+        "start": "Antrag starten",
+        "none": "Du hast noch keinen Antrag gestartet.",
+        "table_caption": "Deine Registrierungsanträge",
+        "open": "Öffnen"
+    },
+    "start": {
+        "heading": "Antrag starten",
+        "intro": "Wähle, wo du dich registrieren möchtest und in welcher Rolle. Angaben und Dokumente kannst du danach ergänzen.",
+        "window": "Organisation und Saison",
+        "window_help": "Nur Organisationen mit offenem Registrierungszeitraum werden angezeigt.",
+        "closes": "schließt am {{date}}",
+        "no_windows": "Derzeit nimmt keine Organisation Anträge an.",
+        "submit": "Starten"
+    },
+    "application": {
+        "heading": "Antrag {{role}} · {{organization}}",
+        "started": "gestartet am {{date}}",
+        "reason": "Begründung",
+        "details": "Deine Angaben",
+        "save_details": "Angaben speichern",
+        "details_saved": "Angaben gespeichert.",
+        "documents": "Dokumente",
+        "documents_help": "Wähle für jedes erforderliche Dokument eine Datei. Es werden nur Name, Typ, Größe und Prüfsumme gespeichert; die Datei selbst bleibt in dieser Version auf deinem Gerät.",
+        "actions": "Nächster Schritt",
+        "incomplete_help": "Ergänze dein Geburtsdatum und alle erforderlichen Dokumente, bevor du einreichst.",
+        "submit": "Antrag einreichen",
+        "resubmit": "Erneut einreichen",
+        "cancel": "Antrag zurückziehen",
+        "cancel_confirm": "Ja, zurückziehen",
+        "history": "Verlauf"
+    },
+    "documents": {
+        "missing": "Noch nicht vorhanden",
+        "choose": "Datei wählen",
+        "choose_for": "Datei für {{type}} wählen",
+        "replace": "Ersetzen",
+        "attached": "Dokument erfasst.",
+        "format_error": "Nur PDF-, JPEG- und PNG-Dateien werden akzeptiert.",
+        "note": "Hinweis der Prüfung",
+        "accept": "Akzeptieren",
+        "reject": "Ablehnen",
+        "reviewed": "Entscheidung zum Dokument gespeichert."
+    },
+    "review": {
+        "heading": "Prüfungsliste",
+        "intro": "Anträge bei den von dir verwalteten Organisationen, die eine Entscheidung brauchen.",
+        "empty": "Derzeit gibt es nichts zu prüfen.",
+        "table_caption": "Anträge in der Prüfung",
+        "open": "Prüfen",
+        "application_heading": "Antrag von {{name}}",
+        "applicant": "Antragsteller:in",
+        "decision": "Entscheidung",
+        "reason": "Begründung",
+        "reason_help": "Erforderlich bei Rückfragen und Ablehnungen. Die antragstellende Person liest sie.",
+        "start": "Prüfung beginnen",
+        "approve": "Genehmigen",
+        "request_information": "Angaben nachfordern",
+        "reject": "Ablehnen"
+    },
+    "windows": {
+        "heading": "Registrierungszeiträume",
+        "none": "Es gibt noch keinen Registrierungszeitraum.",
+        "table_caption": "Registrierungszeiträume nach Organisation und Saison",
+        "opens": "Öffnet",
+        "closes": "Schließt",
+        "roles": "Rollen",
+        "state": "Zustand",
+        "open": "Offen",
+        "closed": "Geschlossen",
+        "open_heading": "Registrierungszeitraum öffnen",
+        "open_submit": "Zeitraum öffnen",
+        "opened": "Registrierungszeitraum geöffnet."
+    },
+    "history": {
+        "none": "Noch kein Verlauf.",
+        "actions": {
+            "application_created": "Antrag gestartet",
+            "application_submitted": "Eingereicht",
+            "application_under_review": "Prüfung begonnen",
+            "application_needs_information": "Angaben nachgefordert",
+            "application_approved": "Genehmigt",
+            "application_rejected": "Abgelehnt",
+            "application_cancelled": "Zurückgezogen",
+            "application_details_updated": "Angaben aktualisiert",
+            "document_attached": "Dokument erfasst",
+            "document_reviewed": "Dokument geprüft"
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "federation-e2e",
+    "version": "0.1.0",
+    "private": true,
+    "description": "End-to-end and accessibility tests for the federation surfaces of the fork (Playwright + axe). Runs against the compose stack.",
+    "scripts": {
+        "test": "playwright test",
+        "test:headed": "playwright test --headed",
+        "report": "playwright show-report"
+    },
+    "devDependencies": {
+        "@axe-core/playwright": "^4.10.2",
+        "@playwright/test": "^1.55.0",
+        "@types/node": "^22.0.0"
+    }
+}
