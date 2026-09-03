@@ -45,4 +45,4 @@ The tooling and api images carry `pdo_pgsql` since B4. The process environment w
 ## Status
 
 - SQLite and MariaDB: `validated` (CI green since 2026-09-03).
-- PostgreSQL: `validated` when the `backend-postgres` job is green on `main`; until then `planned`. The learning log records the first run.
+- PostgreSQL: `validated` (the `backend-postgres` job passed the whole suite, 212 tests, and the demo seeder on pull request #7, 2026-09-03, in about four minutes; the first run had found the three JSON-column comparisons above).
