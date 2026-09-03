@@ -25,3 +25,7 @@ The brief asks for genuine, minimal upstream contributions and forbids flooding 
 - Positive: one clear, testable, generic change reaches the maintainers with a reproduction; the fork's claims about upstream work stay verifiable.
 - Negative: the pull request cannot be opened until the fork exists on GitHub (Phase A5), so the offer waits for the visibility decision; upstream may not respond.
 - Follow-ups: open the issue and the pull request in A5; revisit the CI offer if the maintainers reply on #7.
+
+## Status update (2026-09-03)
+
+The fork is public and the first candidate (the `env()` fix with `.gitattributes`) is ready. The owner decided to make the one offer at the end of Phase B rather than now, so that the fork offers something of value in one well-read issue instead of a two-line fix followed by silence. Nothing has been offered; the README says so until it changes. Recorded in `ROADMAP.md` as decision 7.
