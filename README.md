@@ -80,8 +80,9 @@ Captured from the running stack by [`e2e/tests/screenshots.spec.ts`](e2e/tests/s
 Requirements: Docker Desktop (or Docker Engine with Compose v2) and Node 20+ on the host only for the browser tests. No PHP is needed on the host; everything PHP runs in the `tooling` container, as upstream intends.
 
 ```sh
-git clone --config core.autocrlf=false --origin upstream https://github.com/vereinfacht/vereinfacht.git   # or clone this fork
+git clone --config core.autocrlf=false https://github.com/nick-bellows/federation-member-services-lab.git   # autocrlf off keeps the container scripts LF on Windows
 cd federation-member-services-lab
+git remote add upstream https://github.com/vereinfacht/vereinfacht.git && git fetch upstream   # only for the upstream-versus-fork diff above
 cp docker-compose.override.example.yml docker-compose.override.yml   # Windows/NTFS: dependency trees in named volumes
 printf 'USER_ID=1000\nGROUP_ID=1000\n' > .env
 docker compose up -d --build database api api-docs oidc tooling
