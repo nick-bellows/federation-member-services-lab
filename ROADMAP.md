@@ -1,17 +1,17 @@
 # Roadmap
 
-Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed by the workspace `AGENTS.md` and the central portfolio roadmap; where they conflict, the central roadmap wins.
+Last verified: 2026-09-03. Supersedes the 2026-09-02 versions. Governed by the workspace `AGENTS.md` and the central portfolio roadmap; where they conflict, the central roadmap wins.
 
 ## Handoff snapshot
 
 | Field | Current state |
 | --- | --- |
 | Lifecycle | `VALIDATED` in CI, not deployed — Phase A complete: M0 to M4 (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests), README, cold clone, public fork with CI green on `main` (2026-09-03). Phase B: B2 Learning Center contract done 2026-09-03 (ADR-0009, INCIDENT-001); B3 next |
-| Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
-| Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
+| Branch | `main` of the fork, merged through pull requests (#1 Phase A, #2 to #4 docs, #5 B2); 35+ commits ahead of upstream `main` (`dca9be3`) |
+| Remotes | `origin` = nick-bellows/federation-member-services-lab (public fork, created 2026-09-03 on the owner's instruction); `upstream` = vereinfacht/vereinfacht (read-only) |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, mock OIDC provider, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11; seed with `NorthgateDemoSeeder` |
-| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork has a draft workflow |
-| Original product claim | One complete registration-review workflow: windows, applications with details and document metadata, review with decisions and reasons, audit history, over an OIDC-authenticated JSON:API and accessible member and reviewer pages; verified by PHPUnit and Playwright in compose, not yet in CI |
+| Upstream baseline | PHPUnit 91/91 (338 assertions, 58 s, SQLite), now 95/95 with the fork's tests; Pint 215 issues; `tsc` 0 errors; ESLint 71 warnings; no frontend or E2E tests; upstream has no CI that runs tests, the fork's workflow runs six jobs on GitHub (green on `main` since 2026-09-03) |
+| Original product claim | One complete registration-review workflow: windows, applications with details and document metadata, review with decisions and reasons, audit history, over an OIDC-authenticated JSON:API and accessible member and reviewer pages, plus participation derived from the Learning Center credentials contract (B2); verified by PHPUnit and Playwright in compose and in CI |
 | Purpose in the application | Evidence of **existing-system engineering**: reading, testing and extending a Laravel/Next.js codebase without a rewrite. The sibling `learning-center-reference` remains the flagship |
 
 Start with `docs/UPSTREAM_ANALYSIS.md`, then `docs/adr/`. The sibling Learning Center owns education, certification and safeguarding-derived eligibility. This repository owns organizations, membership, registration applications, document review and audit, and consumes credentials over an HTTP contract only. The two never share a database.
