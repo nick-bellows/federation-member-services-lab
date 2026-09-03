@@ -44,6 +44,23 @@ async function expectAccessible(page: Page) {
     expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 }
 
+// React hydration mismatches and uncaught page errors fail the journey; the
+// cold-clone verification (2026-09-02) found a date that hydrated with a
+// different calendar day than the server rendered.
+let runtimeErrors: string[] = [];
+test.beforeEach(({ page }) => {
+    runtimeErrors = [];
+    page.on('console', (message) => {
+        if (message.type() === 'error' && /hydrat|did not match|server.*client/i.test(message.text())) {
+            runtimeErrors.push(message.text());
+        }
+    });
+    page.on('pageerror', (error) => runtimeErrors.push(error.message));
+});
+test.afterEach(() => {
+    expect(runtimeErrors, 'pages must hydrate without React or runtime errors').toEqual([]);
+});
+
 test.describe.serial('registration review slice', () => {
     test('an applicant starts, completes and submits an application', async ({ page }) => {
         await signIn(page, personas.applicant);

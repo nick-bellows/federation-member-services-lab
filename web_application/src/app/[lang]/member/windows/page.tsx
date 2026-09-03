@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/federation/format';
 import { fetchFederationIdentity } from '@/lib/federation/api';
 import { requireFederationClient } from '@/lib/federation/client';
 import { listReferenceData, listWindows } from '@/lib/federation/queries';
@@ -99,14 +100,10 @@ export default async function WindowsPage({ params }: PageProps) {
                                         {w.season?.label ?? '—'}
                                     </td>
                                     <td className="py-2 pr-4">
-                                        {new Date(
-                                            w.opensAt,
-                                        ).toLocaleDateString()}
+                                        {formatDate(w.opensAt, params.lang)}
                                     </td>
                                     <td className="py-2 pr-4">
-                                        {new Date(
-                                            w.closesAt,
-                                        ).toLocaleDateString()}
+                                        {formatDate(w.closesAt, params.lang)}
                                     </td>
                                     <td className="py-2 pr-4">
                                         {w.roles

@@ -122,7 +122,7 @@ export default async function ReviewApplicationPage({ params }: PageProps) {
                 >
                     {t('application.history')}
                 </h2>
-                <HistoryList entries={attributes.history} />
+                <HistoryList entries={attributes.history} lang={params.lang} />
             </section>
         </article>
     );

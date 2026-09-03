@@ -4,6 +4,7 @@ import {
     startApplication,
     type ActionResult,
 } from '@/actions/federation/actions';
+import { formatDate } from '@/lib/federation/format';
 import type { WindowView } from '@/lib/federation/queries';
 import { applicationRoles, type ApplicationRole } from '@/lib/federation/types';
 import useTranslation from 'next-translate/useTranslation';
@@ -78,7 +79,7 @@ export default function StartApplicationForm({ lang, windows }: Props) {
                             {w.organization?.name ?? '?'} ·{' '}
                             {w.season?.label ?? '?'} ·{' '}
                             {t('start.closes', {
-                                date: new Date(w.closesAt).toLocaleDateString(),
+                                date: formatDate(w.closesAt, lang),
                             })}
                         </option>
                     ))}

@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/federation/format';
 import { requireFederationClient } from '@/lib/federation/client';
 import { listApplications } from '@/lib/federation/queries';
 import createTranslation from 'next-translate/createTranslation';
@@ -106,10 +107,11 @@ export default async function ReviewQueuePage({ params }: PageProps) {
                                     </td>
                                     <td className="py-2 pr-4">
                                         {application.attributes.submittedAt
-                                            ? new Date(
+                                            ? formatDate(
                                                   application.attributes
                                                       .submittedAt,
-                                              ).toLocaleDateString()
+                                                  params.lang,
+                                              )
                                             : '—'}
                                     </td>
                                     <td className="py-2">

@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/federation/format';
 import { requireFederationClient } from '@/lib/federation/client';
 import { getApplication } from '@/lib/federation/queries';
 import {
@@ -48,7 +49,7 @@ export default async function ApplicationPage({ params }: PageProps) {
             <p className="mt-1 text-slate-700">
                 {view.season?.label} ·{' '}
                 {t('application.started', {
-                    date: new Date(attributes.createdAt).toLocaleDateString(),
+                    date: formatDate(attributes.createdAt, params.lang),
                 })}
             </p>
 
@@ -122,7 +123,7 @@ export default async function ApplicationPage({ params }: PageProps) {
                 <h2 id="history-heading" className="text-lg font-semibold">
                     {t('application.history')}
                 </h2>
-                <HistoryList entries={attributes.history} />
+                <HistoryList entries={attributes.history} lang={params.lang} />
             </section>
         </article>
     );

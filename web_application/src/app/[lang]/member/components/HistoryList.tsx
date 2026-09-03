@@ -1,10 +1,17 @@
+import { formatDateTime } from '@/lib/federation/format';
 import type { HistoryEntry } from '@/lib/federation/types';
 import createTranslation from 'next-translate/createTranslation';
 
 /**
  * The audit trail as a readable list: newest last, so it reads as a story.
  */
-export default function HistoryList({ entries }: { entries: HistoryEntry[] }) {
+export default function HistoryList({
+    entries,
+    lang,
+}: {
+    entries: HistoryEntry[];
+    lang: string;
+}) {
     const { t } = createTranslation('federation');
 
     if (entries.length === 0) {
@@ -20,7 +27,7 @@ export default function HistoryList({ entries }: { entries: HistoryEntry[] }) {
                         className="block text-slate-700"
                     >
                         {entry.occurredAt
-                            ? new Date(entry.occurredAt).toLocaleString()
+                            ? formatDateTime(entry.occurredAt, lang)
                             : ''}
                     </time>
                     <span className="font-medium">
