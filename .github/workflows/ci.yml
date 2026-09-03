@@ -168,8 +168,8 @@ jobs:
           git fetch --quiet https://github.com/vereinfacht/vereinfacht.git main
           FORK_MIGRATIONS=$(git diff --name-only --diff-filter=A FETCH_HEAD...HEAD -- database/migrations | sed 's|^api/||')
           vendor/bin/pint --test \
-            app/Federation \
-            tests/Unit/Federation tests/Feature/Federation tests/Unit/WebApplicationUrlConfigTest.php \
+            app/Federation app/Support \
+            tests/Unit/Federation tests/Feature/Federation tests/Feature/Export tests/Unit/WebApplicationUrlConfigTest.php \
             database/factories/Federation database/seeders/NorthgateDemoSeeder.php \
             $FORK_MIGRATIONS
       - name: Pint on the whole tree (upstream carries 215 pre-existing issues; reported, not enforced)
