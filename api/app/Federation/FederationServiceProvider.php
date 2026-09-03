@@ -23,6 +23,9 @@ use App\Federation\Models\MemberOrganization;
 use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Models\Season;
+use App\Federation\Observability\Metrics;
+use App\Federation\Observability\Readiness;
+use App\Federation\Observability\Tracing;
 use App\Federation\Outbox\OutboxRecorder;
 use App\Federation\Policies\ApplicationDocumentPolicy;
 use App\Federation\Policies\ReadOnlyPolicy;
@@ -36,6 +39,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\API\Trace\TracerProviderInterface;
 
 /**
  * Wires the federation module into the application: the "oidc" guard and
@@ -84,6 +89,7 @@ class FederationServiceProvider extends ServiceProvider
             return new HttpCredentialsClient(
                 $app->make(HttpFactory::class),
                 $app->make(ServiceTokenProvider::class),
+                $app->make(TracerInterface::class),
                 (string) $config['base_url'],
                 (string) $config['contract'],
                 (int) $config['connect_timeout_ms'],
@@ -105,6 +111,31 @@ class FederationServiceProvider extends ServiceProvider
                 (string) $app['config']->get('learning_center.contract'),
                 (int) $app['config']->get('learning_center.snapshot_ttl_minutes'),
             );
+        });
+
+        $this->app->bind(Readiness::class, function ($app) {
+            return new Readiness(
+                $app->make(HttpFactory::class),
+                (string) $app['config']->get('learning_center.base_url'),
+                $app['config']->get('observability.readiness'),
+            );
+        });
+        $this->app->bind(Metrics::class, function ($app) {
+            return new Metrics((int) $app['config']->get('observability.metrics.snapshot_stale_minutes'));
+        });
+
+        // Tracing (ADR-0012): one provider per process, flushed when the process ends.
+        $this->app->singleton(TracerProviderInterface::class, function ($app) {
+            return Tracing::provider($app['config']->get('observability.tracing'));
+        });
+        $this->app->bind(TracerInterface::class, function ($app) {
+            return $app->make(TracerProviderInterface::class)->getTracer('federation');
+        });
+        $this->app->terminating(function () {
+            $provider = $this->app->make(TracerProviderInterface::class);
+            if (method_exists($provider, 'forceFlush')) {
+                $provider->forceFlush();
+            }
         });
     }
 

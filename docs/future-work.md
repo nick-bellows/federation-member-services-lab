@@ -35,3 +35,6 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Worker as a Compose service** — the worker is started by hand in the api container as the PHP-FPM user; a dedicated service on the api image with the entrypoint's migration made opt-in would remove the manual step.
 - **Money columns on PostgreSQL** — `unsignedInteger` maps to a plain integer there; a `CHECK (amount >= 0)` per engine would restore the constraint (B4 finding).
 - **Default engine** — MariaDB remains the development default; switching the Compose stack to PostgreSQL is a documented option once B8 chooses a production engine.
+- **Scheduling and alert delivery** — the worker, the reconciliation, `health:check` and `outbox-status` run by hand; B8 defines the scheduler and where a non-zero exit code goes.
+- **Auto-instrumentation** — the OpenTelemetry Laravel extension would add database and HTTP client spans without hand-written code; the four hand-written spans are the ones that matter for the incidents.
+- **Upstream health checks in development** — `EnvironmentCheck` and `DebugModeCheck` expect production and the two pings target upstream's public URLs from inside the container; a development profile for the checks, or none, is upstream's call.

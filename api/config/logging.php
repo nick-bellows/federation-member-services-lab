@@ -95,6 +95,19 @@ return [
             ],
         ],
 
+        // JSON lines to stderr with trace context (ADR-0012, docs/OBSERVABILITY.md):
+        // the container runtime collects them; request and user ids arrive
+        // through the shared log context, trace and span ids through the processor.
+        'json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            'formatter_with' => ['includeStacktraces' => false],
+            'with' => ['stream' => 'php://stderr'],
+            'processors' => [\App\Federation\Observability\LogContextProcessor::class, \Monolog\Processor\PsrLogMessageProcessor::class],
+        ],
+
         'stderr' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),

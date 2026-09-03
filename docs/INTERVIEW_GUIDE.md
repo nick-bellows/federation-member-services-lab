@@ -281,3 +281,37 @@ Three CI jobs instead of two; MariaDB stays the default so the demo stack is sti
 2. What does "supported on PostgreSQL" mean in your README, and what evidence backs it?
 3. Which engine would you run in production for this system, and what would make you change your mind?
 4. Why did the export ordering have no test before, and what does the new one prove on each engine?
+
+## M8 / B5 — Operability
+
+### What it does
+
+Every federation request writes one JSON access line with the request id, the acting user's id, the route, the status, the duration and the trace and span ids; the worker's lines carry the event and consumer as well. Traces go to a local Jaeger: the request's server span, the transition, each outbox job continuing the same trace through the row's stored trace context, and the client span around the Learning Center call with the header propagated. Liveness, readiness and metrics are endpoints; upstream's nine health checks finally have a route. A runbook names the first command, the good answer and the repair for each rehearsed incident, and the three incidents were re-run against the signals.
+
+### Why we built it this way
+
+Correlation is the whole value of structured logs; a trace id that survives the outbox hop is what makes the worker debuggable; readiness must not fail on a dependency the pages do not need; metrics computed from tables are true without a metrics server.
+
+### Alternatives considered
+
+Logs only with correlation ids; Laravel Telescope; keeping the single log file; a hosted service; spatie's JSON results only; Prometheus and Grafana in Compose (ADR-0012).
+
+### Failure modes
+
+A slow provider degrades readiness's report and nothing else; a dead worker takes the instance out of rotation through the outbox age; a parked event shows in the metrics and the status command, not in readiness; an unqualified processor class name made the whole JSON channel fall back to the emergency file logger; PHP-FPM drops worker output unless told to catch it; the in-memory health result store never outlived the process that ran the checks; a storage symlink in the build context broke the image build on this filesystem.
+
+### Tradeoffs
+
+Four hand-written spans instead of auto-instrumentation; readiness ignores parked events by design; the metrics endpoint is open unless a token is set; scheduling and alerting are still B8's.
+
+### Code to locate immediately
+
+`api/app/Federation/Http/Middleware/TraceRequest.php` · `api/app/Federation/Observability/{Tracing,LogContextProcessor,Readiness,Metrics}.php` · `api/app/Federation/Http/Controllers/ObservabilityController.php` · `api/config/{observability,logging}.php` · `api/tests/Feature/Federation/TracingTest.php` · `api/tests/Feature/Federation/Http/ObservabilityHttpTest.php` · `docs/OBSERVABILITY.md` · `docs/RUNBOOK.md`
+
+### Likely interviewer questions
+
+1. How would you find out what a single failed approval did across the web process, the worker and the Learning Center?
+2. What is the difference between liveness and readiness here, and what would break if you merged them?
+3. Which three numbers would you alert on first for this system, and at what thresholds?
+4. Why does a slow Learning Center not make the service unready?
+5. Your traces cross a queue. How does the worker's span know its parent?

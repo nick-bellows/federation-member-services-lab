@@ -16,6 +16,9 @@ use App\Federation\Support\ApplicationActorResolver;
 use App\Federation\Support\AuditRecorder;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\API\Trace\TracerInterface;
+use Throwable;
 
 /**
  * The only way an application changes status.
@@ -40,6 +43,7 @@ class TransitionApplication
         private readonly ApplicationActorResolver $actors,
         private readonly AuditRecorder $audit,
         private readonly OutboxRecorder $outbox,
+        private readonly TracerInterface $tracer,
     ) {}
 
     public function execute(
@@ -49,6 +53,31 @@ class TransitionApplication
         ?string $reason = null,
         ?string $requestId = null,
         ?string $idempotencyKey = null,
+    ): RegistrationApplication {
+        $span = $this->tracer->spanBuilder('application.transition')
+            ->setAttribute('federation.application_id', $application->getKey())
+            ->setAttribute('federation.to', $to->value)
+            ->startSpan();
+        $scope = $span->activate();
+
+        try {
+            return $this->transition($application, $to, $actor, $reason, $requestId, $idempotencyKey);
+        } catch (Throwable $e) {
+            $span->recordException($e)->setStatus(StatusCode::STATUS_ERROR);
+            throw $e;
+        } finally {
+            $scope->detach();
+            $span->end();
+        }
+    }
+
+    private function transition(
+        RegistrationApplication $application,
+        ApplicationStatus $to,
+        User $actor,
+        ?string $reason,
+        ?string $requestId,
+        ?string $idempotencyKey,
     ): RegistrationApplication {
         return DB::transaction(function () use ($application, $to, $actor, $reason, $requestId, $idempotencyKey) {
             $application = RegistrationApplication::query()

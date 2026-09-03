@@ -26,8 +26,9 @@ The sibling project [learning-center-reference](https://github.com/nick-bellows/
 | M5 Learning Center contract | A versioned credentials contract keyed by OIDC subject, executable as fixtures on both sides and served by a mock in Compose; the federation calls with its own client-credentials service token; participation derived on read from a stored snapshot with its age, refreshed after approval, on a reviewer's request and by reconciliation; Incident 1 rehearsed against a slowed provider | [`docs/contracts/learning-center-credentials-v1.md`](docs/contracts/learning-center-credentials-v1.md), [ADR-0009](docs/adr/0009-learning-center-credentials-contract.md), [INCIDENT-001](docs/incidents/INCIDENT-001-slow-credential-service.md), `docs/baseline/incident_001_2026-09-03.txt`, [learning-center-reference PR #1](https://github.com/nick-bellows/learning-center-reference/pull/1) |
 | M6 Events and reliability | A transactional outbox written with every state change, a relay onto Laravel's database queue with one job per event and consumer, a processed-events ledger that makes at-least-once delivery act once, retries with backoff and a parked state an operator can read and replay; two consumers (notification rows, the credential refresh after approval); Incident 3 rehearsed (the worker fails after an approval); the broker mapping documented, none provisioned | [ADR-0010](docs/adr/0010-transactional-outbox-and-consumers.md), [INCIDENT-003](docs/incidents/INCIDENT-003-worker-fails-after-approval.md), `docs/baseline/incident_003_2026-09-03.txt` |
 | M7 PostgreSQL | A three-engine compatibility matrix in CI (SQLite, MariaDB, PostgreSQL 16, the last one with the demo seeder); upstream's MySQL-only SQL made portable in place with a regression test (export ordering, a fee cast, a migration literal); engine differences recorded, none hidden; the driver in both images and an optional PostgreSQL service in Compose | [`docs/DATABASE_COMPATIBILITY.md`](docs/DATABASE_COMPATIBILITY.md), [ADR-0011](docs/adr/0011-postgresql-compatibility-matrix.md) |
+| M8 Operability | JSON logs on stderr with request, user, trace and span ids and one access line per request; OpenTelemetry traces to a local Jaeger from the request through the outbox worker to the Learning Center call; liveness, readiness and metrics endpoints, and upstream's nine health checks routed; a runbook proved by re-running the three incidents against the signals | [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md), [`docs/RUNBOOK.md`](docs/RUNBOOK.md), [ADR-0012](docs/adr/0012-observability.md), `docs/baseline/operability_2026-09-03.txt` |
 
-Planned, not built: structured logs and traces, the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
+Planned, not built: the accessibility and performance passes, release engineering. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Architecture
 
@@ -88,7 +89,7 @@ cd federation-member-services-lab
 git remote add upstream https://github.com/vereinfacht/vereinfacht.git && git fetch upstream   # only for the upstream-versus-fork diff above
 cp docker-compose.override.example.yml docker-compose.override.yml   # Windows/NTFS: dependency trees in named volumes
 printf 'USER_ID=1000\nGROUP_ID=1000\n' > .env
-docker compose up -d --build database api api-docs oidc learning-center tooling
+docker compose up -d --build database api api-docs oidc learning-center jaeger tooling
 docker compose exec tooling bash
 ```
 
@@ -120,17 +121,19 @@ Then restart the API once so it loads the environment: `docker compose restart a
 | http://localhost:3001/federation_openapi.json | The federation API contract |
 | http://localhost:3004/default/.well-known/openid-configuration | The mock identity provider |
 | http://localhost:3005/health | The Learning Center credentials mock; it serves the contract fixtures and takes `LEARNING_CENTER_MOCK_DELAY_MS` for the Incident 1 rehearsal |
+| http://localhost:3006 | Jaeger: traces from the API, the outbox worker and the Learning Center call (service `federation-api`) |
+| http://localhost:3001/api/health/ready, /api/metrics | Readiness with per-dependency detail; the federation's numbers in Prometheus text format ([`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md)) |
 
 Every deviation from upstream's own instructions, and why, is in [`docs/UPSTREAM_ANALYSIS.md` §11](docs/UPSTREAM_ANALYSIS.md).
 
 ## Tests
 
 ```sh
-docker compose exec tooling bash -lc 'cd api && php artisan test'          # 210 tests, SQLite in memory
+docker compose exec tooling bash -lc 'cd api && php artisan test'          # 220 tests, SQLite in memory
 cd e2e && npm ci && npx playwright install chromium && npx playwright test   # 7 browser journeys with axe, against the running stack
 ```
 
-Measured on 2026-09-03 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 210 passed (918 assertions, `phpunit_after_b3_backend.txt`); Playwright 7 passed (`playwright_b3.txt`). The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite, on MariaDB and on PostgreSQL 16 (with the demo seeder), Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
+Measured on 2026-09-03 and retained under [`docs/baseline/`](docs/baseline/): PHPUnit 220 passed (961 assertions, `phpunit_after_b5_backend.txt`); Playwright 7 passed (`playwright_b5.txt`). The run instructions above were followed from a fresh clone in a separate Compose project on the same day (`docs/baseline/cold_clone_2026-09-02.txt`); the first run found a date that hydrated differently on the server and in the browser, which is fixed and now guarded by the browser spec. Upstream's baseline at the fork point was 91 tests and no frontend or end-to-end tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the PHP suite on SQLite, on MariaDB and on PostgreSQL 16 (with the demo seeder), Pint on the fork's own files, the frontend type-check, lint and build, the browser journeys, and publishes the upstream-versus-fork diff. It first ran on GitHub on 2026-09-03 (pull request #1); the first two runs failed on three things the local stack could not show, all fixed in the history and described in `docs/LEARNING_LOG.md`, and it has been green on every run since.
 
 ## Upstream contributions
 

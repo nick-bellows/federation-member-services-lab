@@ -299,3 +299,36 @@ _Pending; recorded in the internal review file._
 3. A test that fails at teardown is still telling you about your fixture.
 
 **Deferred.** `CHECK (amount >= 0)` per engine for money columns; the default engine question until B8; the portability fixes travel with the upstream offer at B9.
+
+## 2026-09-03 — B5 (M8): operability
+
+**Goal.** Make the system answer "what is it doing, is it healthy, where did the time go" without reading code, and prove the answers against the three rehearsed incidents.
+
+**Decisions (owner, at the start).** OpenTelemetry traces to a local Jaeger; JSON logs to stderr with request, user, trace and span context; liveness, readiness and metrics endpoints. ADR-0012 records the alternatives.
+
+**Built.** `TraceRequest` (server span, shared log context, one access line per request); spans around the transition, each outbox job (continuing the request's trace through `traceparent` stored on the row) and the provider call (header propagated); the tracer provider built from configuration (`otlp`, `memory`, `none`); the `json` log channel with a trace-id processor and PHP-FPM forwarding worker output; `Readiness` (database and outbox age required, the Learning Center reported), `Metrics` (nine gauges from the tables), `/api/health/live`, `/api/health/ready`, `/api/health/checks` (upstream's spatie checks, result store moved from memory to the file cache), `/api/metrics` with an optional token; a Jaeger container; `docs/OBSERVABILITY.md` and `docs/RUNBOOK.md`.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Backend suite | `docs/baseline/phpunit_after_b5_backend.txt` | 220 passed, 961 assertions (10 new, including one trace across approval, worker and provider) |
+| Browser journeys | `docs/baseline/playwright_b5.txt` | 7 passed |
+| Incidents against the signals | `docs/baseline/operability_2026-09-03.txt` | slow provider: readiness `ready` with `learning_center: degraded`, the refresh's 503 as one access line and a two-span error trace; worker failure: `federation_jobs_queued 1` through the backoff, then `federation_outbox_parked 1` with the consumer named, cleared by one replay; upstream's eleven checks readable through the endpoint with the development failures explained |
+
+**What went wrong, in order.**
+
+1. An unqualified `PsrLogMessageProcessor::class` in the logging config resolved to a global-namespace string, the `json` channel could not be built, and Laravel fell back to the emergency file logger without a visible error. Found by looking for the access line and reading `laravel.log`.
+2. PHP-FPM does not forward worker output to the container log unless `catch_workers_output` is set; the api image sets it now, undecorated.
+3. The api image would not rebuild: the storage symlink that `storage:link` creates in the public directory is unreadable to BuildKit on this filesystem. It is excluded from the build context.
+4. Upstream's health result store is in memory, so a routed endpoint could never see results; the store is the file cache now, which works because the checks and PHP-FPM run as the same user.
+5. The probe test for "unknown" results read the running stack's results through the shared file cache; the test environment uses the array store.
+6. My Dockerfile edit was written with real newlines by the scripting shell and broke the parse; the Edit tool wrote it literally.
+
+**Three lessons.**
+
+1. A log channel that fails to build fails silently into a file nobody reads. The first thing to verify about structured logging is that one line actually arrives where it should.
+2. A trace across a queue is a stored parent context, not magic; the outbox row was the right place for it because the row already outlives the request.
+3. Readiness is a routing decision, not a health opinion. It fails on what the pages need and reports the rest.
+
+**Deferred.** Scheduling and alert delivery (B8); auto-instrumentation; a development profile for upstream's checks.
