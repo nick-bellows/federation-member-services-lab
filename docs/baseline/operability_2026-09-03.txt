@@ -1,0 +1,44 @@
+[22:19:30] # Operability rehearsal (B5): the three incidents re-run against the signals of ADR-0012. Worker: federation:work in the api container as verein. Jaeger at :3006, JSON logs on the api container's stderr.
+[22:19:30] ## 1. Upstream's checks routed
+Ok
+Ok: 0.04 0.78 0.84
+Ok
+Failed: The debug mode was expected to be `false`, but actually was `true`
+Failed: The environment was expected to be `production`, but actually was `local`
+Failed: Pinging Club management login failed.
+Failed: Pinging Demo club apply form failed.
+Failed: Queue jobs running failed. Check meta for more information.
+Failed: The schedule did not run yet.
+Failed: Security advisories found for `filament/filament`, `league/commonmark` and `livewire/livewire`
+Ok: 31%
+GET /api/health/checks -> unknown | 
+[22:19:34] ## 2. INCIDENT-001 against the signals: slow Learning Center
+GET /api/health/ready -> ready | database=ok, outbox=ok, learning_center=degraded
+POST refresh-credentials (X-Request-Id ops-slow-1788473995) -> http=503 time=1.827277s
+log line:
+{"message":"request","context":{"request_id":"ops-slow-1788473995","user_id":20,"method":"POST","route":"api/v1/federation/registration-applications/{registration_application}/-actions/refresh-credentials","status":503,"duration_ms":932},"level":200,"level_name":"INFO","channel":"local","datetime":"2026-09-03T22:19:57.205087+00:
+trace 69c3c61fda9240258b25e4421b596a16 in Jaeger:
+  spans: [('POST api/v1/federation/registration-applications/{registration_application}/-actions/refresh-credentials', 'ERROR', '935ms'), ('learning-center.credentials', 'ERROR', '858ms')]
+after restore: GET /api/health/ready -> ready | learning_center=ok
+[22:20:21] ## 3. INCIDENT-003 against the signals: the worker's consumer fails
+>   [22:20:52] federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_queued 1 federation_jobs_failed 0 
+  [22:21:06] federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_queued 1 federation_jobs_failed 0 
+  [22:21:19] federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_queued 1 federation_jobs_failed 0 
+  [22:21:31] federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_queued 1 federation_jobs_failed 0 
+  [22:21:44] federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_queued 1 federation_jobs_failed 0 
+  [22:21:57] federation_outbox_unpublished 0 federation_outbox_parked 1 federation_jobs_queued 0 federation_jobs_failed 1 
+  [22:22:10] federation_outbox_unpublished 0 federation_outbox_parked 1 federation_jobs_queued 0 federation_jobs_failed 1 
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=1 failed_events=1 processed=9
+failed application.approved 68c0613c-7c42-423c-87cb-e1950d94bf63 attempts=5 at 2026-09-03 22:21:55: credential-refresh: Learning Center unreachable or too slow: cURL error 28: Operation timed out afte
+exit=0
+GET /api/health/ready -> ready | outbox: oldest unpublished 0s, parked 1
+[22:22:17] repair: restore the provider, replay
+replayed 1
+  federation_outbox_unpublished 0 federation_outbox_parked 0 federation_jobs_failed 1 
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=10
+[22:22:48] helper removed
+[note] the 'exit=0' line above is the shell pipeline's exit code (cut), not federation:outbox-status'; the command returns 1 with a parked event, asserted by OutboxTest::test_incident_003
+[22:24:45] ## 1b. checks endpoint after switching the result store from in-memory to the file cache (upstream's default could not outlive the process)
+http=503
+GET /api/health/checks -> failing finished 2026-09-03T22:24:45+00:00 | Cache=ok, Club management login=failed, CpuLoad=ok, Database=ok, DebugMode=failed, Demo club apply form=failed, Environment=failed, Queue=failed, Schedule=failed, SecurityAdvisories=failed, UsedDiskSpace=ok
+[note] failed checks in development: debug mode and environment expect production; the two pings target upstream's public URLs from inside the container; the queue and schedule checks need the scheduler that B8 defines; the security advisories are upstream's known 13 (docs/baseline/composer_audit.txt).

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use LogicException;
+use OpenTelemetry\API\Trace\TracerInterface;
 use Tests\Unit\Federation\CredentialFactsTest;
 
 /**
@@ -126,8 +127,8 @@ class OutboxTest extends FederationTestCase
 
         // Deliver again: the ledger makes the second delivery a no-op.
         $event = OutboxEvent::query()->where('event_type', 'application.approved')->sole();
-        (new ProcessOutboxEvent($event->event_id, 'notifications'))->handle(app(ConsumerRegistry::class));
-        (new ProcessOutboxEvent($event->event_id, 'credential-refresh'))->handle(app(ConsumerRegistry::class));
+        (new ProcessOutboxEvent($event->event_id, 'notifications'))->handle(app(ConsumerRegistry::class), app(TracerInterface::class));
+        (new ProcessOutboxEvent($event->event_id, 'credential-refresh'))->handle(app(ConsumerRegistry::class), app(TracerInterface::class));
 
         $this->assertSame(1, FederationNotification::query()->where('template', 'application.approved')->count());
         $this->assertSame(1, AuditEntry::query()->where('action', 'credentials.recorded')->count());

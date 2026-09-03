@@ -69,6 +69,8 @@ RUN pecl install imagick \
 RUN sed -ri -e "s!user nginx!user ${USER_NAME}!g" /etc/nginx/nginx.conf
 RUN sed -ri -e "s!user = www-data!user = ${USER_NAME}!g" /usr/local/etc/php-fpm.d/www.conf
 RUN sed -ri -e "s!group = www-data!group = ${GROUP_NAME}!g" /usr/local/etc/php-fpm.d/www.conf
+# Worker stderr reaches the container log undecorated: JSON log lines (ADR-0012).
+RUN printf '\ncatch_workers_output = yes\ndecorate_workers_output = no\n' >> /usr/local/etc/php-fpm.d/www.conf
 
 # Manualy expose port 80 for outside access to nginx
 EXPOSE 80

@@ -22,6 +22,7 @@ class OutboxEvent extends Model
         'aggregate_id',
         'payload',
         'request_id',
+        'traceparent',
         'occurred_at',
         'published_at',
         'attempts',

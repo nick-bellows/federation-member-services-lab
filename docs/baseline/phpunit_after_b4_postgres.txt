@@ -1,0 +1,373 @@
+
+   PASS  Tests\Unit\DivisionTest
+  ✓ division can have many membership types                             16.45s  
+  ✓ division membership type can have monthly fee                       15.30s  
+
+   PASS  Tests\Unit\Federation\ApplicationTransitionsTest
+  ✓ the transition table matches the documented rules                    0.02s  
+  ✓ every pair not in the table is illegal
+  ✓ terminal statuses have no outgoing transitions
+  ✓ applicants move their own application and reviewers decide
+  ✓ only information requests and rejections require a reason
+  ✓ asking for the rule of an illegal pair is a programming error
+
+   PASS  Tests\Unit\Federation\CredentialFactsTest
+  ✓ every fixture parses and reports what the provider decided with dat… 0.02s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ another contract version is refused                                  0.02s  
+  ✓ an unknown status is refused
+  ✓ a missing field is refused
+
+   PASS  Tests\Unit\Federation\ParticipationResolverTest
+  ✓ an approved participant with an eligible snapshot may participate   18.27s  
+  ✓ an approved coach needs a valid coach credential                    20.07s  
+  ✓ a hold blocks regardless of credentials                             19.15s  
+  ✓ a lapsed credential blocks with both reasons                        18.70s  
+  ✓ an unapproved application reports findings but never participates   19.47s  
+  ✓ no snapshot is unknown for an approved application                  19.04s  
+  ✓ a not found snapshot is unknown with its age                        19.02s  
+  ✓ a snapshot older than the limit is marked stale and still answers   19.16s  
+  ✓ the serialised shape is stable                                      18.54s  
+
+   PASS  Tests\Unit\Federation\SchemaIdentifierLengthTest
+  ✓ every table index and foreign key name fits mysql limits            19.07s  
+
+   PASS  Tests\Unit\FinanceAccountTest
+  ✓ a finance account can be created                                    14.64s  
+  ✓ a finance account has many statements                               15.50s  
+  ✓ current balance is calculated correctly                             15.36s  
+
+   PASS  Tests\Unit\MembershipTest
+  ✓ membership monthly fee includes membership type fee                 15.31s  
+  ✓ membership monthly fee excludes membership type admission fee       15.02s  
+  ✓ membership monthly fee includes voluntary contribution              14.90s  
+  ✓ membership monthly fee includes selected divisions                  15.56s  
+
+   PASS  Tests\Unit\MembershipTypeTest
+  ✓ membership type can have many divisions                             15.58s  
+
+   PASS  Tests\Unit\TestEnvironmentIsolationTest
+  ✓ the test process never reads the containers config cache            24.91s  
+  ✓ the test database is the one the testing environment names          19.35s  
+
+   PASS  Tests\Unit\WebApplicationUrlConfigTest
+  ✓ club apply url uses the configured web application url              19.18s  
+  ✓ welcome mail login url and support address come from config         19.81s  
+  ✓ password reset link uses the configured web application url         19.30s  
+  ✓ health ping checks target the configured web application url        19.00s  
+
+   PASS  Tests\Feature\ClubAdmin\ClubTest
+  ✓ admin user can get own club                                         15.12s  
+  ✓ admin user cannot get other clubs                                   15.89s  
+  ✓ admin user can edit own club                                        16.14s  
+  ✓ admin user cannot edit other club                                   15.14s  
+  ✓ admin user cannot edit any field of own club                        14.63s  
+
+   FAIL  Tests\Feature\ClubAdmin\DivisionTest
+  ⨯ admin user can edit divisions                                       14.35s  
+  ⨯ admin user cannot edit other clubs divisions                        13.55s  
+
+   PASS  Tests\Feature\ClubAdmin\FinanceContactTest
+  ✓ admin user cannot edit external finance contacts                    16.05s  
+
+   PASS  Tests\Feature\ClubAdmin\MembershipTest
+  ✓ admin user can edit memberships                                     15.72s  
+  ✓ admin user cannot edit other clubs memberships                      15.80s  
+
+   FAIL  Tests\Feature\ClubAdmin\MembershipTypeTest
+  ⨯ admin user can edit membership types                                14.07s  
+  ✓ admin user cannot edit other clubs membership types                 16.09s  
+  ✓ admin user can set only minimum number of divisions                 19.60s  
+  ✓ admin user can set only maximum number of divisions                 18.03s  
+
+   PASS  Tests\Feature\ClubPermissionsTest
+  ✓ club admins default club is set in session by middleware            17.01s  
+  ✓ club set in session by middleware                                   15.52s  
+
+   PASS  Tests\Feature\ClubTest
+  ✓ clubs generate slugs automatically on create                        15.64s  
+  ✓ can manually set club slug                                          15.66s  
+  ✓ super admin can get clubs                                           16.55s  
+  ✓ super admin can get clubs filtered by slug                          15.03s  
+  ✓ other user cannot get clubs                                         15.38s  
+
+   PASS  Tests\Feature\DivisionTest
+  ✓ club can only get own divisions                                     14.95s  
+  ✓ club can attach member to division of own club                      15.49s  
+  ✓ admin user can only get current clubs divisions                     15.49s  
+
+   PASS  Tests\Feature\Export\ExportOrderTest
+  ✓ an export returns rows in the requested id order                    20.28s  
+  ✓ ids outside the list sort last and an empty list adds no ordering   20.00s  
+
+   PASS  Tests\Feature\Federation\CredentialSnapshotsTest
+  ✓ a refresh stores the answer and audits the first record             20.48s  
+  ✓ a changed eligibility is audited with both states                   21.64s  
+  ✓ an unchanged answer writes no audit entry                           19.94s  
+  ✓ a member the provider does not know is recorded as not found        31.71s  
+  ✓ a user without a linked identity is not asked about                 34.29s  
+  ✓ a slow or absent provider leaves the previous snapshot untouched    32.43s  
+  ✓ a server error is unavailable not a new snapshot                    25.65s  
+  ✓ the service token is fetched once and reused                        25.87s  
+
+   PASS  Tests\Feature\Federation\HierarchyAndAuditTest
+  ✓ a club may belong to a member organization and defaults to none     20.13s  
+  ✓ deleting an organization detaches its clubs instead of deleting th… 18.40s  
+  ✓ an organization with applications cannot be deleted                 33.50s  
+  ✓ a member may be linked to a user                                    39.47s  
+  ✓ audit entries are append only                                       27.44s  
+
+   PASS  Tests\Feature\Federation\Http\ApplicationDocumentsHttpTest
+  ✓ the applicant attaches metadata and replacing resets the review     20.76s  
+  ✓ only the applicant attaches and only while editable                 21.71s  
+  ✓ format size and checksum are validated                              20.92s  
+  ✓ a reviewer accepts or rejects documents under review                20.52s  
+
+   PASS  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ✓ an approval asks the provider once and the application shows parti… 21.34s  
+  ✓ an approval succeeds when the provider is away and participation i… 26.60s  
+  ✓ a reviewer can refresh and sees the new answer                      17.85s  
+  ✓ only a reviewer of that organization may refresh                    18.94s  
+  ✓ a refresh while the provider is away is a 503 with a stable code    19.42s  
+  ✓ the queue reads snapshots without calling the provider              20.73s  
+  ✓ an unapproved application reports findings but is not participatin… 19.88s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ✓ an applicant starts a draft inside an open window                   21.06s  
+  ✓ the response lists what is still missing before submission          19.29s  
+  ✓ submitting an incomplete application is a 422 with the missing pie… 20.02s  
+  ✓ a complete application submits and a retry with the same key is id… 20.72s  
+  ✓ applicants only see their own applications                          21.44s  
+  ✓ a reviewer sees the queue for their organization only               21.96s  
+  ✓ the review path over http with reasons and actor rules              19.56s  
+  ✓ the applicant can edit details while editable and not afterwards    20.20s  
+  ✓ a closed window and a duplicate are conflicts                       20.22s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ✓ an organization administrator opens a window for their organizatio… 19.74s  
+  ✓ an applicant cannot open a window                                   19.59s  
+  ✓ an administrator cannot open a window for another organization      20.34s  
+  ✓ a federation administrator can open a window for any organization   19.22s  
+  ✓ windows are listed and filtered by openness                         19.27s  
+  ✓ validation rejects a window that closes before it opens             19.80s  
+
+   PASS  Tests\Feature\Federation\OidcGuardTest
+  ✓ a request without a token is unauthenticated                        19.34s  
+  ✓ a request with a rejected token is unauthenticated and says nothin… 19.92s  
+  ✓ an unknown subject with a verified email is provisioned             19.96s  
+  ✓ a known subject is matched without touching the email               23.98s  
+  ✓ an existing user is linked by verified email once                   19.36s  
+  ✓ an unverified email never links or provisions                       19.57s  
+  ✓ an email already linked to another subject is a conflict            19.44s  
+  ✓ provisioning can be disabled                                        19.14s  
+  ✓ scopes and administered bodies come from the database               19.79s  
+  ✓ upstream sanctum login still works beside the new guard             18.96s  
+
+   PASS  Tests\Feature\Federation\OidcTokenVerifierTest
+  ✓ a valid token yields the identity                                   18.82s  
+  ✓ the audience may be a list that contains ours                       19.83s  
+  ✓ a token for another audience is rejected                            19.16s  
+  ✓ a token from another issuer is rejected                             18.98s  
+  ✓ an expired token is rejected                                        18.94s  
+  ✓ a token signed with an unknown key is rejected after one refresh    19.46s  
+  ✓ key rotation is absorbed by refreshing the key set                  19.16s  
+  ✓ a symmetric algorithm is rejected even with the public key as secr… 19.88s  
+  ✓ the key set is cached between requests                              24.70s  
+  ✓ missing configuration fails closed                                  21.24s  
+
+   PASS  Tests\Feature\Federation\OutboxTest
+  ✓ an outbox event cannot be recorded outside a transaction            19.85s  
+  ✓ a rolled back transaction leaves no event behind                    19.59s  
+  ✓ transitions write facts only for the published types                20.06s  
+  ✓ the relay dispatches one job per consumer and marks the row publis… 19.65s  
+  ✓ the worker delivers an approval to both consumers exactly once      20.55s  
+  ✓ a credential change is itself a fact with a notification            19.62s  
+  ✓ incident 003 the worker fails after an approval and the event is p… 26.25s  
+  ✓ status reports the queue and succeeds when nothing failed           19.33s  
+
+   PASS  Tests\Feature\Federation\ReconcileCredentialsCommandTest
+  ✓ it fills a missing snapshot for an approved applicant and skips a…  19.60s  
+  ✓ it refreshes old snapshots and reports a change                     20.86s  
+  ✓ it ignores applicants without an approved application               19.70s  
+  ✓ an absent provider is counted and fails the command                 23.20s  
+
+   PASS  Tests\Feature\Federation\StartApplicationTest
+  ✓ a new application starts as a draft with an audit entry             20.62s  
+  ✓ a second live application for the same person organization season…  21.98s  
+  ✓ a different role in the same season is a separate application       19.80s  
+  ✓ a new application is allowed after a cancellation                   19.04s  
+  ✓ the same idempotency key returns the existing application           19.28s  
+  ✓ the database rejects a duplicate that bypasses the action           19.47s  
+  ✓ a closed window refuses new applications                            19.91s  
+  ✓ a window only accepts the roles it offers                           19.58s  
+  ✓ the application inherits organization and season from the window    19.13s  
+
+   PASS  Tests\Feature\Federation\TransitionApplicationTest
+  ✓ the applicant submits a draft and the transition is audited         20.28s  
+  ✓ an illegal transition is rejected and leaves no trace               19.84s  
+  ✓ the applicant cannot perform reviewer transitions                   19.60s  
+  ✓ a reviewer cannot perform applicant transitions                     20.11s  
+  ✓ an administrator of another organization cannot review              20.06s  
+  ✓ a federation administrator can review for any organization          20.88s  
+  ✓ a rejection requires a reason and records it                        22.63s  
+  ✓ the happy path ends approved with a complete audit trail            22.51s  
+  ✓ an information request round trips back to review                   20.28s  
+  ✓ status cannot be assigned outside the transition service            19.27s  
+  ✓ the domain event carries the transition                             19.57s  
+
+   PASS  Tests\Feature\Filters\QueryFilterCurrencyTest
+  ✓ query filter converts formatted amounts to cents                    15.00s  
+  ✓ query filter handles multiple currency formats                      14.90s  
+  ✓ query filter works with mixed columns                               14.94s  
+
+   PASS  Tests\Feature\Filters\QueryFilterTest
+  ✓ query filter searches multiple transaction columns                  14.74s  
+
+   PASS  Tests\Feature\FinanceAccountTest
+  ✓ api can get finance accounts for club                               15.13s  
+  ✓ api can get statements for a finance account                        15.36s  
+
+   PASS  Tests\Feature\FinanceContactTest
+  ✓ club can only get own finance contacts                              15.46s  
+  ✓ club can edit external finance contacts                             15.51s  
+  ✓ creating non external finance contacts requires many fields         14.40s  
+  ✓ creating external finance contacts bypasses most required rules     15.70s  
+
+   PASS  Tests\Feature\LoginTest
+  ✓ successful login attempt returns token                              14.93s  
+  ✓ login requires club role association                                15.06s  
+
+   PASS  Tests\Feature\MediaTest
+  ✓ user cannot upload media for other club                             15.84s  
+  ✓ user can upload media for own club                                  16.12s  
+  ✓ unauthenticated user cannot upload media                            17.87s  
+  ✓ user can download media for own club                                17.74s  
+  ✓ user cannot download media for other club                           15.35s  
+  ✓ unauthenticated user cannot download media                          15.22s  
+  ✓ user can preview media for own club                                 14.94s  
+  ✓ user cannot preview media for other club                            15.45s  
+  ✓ unauthenticated user cannot preview media                           15.56s  
+
+   PASS  Tests\Feature\MemberTest
+  ✓ club can create new member                                          15.41s  
+  ✓ cannot create member for other club                                 15.43s  
+  ✓ consent boolean mutates timestamp column                            15.26s  
+  ✓ cannot create member when membership has no capacity                15.27s  
+  ✓ cannot update member to membership with no capacity                 15.69s  
+
+   PASS  Tests\Feature\MembershipApplicationTest
+  ✓ can apply completed membership                                      16.44s  
+  ✓ cannot apply for membership if status wasnt null                    14.53s  
+  ✓ cannot apply for membership if owner is missing                     15.61s  
+  ✓ cannot apply for membership if members count is above maximum memb… 15.10s  
+  ✓ cannot apply for membership if members count is below minimum memb… 15.24s  
+  ✓ club is notified on membership application                          15.55s  
+  ✓ all members are notified on membership application                  16.14s  
+  ✓ api can apply for membership                                        16.32s  
+
+   PASS  Tests\Feature\MembershipTest
+  ✓ club can create new membership                                      17.16s  
+  ✓ club can create new membership with payment period                  19.31s  
+  ✓ club can set owner                                                  16.39s  
+  ✓ club cannot update memberships for other club                       15.16s  
+  ✓ club cannot create membership for other club                        14.75s  
+
+   PASS  Tests\Feature\MembershipTypeTest
+  ✓ club can only get own membership types                              15.81s  
+
+   PASS  Tests\Feature\PasswordResetTest
+  ✓ forgot password sends reset notification                            19.40s  
+  ✓ forgot password with non existing email returns generic error       19.13s  
+  ✓ forgot password fails when reaches rate limiting                    21.06s  
+  ✓ reset password updates database                                     18.81s  
+  ✓ reset password fails with invalid token                             19.35s  
+  ✓ reset password fails with expired token                             19.68s  
+
+   PASS  Tests\Feature\PaymentPeriodTest
+  ✓ cannot apply membership with unattached payment period              15.32s  
+
+   PASS  Tests\Feature\ReceiptTest
+  ✓ club can only get own receipts                                      15.74s  
+  ✓ can create receipt with media                                       15.74s  
+  ✓ can update receipt with existing media                              15.01s  
+
+   PASS  Tests\Feature\StatementTest
+  ✓ club can only get own statements                                    15.25s  
+
+   PASS  Tests\Feature\TaxAccountTest
+  ✓ club can only get related tax accounts                              23.35s  
+  ✓ club can get custom tax accounts with null chart relation           19.82s  
+  ✓ club without chart can only get custom tax accounts                 19.42s  
+
+   PASS  Tests\Feature\UserTest
+  ✓ club can only get own users                                         15.12s  
+  ✓ admin can create new user with roles                                15.07s  
+  ✓ admin can update user with roles                                    15.67s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ClubAdmin\DivisionTest > admin user…  QueryException   
+  SQLSTATE[42883]: Undefined function: 7 ERROR:  operator does not exist: json = unknown
+LINE 1: ...t * from "divisions" where ("id" = $1 and "title" = $2)) as ...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts. (Connection: pgsql, Host: postgres, Port: 5432, Database: verein_test, SQL: select exists(select * from "divisions" where ("id" = 1 and "title" = {"de":"New German title","en":"en non"})) as "exists")
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+    853▕             $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
+    854▕                 ? UniqueConstraintViolationException::class
+    855▕                 : QueryException::class;
+    856▕ 
+  ➜ 857▕             $exception = new $exceptionType(
+    858▕                 $this->getNameWithReadWriteType(),
+    859▕                 $query,
+    860▕                 $this->prepareBindings($bindings),
+    861▕                 $e,
+
+      +7 vendor frames 
+  8   tests/Feature/ClubAdmin/DivisionTest.php:45
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ClubAdmin\DivisionTest > admin user…  QueryException   
+  SQLSTATE[42883]: Undefined function: 7 ERROR:  operator does not exist: json = unknown
+LINE 1: ...t * from "divisions" where ("id" = $1 and "title" = $2)) as ...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts. (Connection: pgsql, Host: postgres, Port: 5432, Database: verein_test, SQL: select exists(select * from "divisions" where ("id" = 1 and "title" = {"de":"New German title","en":"en tempora"})) as "exists")
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+    853▕             $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
+    854▕                 ? UniqueConstraintViolationException::class
+    855▕                 : QueryException::class;
+    856▕ 
+  ➜ 857▕             $exception = new $exceptionType(
+    858▕                 $this->getNameWithReadWriteType(),
+    859▕                 $query,
+    860▕                 $this->prepareBindings($bindings),
+    861▕                 $e,
+
+      +7 vendor frames 
+  8   tests/Feature/ClubAdmin/DivisionTest.php:87
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ClubAdmin\MembershipTypeTest > admi…  QueryException   
+  SQLSTATE[42883]: Undefined function: 7 ERROR:  operator does not exist: json = unknown
+LINE 1: ...m "membership_types" where ("id" = $1 and "title" = $2 and "...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts. (Connection: pgsql, Host: postgres, Port: 5432, Database: verein_test, SQL: select exists(select * from "membership_types" where ("id" = 1 and "title" = {"de":"de earum","en":"en saepe","xx":"New Danish title"} and "description" = {"de":"de Explicabo pariatur laudantium ducimus ut. Quod molestiae dolore nihil. Culpa perferendis ullam perferendis omnis. Nemo impedit id ad rerum nisi.","en":"en Eius nesciunt dolorem nisi suscipit ut odio. Fugit voluptatem reprehenderit incidunt similique. Dicta ea et tempore rerum velit laudantium. Fugiat non et animi voluptatem rem odio.","xx":"New Danish Description"} and "monthly_fee" = 200 and "admission_fee" = 400 and "minimum_number_of_months" = 6 and "minimum_number_of_members" = 2 and "maximum_number_of_members" = 5 and "minimum_number_of_divisions" = 1 and "maximum_number_of_divisions" = 3)) as "exists")
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+    853▕             $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
+    854▕                 ? UniqueConstraintViolationException::class
+    855▕                 : QueryException::class;
+    856▕ 
+  ➜ 857▕             $exception = new $exceptionType(
+    858▕                 $this->getNameWithReadWriteType(),
+    859▕                 $query,
+    860▕                 $this->prepareBindings($bindings),
+    861▕                 $e,
+
+      +7 vendor frames 
+  8   tests/Feature/ClubAdmin/MembershipTypeTest.php:65
+
+
+  Tests:    3 failed, 209 passed (920 assertions)
+  Duration: 3745.75s
+

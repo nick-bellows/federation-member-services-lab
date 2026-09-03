@@ -4,7 +4,9 @@ use App\Federation\Http\Controllers\ApplicationDocumentController;
 use App\Federation\Http\Controllers\MeController;
 use App\Federation\Http\Controllers\RegistrationApplicationController;
 use App\Federation\Http\Controllers\RegistrationWindowController;
+use App\Federation\Http\Controllers\ObservabilityController;
 use App\Federation\Http\Middleware\AssignRequestId;
+use App\Federation\Http\Middleware\TraceRequest;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
@@ -24,7 +26,7 @@ use LaravelJsonApi\Laravel\Routing\ActionRegistrar;
 
 // Route names must not contain the JSON:API server's name ("federation"):
 // the OpenAPI generator treats every such route as a JSON:API action.
-Route::middleware(['auth:oidc', AssignRequestId::class])
+Route::middleware(['auth:oidc', AssignRequestId::class, TraceRequest::class])
     ->prefix('v1/federation-identity')
     ->name('identity.')
     ->group(function () {
@@ -33,7 +35,7 @@ Route::middleware(['auth:oidc', AssignRequestId::class])
 
 JsonApiRoute::server('federation')
     ->prefix('v1/federation')
-    ->middleware('auth:oidc', AssignRequestId::class)
+    ->middleware('auth:oidc', AssignRequestId::class, TraceRequest::class)
     ->resources(function ($server) {
         $server->resource('federations', JsonApiController::class)
             ->only('index', 'show');
@@ -62,3 +64,13 @@ JsonApiRoute::server('federation')
         $server->resource('application-documents', ApplicationDocumentController::class)
             ->only('index', 'show', 'store', 'update');
     });
+
+// Probes and metrics (ADR-0012, docs/OBSERVABILITY.md). Unauthenticated by
+// design: liveness and readiness are read by the platform, metrics by a
+// scraper (optionally with METRICS_TOKEN). None of them expose personal data.
+Route::prefix('health')->name('observability.')->group(function () {
+    Route::get('live', [ObservabilityController::class, 'live'])->name('live');
+    Route::get('ready', [ObservabilityController::class, 'ready'])->name('ready');
+    Route::get('checks', [ObservabilityController::class, 'checks'])->name('checks');
+});
+Route::get('metrics', [ObservabilityController::class, 'metrics'])->name('observability.metrics');

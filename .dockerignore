@@ -28,3 +28,5 @@ vite.config.js
 package-lock.json
 package.json
 docker-compose.override.yml
+# A storage symlink created by `php artisan storage:link` in the container is unreadable to BuildKit on Windows.
+api/public/storage

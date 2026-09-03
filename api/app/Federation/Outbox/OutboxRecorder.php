@@ -3,10 +3,12 @@
 namespace App\Federation\Outbox;
 
 use App\Federation\Models\OutboxEvent;
+use App\Federation\Observability\Tracing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LogicException;
+use OpenTelemetry\API\Trace\Span;
 
 /**
  * Writes a fact into the outbox. Only valid inside the transaction that
@@ -31,6 +33,8 @@ final class OutboxRecorder
             'aggregate_id' => $aggregate->getKey(),
             'payload' => $payload,
             'request_id' => $requestId,
+            // The trace that wrote the fact; the worker's span continues it (ADR-0012).
+            'traceparent' => Tracing::traceparent(Span::getCurrent()),
             'occurred_at' => now(),
             'created_at' => now(),
         ]);
