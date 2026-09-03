@@ -290,6 +290,7 @@ _Pending; recorded in the internal review file._
 
 1. The export-order test failed at teardown, not in the assertion: the per-test rollback runs an upstream migration's `down()` that makes `membership_type_id` NOT NULL again, and the membership factory sets no type. Upstream's own tests always create a type; the fixture now does too.
 2. The local PostgreSQL run is slow for the same reason the MariaDB run is: `DatabaseMigrations` per test. The CI runner does it in minutes; the laptop in an hour. Recorded, not hidden; `RefreshDatabase` for the fork's tests stays in future work.
+3. The first PostgreSQL job on GitHub: 209 passed, 3 failed, all three upstream club-admin tests comparing a JSON column to an encoded string in `assertDatabaseHas`. MariaDB and SQLite compare as text; PostgreSQL's `json` type has no equality operator. The assertions now compare translations through the model, which is what they meant. Four minutes on the runner for the whole suite, against an hour locally.
 
 **Three lessons.**
 

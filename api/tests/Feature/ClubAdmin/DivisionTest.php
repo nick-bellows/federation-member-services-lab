@@ -42,15 +42,11 @@ class DivisionTest extends TestCase
 
         $response->assertFetchedOne($division);
 
-        $this->assertDatabaseHas('divisions', [
-            'id' => $division->getKey(),
-            'title' => json_encode(
-                array_merge(
-                    $division->getTranslations('title'),
-                    $data['attributes']['titleTranslations']
-                )
-            ),
-        ]);
+        // Compared through the model: a JSON column has no text equality on PostgreSQL.
+        $this->assertEquals(
+            array_merge($division->getTranslations('title'), $data['attributes']['titleTranslations']),
+            $division->fresh()->getTranslations('title')
+        );
     }
 
     public function test_admin_user_cannot_edit_other_clubs_divisions(): void
@@ -84,14 +80,9 @@ class DivisionTest extends TestCase
 
         $response->assertStatusCode(404);
 
-        $this->assertDatabaseMissing('divisions', [
-            'id' => $division->getKey(),
-            'title' => json_encode(
-                array_merge(
-                    $division->getTranslations('title'),
-                    $data['attributes']['titleTranslations']
-                )
-            ),
-        ]);
+        $this->assertNotEquals(
+            array_merge($division->getTranslations('title'), $data['attributes']['titleTranslations']),
+            $division->fresh()->getTranslations('title')
+        );
     }
 }
