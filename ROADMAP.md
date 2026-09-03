@@ -6,7 +6,7 @@ Last verified: 2026-09-02. Supersedes the 2026-09-02 morning version. Governed b
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `DRAFT` — M0 to M4 complete in compose (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests); CI jobs written but unrun; README rewrite and publication (A5) pending |
+| Lifecycle | `VALIDATED` in CI, not deployed — Phase A complete: M0 to M4 (archaeology, baseline fix, domain and state machine, OIDC identity, registration-review slice with browser tests), README, cold clone, public fork with CI green on `main` (2026-09-03). Phase B not started |
 | Branch | `m0/engineering-archaeology`, docs-only commits ahead of upstream `main` (`dca9be3`): M0 analysis, one correction after a live probe, this roadmap |
 | Remotes | `upstream` = vereinfacht/vereinfacht (read-only). **No `origin`, no GitHub fork yet.** |
 | Runs locally | Yes: compose stack `vereinfacht` (MariaDB 11.8, Laravel 13 API, Swagger, mock OIDC provider, tooling with `next dev`). Setup and deviations in `docs/UPSTREAM_ANALYSIS.md` §11; seed with `NorthgateDemoSeeder` |
@@ -26,7 +26,7 @@ Sizes below are planning estimates, not commitments: **S** = one working session
 
 ## Phase A — reach the public gate
 
-Public visibility is allowed only when A1–A5 are done and the acceptance checklist at the end of Phase A passes. Until then: no fork, no `origin`, no push.
+Public visibility was allowed only when A1–A5 were done and the acceptance checklist at the end of Phase A passed. The fork was created on the owner's explicit instruction on 2026-09-03 (`nick-bellows/federation-member-services-lab`, `origin`; `upstream` kept); Phase A merged through pull request #1.
 
 ### A1 — Baseline quality and one defensible fix (M1) — size M
 
@@ -40,7 +40,7 @@ Goal: prove the inherited system can be tested and improved safely before any fe
 
 Acceptance: CI green in the fork on the milestone branch; the fix explained line by line in `docs/LEARNING_LOG.md`; no unrelated upstream behaviour changed.
 
-**Status 2026-09-02: done except the CI run.** Fix landed with fail-then-pass evidence (ADR-0002, `docs/baseline/env_*`), full suite 95/95 on SQLite, regression tests also pass on MariaDB; `.gitattributes` in place; workflow written and its commands validated locally but **DRAFT until it runs on GitHub**, which requires the fork (A5). Playwright recorded in ADR-0003; upstream offer policy in ADR-0004. Open: the first CI run, and the upstream issue and pull request once a remote exists.
+**Status 2026-09-02: done except the CI run.** Fix landed with fail-then-pass evidence (ADR-0002, `docs/baseline/env_*`), full suite 95/95 on SQLite, regression tests also pass on MariaDB; `.gitattributes` in place; workflow written and its commands validated locally but **DRAFT until it runs on GitHub**, which requires the fork (A5). Playwright recorded in ADR-0003; upstream offer policy in ADR-0004. CI ran on GitHub on 2026-09-03 (A5). Open: the upstream issue and pull request (needs the owner's go; outward-facing).
 
 ### A2 — Federation domain and the application state machine (M2) — size L
 
@@ -68,7 +68,7 @@ Goal: separate "who are you" from "what may you do" before the federation workfl
 
 Acceptance: a member can sign in through OIDC in compose and in CI; token validation failures are tested; no upstream login path regressed.
 
-**Status 2026-09-02: done in compose; CI job written, not run.** `oidc` guard on `firebase/php-jwt` 7.1 with JWKS discovery, cache and rotation; subject-to-user resolution with verified-e-mail linking and optional provisioning; scopes from database roles; `GET /api/v1/federation-identity/me`; next-auth providers for the mock issuer and Auth0 with the access token server-side only; `/member` pages; `mock-oauth2-server` in compose with personas. 20 PHPUnit tests, 3 Playwright tests with axe (`docs/baseline/playwright_m3.txt`), full suite 147/147. ADR-0007. INCIDENT-000 (development database wiped by the config-cache trap) fixed permanently in `phpunit.xml` with a regression test. Open: the Auth0 tenant walkthrough (owner creates the tenant), the first CI run, refresh-token handling.
+**Status 2026-09-02: done in compose; CI job written, not run.** `oidc` guard on `firebase/php-jwt` 7.1 with JWKS discovery, cache and rotation; subject-to-user resolution with verified-e-mail linking and optional provisioning; scopes from database roles; `GET /api/v1/federation-identity/me`; next-auth providers for the mock issuer and Auth0 with the access token server-side only; `/member` pages; `mock-oauth2-server` in compose with personas. 20 PHPUnit tests, 3 Playwright tests with axe (`docs/baseline/playwright_m3.txt`), full suite 147/147. ADR-0007. INCIDENT-000 (development database wiped by the config-cache trap) fixed permanently in `phpunit.xml` with a regression test. CI green on GitHub since 2026-09-03. Open: the Auth0 tenant walkthrough (deferred to B9), refresh-token handling.
 
 ### A4 — One complete registration-review slice (M4 in the brief) — size L
 
@@ -92,7 +92,7 @@ organization admin opens a registration window
 
 Acceptance: the slice runs from a cold clone by following the README; E2E and accessibility checks green in CI; `docs/incidents/INCIDENT-002.md` (duplicate submission) written from the actual regression test.
 
-**Status 2026-09-02: done in compose; CI unrun; README rewrite pending (A5).** Backend: registration windows, application details, document metadata with required types per role, second JSON:API server `federation` (seven schemas, six transition actions, stable error codes, request ids, HTTP idempotency), `php artisan federation:openapi`. Frontend: generated typed client, server actions, member pages (list, start, detail with local file hashing, submit and withdraw, history), reviewer pages (queue, detail with document decisions), window page, navigation by capability, en and de. Tests: 168 PHPUnit (19 HTTP tests for the slice), 7 Playwright journeys with axe (`docs/baseline/playwright_m4.txt`), screenshots in `docs/assets/`. ADR-0008, INCIDENT-002. Open: the first CI run, a GIF or short demo. Cold-clone verification done under A5.
+**Status 2026-09-02: done in compose; CI unrun; README rewrite pending (A5).** Backend: registration windows, application details, document metadata with required types per role, second JSON:API server `federation` (seven schemas, six transition actions, stable error codes, request ids, HTTP idempotency), `php artisan federation:openapi`. Frontend: generated typed client, server actions, member pages (list, start, detail with local file hashing, submit and withdraw, history), reviewer pages (queue, detail with document decisions), window page, navigation by capability, en and de. Tests: 168 PHPUnit (19 HTTP tests for the slice), 7 Playwright journeys with axe (`docs/baseline/playwright_m4.txt`), screenshots in `docs/assets/`. ADR-0008, INCIDENT-002. CI green on GitHub since 2026-09-03. Open: a GIF or short demo. Cold-clone verification done under A5.
 
 ### A5 — Publication (M11 brought forward) — size M
 
@@ -101,16 +101,16 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 3. Publish pre-flight per the portfolio house rules: clean tree, tracked-file audit, gitleaks over history, no seeded credentials described as production-safe, logged-out README review.
 4. **Only on explicit approval:** create the GitHub fork, add `origin`, push, merge the milestone branches through pull requests, enable Actions. Pins and profile changes are separate manual approvals.
 
-**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`; cold-clone verification done.** The README instructions were followed from a fresh clone in a separate Compose project with fresh volumes (`docs/baseline/cold_clone_2026-09-02.txt`, lesson in `docs/LEARNING_LOG.md`). The first run found a React hydration defect in date formatting (server in UTC, browser in the local zone); it is fixed, guarded by the browser spec, and the rerun passed 7 of 7. Pre-flight run once on the earlier tree (clean tree, tracked-file audit, gitleaks over 24 commits: nothing found) and to be repeated on the final commit. Still open: the owner's explicit go for the fork itself, then the first CI run.
+**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`; cold-clone verification done.** The README instructions were followed from a fresh clone in a separate Compose project with fresh volumes (`docs/baseline/cold_clone_2026-09-02.txt`, lesson in `docs/LEARNING_LOG.md`). The first run found a React hydration defect in date formatting (server in UTC, browser in the local zone); it is fixed, guarded by the browser spec, and the rerun passed 7 of 7. Pre-flight run once on the earlier tree (clean tree, tracked-file audit, gitleaks over 24 commits: nothing found) and to be repeated on the final commit. **2026-09-03: fork created on the owner's word, branch pushed, Actions enabled, pull request #1 opened.** The first two CI runs failed on three findings (an engine assumption in the INCIDENT-000 test; the runner's browser could not resolve the OIDC issuer host; a migration race between the API container's start-up and the seed, which hung one run for 45 minutes); fixed in three commits, green on both runs of `99aca82`, merged as `0bb07f3`, green on `main`. Lesson in `docs/LEARNING_LOG.md`. Anonymous README view checked (fork banner, attribution, disclaimer; no secrets; nothing claimed). Open: the upstream issue and pull request (ADR-0004), a short demo.
 
 ### Phase A acceptance checklist
 
-- [ ] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs
+- [x] CI green on `main` of the fork for backend, frontend, E2E and accessibility jobs (2026-09-03, merge commit `0bb07f3`)
 - [x] Cold-clone verification recorded in `docs/LEARNING_LOG.md` (2026-09-02; log in `docs/baseline/cold_clone_2026-09-02.txt`)
-- [ ] One feature (state machine + review slice) with unit, feature, authorization and E2E tests
-- [ ] OIDC sign-in working against the self-hosted provider in CI and against the Auth0 tenant in the documented walkthrough; privilege-boundary tests
-- [ ] ADR-0000 to ADR-0005, `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
-- [ ] README passes the one-minute and five-minute reads; attribution and license unchanged
+- [x] One feature (state machine + review slice) with unit, feature, authorization and E2E tests
+- [ ] OIDC sign-in working against the self-hosted provider in CI (done) and against the Auth0 tenant in the documented walkthrough (deferred to B9 by owner decision, 2026-09-02); privilege-boundary tests (done)
+- [x] ADR-0000 to ADR-0005 (through ADR-0008), `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
+- [ ] README passes the one-minute and five-minute reads (owner's read pending; anonymous view checked 2026-09-03); attribution and license unchanged (verified)
 - [ ] One upstream contribution offered, status recorded truthfully
 - [ ] Explicit approval for visibility received
 

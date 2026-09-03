@@ -48,7 +48,7 @@ The project's thesis is incremental modernization of a system with existing user
 
 ### What it does
 
-Reads the web application URL, the admin login path and the sender address through Laravel's configuration instead of `env()`, so they survive configuration caching; normalises line endings; adds a CI workflow (draft until it runs on GitHub) and records the end-to-end tool and the upstream-contribution policy.
+Reads the web application URL, the admin login path and the sender address through Laravel's configuration instead of `env()`, so they survive configuration caching; normalises line endings; adds a CI workflow (first run on GitHub on 2026-09-03; its three first-run findings are in the learning log) and records the end-to-end tool and the upstream-contribution policy.
 
 ### Why we built it
 
@@ -75,6 +75,7 @@ Two extra config keys versus four hard-coded fallbacks; running the suite twice 
 1. How does configuration reach your code in a production Laravel deployment, and what changes when it is cached?
 2. How do you know a fix is real? Walk through fail-then-pass for this one.
 3. Your CI runs the suite on SQLite and on MariaDB. Why both, and what would you do about the cost?
+4. The same commit passed its pull-request run and hung its push run for 45 minutes. What was racing, how did you find it without a log line, and what made the job deterministic?
 4. Why is Pint a report and not a gate, and how would you enforce style on new code without reformatting upstream?
 
 ## M2 — Federation domain and application state machine

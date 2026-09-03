@@ -170,3 +170,32 @@ _Pending; recorded in the internal review file._
 3. When an accessibility scan fails on tooling rather than on the page, read the trace before touching colours. The contrast rule was the messenger.
 
 **Deferred.** Registration windows in a federation-defined time zone rather than UTC display, recorded in `docs/future-work.md`.
+
+## 2026-09-03 — A5: the fork, the first CI run and what it found
+
+**Goal.** Make the repository public as a fork with upstream's history intact, run the CI workflow for the first time, and merge Phase A into `main` through a pull request.
+
+**Done.** `nick-bellows/federation-member-services-lab` is a GitHub fork of `vereinfacht/vereinfacht` (the API reports `fork`, the parent and MIT); `origin` added, `upstream` kept, `main` at the fork point. The milestone branch was pushed, Actions enabled, pull request #1 opened. Two runs failed, three commits fixed them, the third was green on both the push run and the pull-request run, and the merge commit `0bb07f3` is green on `main`.
+
+**Measured on GitHub-hosted runners.**
+
+| Job | Result | Time |
+|---|---|---|
+| Backend tests, SQLite | 168 passed, 682 assertions | 45 s |
+| Backend tests, MariaDB 11.8 | 168 passed, 681 assertions | 184 s |
+| Browser journeys with axe | 7 passed, 1 skipped (screenshots, by design) | wait for the API container 9 to 13 s, seed 100 s, Playwright about 70 s |
+| Whole workflow, six jobs in parallel | green | 6.6 and 7.1 (the two runs of `99aca82`) minutes wall clock |
+
+**What the first runs found, in order.**
+
+1. The INCIDENT-000 regression test asserted that the test database is SQLite in memory. That is the local configuration, not the invariant; the MariaDB job runs the suite on MariaDB by design and failed on that one assertion (167 of 168). The test now asserts what the incident requires: the connection and database are the ones the testing environment names, never the development database, on any engine.
+2. The browser journeys failed at the redirect to the mock OIDC provider with a browser error page. Chromium runs on the runner, not in a container; `extra_hosts` in Compose resolves `host.docker.internal` for containers only. One hosts-file line on the runner fixed it.
+3. The same commit then passed its pull-request run and hung its push run for the job's full 45 minutes, right after `composer install`. The API container migrates the empty database at start-up; a `migrate:fresh` from the tooling container at the same moment waits on MariaDB metadata locks, whose default timeout is a day. The pull-request run had won the race. The job now waits for the container's "Starting the app" line before any tooling-side database command, which is the README's own ordering, the silent unbounded readiness loop is gone, and container logs are captured on cancellation as well as failure.
+
+**Three lessons.**
+
+1. A test must assert the invariant, not the local configuration that happens to satisfy it. "SQLite in memory" was a symptom of isolation, not its definition.
+2. "It works in Docker" has two sides. Anything that runs on the host, a browser in a CI job included, sees none of Compose's networking.
+3. One green run proves nothing about ordering. Two runs of the same commit are the cheapest race detector available, and a silent unbounded loop turns a race into a timeout with no diagnosis. Bound the wait, print what it saw, and capture logs when the job is cancelled, not only when it fails.
+
+**Deferred.** Making the entrypoint's migration opt-in for development and CI (`docs/future-work.md`); the upstream issue and pull request (ADR-0004), which are outward-facing and wait for the owner's go; a short demo.
