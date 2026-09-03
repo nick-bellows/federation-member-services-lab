@@ -40,7 +40,7 @@ Goal: prove the inherited system can be tested and improved safely before any fe
 
 Acceptance: CI green in the fork on the milestone branch; the fix explained line by line in `docs/LEARNING_LOG.md`; no unrelated upstream behaviour changed.
 
-**Status 2026-09-02: done except the CI run.** Fix landed with fail-then-pass evidence (ADR-0002, `docs/baseline/env_*`), full suite 95/95 on SQLite, regression tests also pass on MariaDB; `.gitattributes` in place; workflow written and its commands validated locally but **DRAFT until it runs on GitHub**, which requires the fork (A5). Playwright recorded in ADR-0003; upstream offer policy in ADR-0004. CI ran on GitHub on 2026-09-03 (A5). Open: the upstream issue and pull request (needs the owner's go; outward-facing).
+**Status 2026-09-02: done except the CI run.** Fix landed with fail-then-pass evidence (ADR-0002, `docs/baseline/env_*`), full suite 95/95 on SQLite, regression tests also pass on MariaDB; `.gitattributes` in place; workflow written and its commands validated locally but **DRAFT until it runs on GitHub**, which requires the fork (A5). Playwright recorded in ADR-0003; upstream offer policy in ADR-0004. CI ran on GitHub on 2026-09-03 (A5). The upstream offer is deferred to B9 (decision 7).
 
 ### A2 — Federation domain and the application state machine (M2) — size L
 
@@ -101,7 +101,7 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 3. Publish pre-flight per the portfolio house rules: clean tree, tracked-file audit, gitleaks over history, no seeded credentials described as production-safe, logged-out README review.
 4. **Only on explicit approval:** create the GitHub fork, add `origin`, push, merge the milestone branches through pull requests, enable Actions. Pins and profile changes are separate manual approvals.
 
-**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`; cold-clone verification done.** The README instructions were followed from a fresh clone in a separate Compose project with fresh volumes (`docs/baseline/cold_clone_2026-09-02.txt`, lesson in `docs/LEARNING_LOG.md`). The first run found a React hydration defect in date formatting (server in UTC, browser in the local zone); it is fixed, guarded by the browser spec, and the rerun passed 7 of 7. Pre-flight run once on the earlier tree (clean tree, tracked-file audit, gitleaks over 24 commits: nothing found) and to be repeated on the final commit. **2026-09-03: fork created on the owner's word, branch pushed, Actions enabled, pull request #1 opened.** The first two CI runs failed on three findings (an engine assumption in the INCIDENT-000 test; the runner's browser could not resolve the OIDC issuer host; a migration race between the API container's start-up and the seed, which hung one run for 45 minutes); fixed in three commits, green on both runs of `99aca82`, merged as `0bb07f3`, green on `main`. Lesson in `docs/LEARNING_LOG.md`. Anonymous README view checked (fork banner, attribution, disclaimer; no secrets; nothing claimed). Open: the upstream issue and pull request (ADR-0004), a short demo.
+**Status 2026-09-02: README rewritten for the five-minute path; upstream's README preserved at `docs/UPSTREAM_README.md`; cold-clone verification done.** The README instructions were followed from a fresh clone in a separate Compose project with fresh volumes (`docs/baseline/cold_clone_2026-09-02.txt`, lesson in `docs/LEARNING_LOG.md`). The first run found a React hydration defect in date formatting (server in UTC, browser in the local zone); it is fixed, guarded by the browser spec, and the rerun passed 7 of 7. Pre-flight run once on the earlier tree (clean tree, tracked-file audit, gitleaks over 24 commits: nothing found) and to be repeated on the final commit. **2026-09-03: fork created on the owner's word, branch pushed, Actions enabled, pull request #1 opened.** The first two CI runs failed on three findings (an engine assumption in the INCIDENT-000 test; the runner's browser could not resolve the OIDC issuer host; a migration race between the API container's start-up and the seed, which hung one run for 45 minutes); fixed in three commits, green on both runs of `99aca82`, merged as `0bb07f3`, green on `main`. Lesson in `docs/LEARNING_LOG.md`. Anonymous README view checked (fork banner, attribution, disclaimer; no secrets; nothing claimed). Open: a short demo. The upstream offer is deferred to B9 (decision 7, 2026-09-03).
 
 ### Phase A acceptance checklist
 
@@ -111,7 +111,7 @@ Acceptance: the slice runs from a cold clone by following the README; E2E and ac
 - [ ] OIDC sign-in working against the self-hosted provider in CI (done) and against the Auth0 tenant in the documented walkthrough (deferred to B9 by owner decision, 2026-09-02); privilege-boundary tests (done)
 - [x] ADR-0000 to ADR-0005 (through ADR-0008), `docs/DOMAIN_MODEL.md`, `docs/DATABASE_BASELINE.md`, `docs/incidents/INCIDENT-002.md`
 - [ ] README passes the one-minute and five-minute reads (owner's read pending; anonymous view checked 2026-09-03); attribution and license unchanged (verified)
-- [ ] One upstream contribution offered, status recorded truthfully — **not offered as of 2026-09-03.** The candidate is ready (the `env()` fix with `.gitattributes`, ADR-0004) and the fork makes it possible; opening an issue on another project is outward-facing and waits for the owner's explicit go. Until then this gate is open, not waived.
+- [ ] One upstream contribution offered, status recorded truthfully — **deferred to B9 by owner decision, 2026-09-03 (decision 7).** Nothing has been offered. The offer is made once, at the end of Phase B, with the best candidate then: the `env()` fix with `.gitattributes` (ADR-0004), and possibly the PostgreSQL compatibility work from B4. The gate stays open until then; it is not waived.
 - [ ] Explicit approval for visibility received
 
 ## Phase B — depth, after the public gate
@@ -128,7 +128,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 | B6 Accessibility and performance (M9) | Manual WCAG 2.1 AA review of the slice, fixes, low-bandwidth review of the member flow, synthetic load on three endpoints with before/after measurements | M | Numbers only from retained runs; the missing `club_id` indexes are the obvious first finding |
 | B7 Security review | `docs/THREAT_MODEL.md` covering the brief's list; JSON Patch on one resource with field-level authorization | S–M | Threat model can start earlier and grow |
 | B8 Release engineering (M10) | Production images, deployment architecture document (CloudFront, load balancer, containers, RDS PostgreSQL, S3, queue, worker, CloudWatch), rollback plan, release checklist; Terraform only if labelled untested | M | No provisioning, no cost, without approval. Kubernetes only if everything else works and only as a documented exercise |
-| B9 Case study and demo | Static modernization case study page, demo video, final README pass, interview guide complete; **the Auth0 tenant walkthrough with screenshots (owner decision 2026-09-02: deferred to the very end; the mock provider covers development and CI until then)** | S–M | Hosting a live demo is a separate cost decision, evaluated only after B8 |
+| B9 Case study and demo | Static modernization case study page, demo video, final README pass, interview guide complete; **the one upstream offer per ADR-0004 (decision 7, 2026-09-03)**; **the Auth0 tenant walkthrough with screenshots (owner decision 2026-09-02: deferred to the very end; the mock provider covers development and CI until then)** | S–M | Hosting a live demo is a separate cost decision, evaluated only after B8 |
 
 ## Continuous tracks
 
@@ -144,7 +144,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 | After B2–B3 | Integration contract, event-driven processing | Contract tests with a mock, outbox with failure exercises, three incident reports | Degraded behaviour when the credential service is slow; nothing lost when a worker dies |
 | After B4–B9 | PostgreSQL, observability, accessibility, deployment architecture | Traces, metrics, load measurements, threat model, runbook | Accessibility review, performance budgets, case study |
 
-## Decisions taken (2026-09-02, owner's review)
+## Decisions taken (owner's review, 2026-09-02 onward)
 
 1. **Sequencing: identity before the review slice**, as in the original brief. The public gate moves one milestone later; the first public state shows OIDC.
 2. **M1 fix: the `env()` calls outside `config/`**, with a regression test that fails before and passes after.
@@ -152,6 +152,7 @@ Each milestone is bounded, starts with its lesson and decision, and updates this
 4. **Fictional federation: Northgate Soccer Federation (NSF).** Name and any branding are invented for this project and must not resemble a real federation's marks.
 5. **Identity provider: Auth0 free tier**, tenant created by the owner when A3 starts; a self-hosted OIDC provider in compose and CI so nothing depends on the external account.
 6. **Learning Center contract: add `GET /v1/members/{id}/credentials` to the Learning Center** as a bounded milestone there; this repository consumes it through fixtures and contract tests first.
+7. **Upstream offer timing (2026-09-03): one offer, at the end of Phase B (B9).** The owner prefers to offer when the fork has more to give than a two-line fix; nothing is offered piecemeal. Candidates then: the `env()` fix with `.gitattributes` (ADR-0004) and, if B4 produces it, the PostgreSQL compatibility work. The README says "none offered" until that happens.
 
 ## Stop conditions
 
