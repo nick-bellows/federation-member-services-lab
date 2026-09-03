@@ -6,8 +6,8 @@
 # browser job); the fixes are in the history and in docs/LEARNING_LOG.md.
 # Green on both the push and the pull-request run since 99aca82, and on main.
 #
-# Jobs: backend tests on SQLite (upstream's test configuration) and on MariaDB
-# (the runtime engine, so MySQL-only SQL is exercised), Pint as a report,
+# Jobs: backend tests on SQLite (upstream's test configuration), on MariaDB
+# (the runtime engine) and on PostgreSQL 16 (the compatibility matrix's strict engine), Pint as a report,
 # frontend type-check, lint and production build, an env() misuse guard, and an
 # upstream-versus-fork manifest published to the job summary.
 
@@ -28,7 +28,7 @@ concurrency:
 env:
   PHP_VERSION: "8.3"
   NODE_VERSION: "20"
-  PHP_EXTENSIONS: mbstring, intl, gd, imagick, zip, bcmath, exif, pdo_sqlite, sqlite3, pdo_mysql
+  PHP_EXTENSIONS: mbstring, intl, gd, imagick, zip, bcmath, exif, pdo_sqlite, sqlite3, pdo_mysql, pdo_pgsql
 
 jobs:
   backend-sqlite:
@@ -95,6 +95,52 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: php artisan test
 
+  backend-postgres:
+    name: Backend tests (PostgreSQL 16, compatibility matrix)
+    # The third engine of docs/DATABASE_COMPATIBILITY.md (ADR-0011): the whole
+    # suite plus the demo seeder, on the engine that rejects what SQLite tolerates.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    services:
+      database:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: verein_test
+          POSTGRES_USER: verein
+          POSTGRES_PASSWORD: verein
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U verein -d verein_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+      DB_DATABASE: verein_test
+      DB_USERNAME: verein
+      DB_PASSWORD: verein
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ghostscript
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('api/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test
+      - name: Seed the demo data on PostgreSQL
+        run: |
+          cp .env.example .env && php artisan key:generate --no-interaction
+          php artisan migrate:fresh --seeder=NorthgateDemoSeeder --no-interaction --force
+          php artisan federation:outbox-status
+
   backend-style:
     name: Backend style (Pint, report only) and env() guard
     runs-on: ubuntu-latest
@@ -122,8 +168,8 @@ jobs:
           git fetch --quiet https://github.com/vereinfacht/vereinfacht.git main
           FORK_MIGRATIONS=$(git diff --name-only --diff-filter=A FETCH_HEAD...HEAD -- database/migrations | sed 's|^api/||')
           vendor/bin/pint --test \
-            app/Federation \
-            tests/Unit/Federation tests/Feature/Federation tests/Unit/WebApplicationUrlConfigTest.php \
+            app/Federation app/Support \
+            tests/Unit/Federation tests/Feature/Federation tests/Feature/Export tests/Unit/WebApplicationUrlConfigTest.php \
             database/factories/Federation database/seeders/NorthgateDemoSeeder.php \
             $FORK_MIGRATIONS
       - name: Pint on the whole tree (upstream carries 215 pre-existing issues; reported, not enforced)

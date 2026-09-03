@@ -12,7 +12,7 @@ class ClubPathGenerator implements PathGenerator
         $clubId = $media->club_id;
         $collection = $media->collection_name ?? 'default';
 
-        return $clubId . '/' . $collection . '/' . $media->id . '/';
+        return $clubId.'/'.$collection.'/'.$media->id.'/';
     }
 
     public function getPath(Media $media): string
@@ -22,11 +22,11 @@ class ClubPathGenerator implements PathGenerator
 
     public function getPathForConversions(Media $media): string
     {
-        return $this->basePath($media) . 'conversions/';
+        return $this->basePath($media).'conversions/';
     }
 
     public function getPathForResponsiveImages(Media $media): string
     {
-        return $this->basePath($media) . 'responsive-images/';
+        return $this->basePath($media).'responsive-images/';
     }
 }

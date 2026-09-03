@@ -70,7 +70,7 @@ class Membership extends Model
     {
         $query->addSelect([
             'members_divisions_fee' => function (QueryBuilder $query) {
-                $query->select(DB::raw('CAST(SUM(division_membership_type.monthly_fee) AS UNSIGNED INT)'))
+                $query->select(DB::raw('CAST(SUM(division_membership_type.monthly_fee) AS INTEGER)'))
                     ->from('members')
                     ->join('division_member', 'members.id', '=', 'division_member.member_id')
                     ->join('division_membership_type', 'division_member.division_id', '=', 'division_membership_type.division_id')

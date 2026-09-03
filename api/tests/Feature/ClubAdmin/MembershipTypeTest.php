@@ -62,22 +62,19 @@ class MembershipTypeTest extends TestCase
 
         $response->assertFetchedOne($membershipType);
 
+        // Translations compared through the model: a JSON column has no text equality on PostgreSQL.
+        $this->assertEquals(
+            array_merge($membershipType->getTranslations('title'), $data['attributes']['titleTranslations']),
+            $membershipType->fresh()->getTranslations('title')
+        );
+        $this->assertEquals(
+            array_merge($membershipType->getTranslations('description'), $data['attributes']['descriptionTranslations']),
+            $membershipType->fresh()->getTranslations('description')
+        );
         $this->assertDatabaseHas(
             'membership_types',
             [
                 'id' => $membershipType->getKey(),
-                'title' => json_encode(
-                    array_merge(
-                        $membershipType->getTranslations('title'),
-                        $data['attributes']['titleTranslations']
-                    )
-                ),
-                'description' => json_encode(
-                    array_merge(
-                        $membershipType->getTranslations('description'),
-                        $data['attributes']['descriptionTranslations']
-                    )
-                ),
                 'monthly_fee' => 200,
                 'admission_fee' => 400,
                 'minimum_number_of_months' => 6,

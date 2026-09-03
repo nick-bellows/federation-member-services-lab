@@ -3,6 +3,7 @@
 namespace App\Actions\Export;
 
 use App\Models\Division;
+use App\Support\OrderByIdList;
 use Illuminate\Database\Eloquent\Builder;
 
 class ExportDivisionResource extends ExportResourceCsv
@@ -12,10 +13,7 @@ class ExportDivisionResource extends ExportResourceCsv
         $query = Division::query()->whereIn('id', $ids)
             ->where('club_id', $clubId);
 
-        if (!empty($ids)) {
-            $idsString = implode(',', array_map('intval', $ids));
-            $query->orderByRaw("FIELD(id, $idsString)");
-        }
+        OrderByIdList::apply($query, $ids);
 
         return $query;
     }
