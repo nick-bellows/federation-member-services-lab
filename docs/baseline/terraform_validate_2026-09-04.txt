@@ -1,0 +1,19 @@
+# terraform validate, 2026-09-04 (deploy/terraform; ADR-0015 addendum). Not planned, not applied: no AWS credentials on this machine.
+
+$ terraform version
+Terraform v1.9.8
+on linux_amd64
+
+$ terraform init -backend=false
+you run "terraform init" in the future.
+Terraform has been successfully initialized!
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+$ terraform validate
+Success! The configuration is valid.
+

@@ -13,9 +13,9 @@ Status: **planned**. The code path exists and is exercised in CI against the sel
 1. **Create a tenant** on the Auth0 free tier. Note the domain, for example `northgate-dev.eu.auth0.com`.
 2. **Create an API** (Applications → APIs): name `Northgate Federation API`, identifier `https://api.northgate.example` (this string is the audience; it does not have to resolve). Signing algorithm RS256. Leave RBAC off: the federation derives capabilities from its own tables.
 3. **Create an application** of type Regular Web Application: name `Northgate Member Services`.
-   - Allowed Callback URLs: `http://localhost:3000/api/auth/callback/auth0`
-   - Allowed Logout URLs: `http://localhost:3000/en/member/sign-in`
-   - Allowed Web Origins: `http://localhost:3000`
+   - Allowed Callback URLs: `http://localhost:3000/api/auth/callback/auth0` (and, for the AWS proof, the `auth0_callback_url` output of `deploy/terraform`, which is `https://<distribution>.cloudfront.net/api/auth/callback/auth0`)
+   - Allowed Logout URLs: `http://localhost:3000/en/member/sign-in` (and the CloudFront equivalent)
+   - Allowed Web Origins: `http://localhost:3000` (and `https://<distribution>.cloudfront.net`)
    - Grant types: Authorization Code, Refresh Token (default). Nothing else.
 4. **Enable a connection** for the application: the built-in Username-Password-Authentication database, with e-mail verification on (the API provisions a user only from a verified e-mail).
 5. **Create two test users** in that connection, one to act as an applicant and one whose e-mail you will attach to an organization administrator in the seed (`NorthgateDemoSeeder` links administrators by e-mail).

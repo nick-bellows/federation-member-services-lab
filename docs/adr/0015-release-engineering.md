@@ -35,4 +35,8 @@ The milestone's opening decision was design-only versus opt-in provisioning. On 
 - Every deployment must supply the full environment from a secret store; the example file lists it.
 - The scheduler's failure line and the readiness age are the two signals an alarm design depends on; `docs/RUNBOOK.md` names both.
 - The dependency update moved the framework by seven minor versions within 13.x; the three-engine suite and the browser journeys are the evidence it was safe.
-- Follow-ups in `docs/future-work.md`: Terraform or CDK once an account exists, image scanning and digest pinning in the pipeline, SQS behind the relay, a write-once audit table by database role.
+- Follow-ups in `docs/future-work.md`: image scanning and digest pinning in the pipeline, SQS behind the relay, a write-once audit table by database role.
+
+## Addendum 2026-09-04: provisioning approved, Terraform added
+
+The owner approved the provisioning question (approvals list, step 3) on 2026-09-04. Alternative 5 above (Terraform labelled untested) is therefore superseded: `deploy/terraform/` now holds the smallest honest version of `docs/DEPLOYMENT.md` (public subnets without a NAT, Fargate tasks at the smallest size, a single-AZ db.t4g.micro, an HTTP load balancer behind CloudFront on its default certificate, SSM parameters for the secrets, the `scheduled_task_failed` metric filter and alarm). It is validated with `terraform validate`, and it stays **not applied** until the owner supplies AWS credentials; the first `plan` and `apply` are recorded under `docs/baseline/` when they happen. The cost estimate and the gaps of the proof are in `deploy/terraform/README.md`. Decision 5 stands otherwise: the production shape is the document, and the proof does not claim to be it.
