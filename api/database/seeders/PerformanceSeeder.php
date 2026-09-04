@@ -25,8 +25,8 @@ class PerformanceSeeder extends Seeder
             return;
         }
 
-        $clubs = (int) (getenv('PERF_CLUBS') ?: 20);
-        $membersPerClub = (int) (getenv('PERF_MEMBERS_PER_CLUB') ?: 1500);
+        $clubs = max(1, (int) config('performance.seed.clubs', 20));
+        $membersPerClub = max(1, (int) config('performance.seed.members_per_club', 1500));
         $now = now();
 
         for ($c = 1; $c <= $clubs; $c++) {
