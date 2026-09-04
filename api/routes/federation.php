@@ -59,15 +59,18 @@ JsonApiRoute::server('federation')
                 $actions->withId()->post('approve');
                 $actions->withId()->post('reject');
                 $actions->withId()->post('refresh-credentials');
+                // JSON Patch (RFC 6902) with field-level authorization (ADR-0014).
+                $actions->withId()->patch('fields');
             });
 
         $server->resource('application-documents', ApplicationDocumentController::class)
             ->only('index', 'show', 'store', 'update');
     });
 
-// Probes and metrics (ADR-0012, docs/OBSERVABILITY.md). Unauthenticated by
-// design: liveness and readiness are read by the platform, metrics by a
-// scraper (optionally with METRICS_TOKEN). None of them expose personal data.
+// Probes and metrics (ADR-0012, docs/OBSERVABILITY.md). Liveness and
+// readiness are open by design: the platform probes them before it holds any
+// secret. Checks and metrics describe the system and require METRICS_TOKEN,
+// which the shipped .env.example sets (ADR-0014). None expose personal data.
 Route::prefix('health')->name('observability.')->group(function () {
     Route::get('live', [ObservabilityController::class, 'live'])->name('live');
     Route::get('ready', [ObservabilityController::class, 'ready'])->name('ready');

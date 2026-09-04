@@ -34,8 +34,12 @@ final class ObservabilityController extends Controller
         ], $result['ready'] ? 200 : 503);
     }
 
-    public function checks(ResultStore $store): JsonResponse
+    public function checks(Request $request, ResultStore $store): JsonResponse
     {
+        if (! $this->scraperAuthorised($request)) {
+            return response()->json(['status' => 'unauthorized'], 401);
+        }
+
         $results = $store->latestResults();
 
         if ($results === null) {
@@ -62,11 +66,24 @@ final class ObservabilityController extends Controller
 
     public function metrics(Request $request, Metrics $metrics): Response
     {
-        $token = (string) config('observability.metrics.token');
-        if ($token !== '' && ! hash_equals($token, (string) $request->bearerToken())) {
+        if (! $this->scraperAuthorised($request)) {
             return response('unauthorized', 401, ['Content-Type' => 'text/plain']);
         }
 
         return response($metrics->render(), 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
+    }
+
+    /**
+     * Checks and metrics describe the system (queue depth, failing checks,
+     * dependency state): useful to an operator, useful to an attacker planning
+     * a quiet moment. They require the scrape token whenever one is configured,
+     * which the shipped .env.example does (ADR-0014). Liveness and readiness
+     * stay open: a platform must be able to probe them before it has secrets.
+     */
+    private function scraperAuthorised(Request $request): bool
+    {
+        $token = (string) config('observability.metrics.token');
+
+        return $token === '' || hash_equals($token, (string) $request->bearerToken());
     }
 }

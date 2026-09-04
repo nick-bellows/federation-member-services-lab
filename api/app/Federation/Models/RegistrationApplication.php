@@ -33,6 +33,7 @@ class RegistrationApplication extends Model
         'date_of_birth',
         'phone',
         'applicant_notes',
+        'reviewer_notes',
         'idempotency_key',
     ];
 

@@ -9,7 +9,7 @@ The operator's half of the contract (ADR-0012): for each situation, the symptom,
 | Every deploy, every restart | `docker compose exec -d -u verein api php artisan federation:work` | `federation_outbox_oldest_unpublished_seconds` stays near 0 |
 | Daily | `php artisan federation:reconcile-credentials` | `refreshed=n changed=m unavailable=0` |
 | Hourly, or on a page | `php artisan federation:outbox-status` | exit code 0, `failed_events=0 failed_jobs=0` |
-| Hourly | `php artisan health:check` then `GET /api/health/checks` | `status: ok` (in development two checks expect production and fail by design) |
+| Hourly | `php artisan health:check` then `GET /api/health/checks` with `Authorization: Bearer $METRICS_TOKEN` | `status: ok` (in development two checks expect production and fail by design) |
 | Before trusting anything | `GET /api/health/ready` | `status: ready`; `learning_center` may read `degraded` without affecting readiness |
 
 ## Situations

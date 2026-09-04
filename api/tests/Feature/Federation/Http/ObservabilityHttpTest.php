@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 /**
- * The probes and the metrics endpoint as a platform sees them: no token,
+ * The probes and the metrics endpoint as a platform sees them: liveness and
+ * readiness without a token, checks and metrics behind the scrape token,
  * no personal data, honest about dependencies and the queue.
  */
 class ObservabilityHttpTest extends FederationHttpTestCase
@@ -98,5 +99,25 @@ class ObservabilityHttpTest extends FederationHttpTestCase
 
         $this->get('/api/metrics')->assertStatus(401);
         $this->withToken('scrape-me')->get('/api/metrics')->assertOk();
+    }
+
+    public function test_checks_require_the_same_token_while_the_probes_stay_open(): void
+    {
+        config()->set('observability.metrics.token', 'scrape-me');
+        Http::fake(['http://learning-center.test/*' => Http::response(['status' => 'ok'])]);
+
+        $this->getJson('/api/health/checks')->assertStatus(401)->assertJsonPath('status', 'unauthorized');
+        $this->withToken('scrape-me')->getJson('/api/health/checks')->assertOk();
+
+        // A platform probes liveness and readiness before it has any secret.
+        $this->getJson('/api/health/live')->assertOk();
+        $this->getJson('/api/health/ready')->assertOk();
+    }
+
+    public function test_the_shipped_environment_file_sets_a_scrape_token(): void
+    {
+        $example = file_get_contents(base_path('.env.example'));
+
+        $this->assertMatchesRegularExpression('/^METRICS_TOKEN=\S+$/m', $example, 'checks and metrics are token-gated by default (ADR-0014)');
     }
 }

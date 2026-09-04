@@ -2,6 +2,7 @@
 
 namespace App\Federation\Http\Controllers;
 
+use App\Federation\Actions\PatchApplicationFields;
 use App\Federation\Actions\StartApplication;
 use App\Federation\Actions\TransitionApplication;
 use App\Federation\Enums\ApplicationRole;
@@ -14,6 +15,7 @@ use App\Federation\LearningCenter\Exceptions\LearningCenterUnavailableException;
 use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Support\AuditRecorder;
+use App\Federation\Support\JsonPatch;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Error;
@@ -137,6 +139,35 @@ class RegistrationApplicationController extends Controller
         }
 
         return DataResponse::make($application->fresh(['applicant.credentialSnapshot']));
+    }
+
+    /**
+     * JSON Patch (RFC 6902) on the application's fields, authorised operation
+     * by operation for the acting person (ADR-0014). The media type is the
+     * contract: anything else is 415, a malformed document 422, a field the
+     * person may not touch 403 naming the path, a failed test 409.
+     */
+    public function fields(Request $request, RegistrationApplication $application, PatchApplicationFields $patch): DataResponse
+    {
+        if (! str_starts_with(strtolower((string) $request->header('Content-Type')), JsonPatch::MEDIA_TYPE)) {
+            throw new JsonApiException(Error::fromArray([
+                'status' => '415',
+                'code' => 'unsupported_media_type',
+                'title' => 'Unsupported media type',
+                'detail' => 'Send the operations as '.JsonPatch::MEDIA_TYPE.'.',
+            ]));
+        }
+
+        $this->authorize('view', $application);
+
+        $application = $this->domain(fn () => $patch->execute(
+            $application,
+            JsonPatch::parse(json_decode($request->getContent(), true)),
+            $request->user(),
+            AssignRequestId::current($request),
+        ));
+
+        return DataResponse::make($application);
     }
 
     private function transition(Request $request, RegistrationApplication $application, TransitionApplication $transition, ApplicationStatus $to): DataResponse

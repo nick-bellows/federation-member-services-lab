@@ -9,6 +9,7 @@ use App\JsonApi\V1\PagePagination;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\ArrayHash;
 use LaravelJsonApi\Eloquent\Fields\ArrayList;
@@ -46,6 +47,13 @@ class RegistrationApplicationSchema extends Schema
             Str::make('dateOfBirth')->serializeUsing(static fn ($value) => $value?->toDateString()),
             Str::make('phone'),
             Str::make('applicantNotes'),
+            // Reviewer-only: written through the JSON Patch fields action (ADR-0014),
+            // never through the resource update, and not shown to the applicant.
+            Str::make('reviewerNotes')->readOnly()->extractUsing(
+                static fn (RegistrationApplication $application) => Gate::allows('review', $application)
+                    ? $application->reviewer_notes
+                    : null,
+            ),
             ArrayList::make('missingRequiredDocuments')->readOnly()->extractUsing(
                 static fn (RegistrationApplication $application) => array_map(
                     static fn (DocumentType $type) => $type->value,

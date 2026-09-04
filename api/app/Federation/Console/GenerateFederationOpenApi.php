@@ -54,6 +54,10 @@ class GenerateFederationOpenApi extends Command
             ];
         }
 
+        $document['paths']['/registration-applications/{registration_application}/-actions/fields'] = [
+            'patch' => $this->patchFieldsOperation($fetchOne),
+        ];
+
         $document['info']['description'] = ($document['info']['description'] ?? '')
             .' Custom actions on registration applications are added by federation:openapi; the package generator does not describe them.';
 
@@ -63,6 +67,61 @@ class GenerateFederationOpenApi extends Command
         $this->info("Written {$output} with ".count($document['paths']).' paths.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * JSON Patch on the application's fields (ADR-0014): its own media type,
+     * its own error codes, no idempotency key (a "test" operation is the
+     * client's guard against stale writes).
+     *
+     * @param  array<string, mixed>  $fetchOne
+     * @return array<string, mixed>
+     */
+    private function patchFieldsOperation(array $fetchOne): array
+    {
+        $ok = $fetchOne['responses']['200'] ?? ['description' => 'The application after the patch.'];
+
+        return [
+            'summary' => 'Apply an RFC 6902 JSON Patch to the application\'s fields. Every operation is authorised for the signed-in person before any is applied; one refused operation refuses the patch. Applicants may change /dateOfBirth, /phone and /applicantNotes while the application is a draft or needs information; reviewers may change /reviewerNotes.',
+            'operationId' => 'registration-applications.patchFields',
+            'tags' => ['registration-applications'],
+            'parameters' => array_merge($fetchOne['parameters'] ?? [], [
+                [
+                    'name' => 'X-Request-Id',
+                    'in' => 'header',
+                    'required' => false,
+                    'description' => 'Correlation id echoed in the response and stored with the audit entry.',
+                    'schema' => ['type' => 'string', 'pattern' => '^[A-Za-z0-9._-]{8,64}$'],
+                ],
+            ]),
+            'requestBody' => [
+                'required' => true,
+                'content' => [
+                    'application/json-patch+json' => [
+                        'schema' => [
+                            'type' => 'array',
+                            'minItems' => 1,
+                            'items' => [
+                                'type' => 'object',
+                                'required' => ['op', 'path'],
+                                'properties' => [
+                                    'op' => ['type' => 'string', 'enum' => ['add', 'replace', 'remove', 'test']],
+                                    'path' => ['type' => 'string', 'pattern' => '^/[A-Za-z][A-Za-z0-9]*$', 'example' => '/phone'],
+                                    'value' => ['description' => 'Required for add, replace and test.'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'responses' => [
+                '200' => $ok,
+                '403' => ['description' => 'The signed-in person may not perform an operation on that path (code field_not_allowed, meta.path names it). Nothing was applied.'],
+                '409' => ['description' => 'A test operation did not match the stored value (code patch_test_failed), or the applicant may no longer edit (code application_not_editable). Nothing was applied.'],
+                '415' => ['description' => 'The body was not sent as application/json-patch+json.'],
+                '422' => ['description' => 'The document is not a valid JSON Patch, or a value fails validation (code invalid_patch).'],
+            ],
+        ];
     }
 
     /**

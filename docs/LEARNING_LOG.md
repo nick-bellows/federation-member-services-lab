@@ -369,3 +369,38 @@ _Pending; recorded in the internal review file._
 3. Automated accessibility is the floor; the walk and the per-criterion record are the review. Say what was not done (a screen reader by ear).
 
 **Deferred.** A skip link, per-page titles and described transition buttons (B9); a production frontend measurement (B8); composite indexes if a plan asks for them.
+
+## 2026-09-03 — B7: security review
+
+**Goal.** A threat model covering the brief's list, JSON Patch on one resource with field-level authorization, and the operator surfaces reviewed as part of the model.
+
+**Decisions (owner, at the start).** Attack trees rather than a STRIDE table; a dedicated `-actions/fields` route for RFC 6902 rather than overloading the JSON:API update; the scrape token on by default for checks and metrics. ADR-0014 records the alternatives.
+
+**Built.** `docs/THREAT_MODEL.md` (assets, actors, entry points; six trees; a legend that separates mitigated, partly, open, upstream and dev-only; the two audits classified by reachability; an update policy for B8); `JsonPatch` (four operations, one-level paths, whole-document refusal); `PatchApplicationFields` (authorise every operation before applying any, one transaction with the row locked, `test` as the stale-view guard, one audit entry with previous and new values); `reviewer_notes` with a reviewer-only attribute; `/api/health/checks` behind `METRICS_TOKEN`, shipped set in `.env.example`; `SecretsNeverLoggedTest`; the OpenAPI document and the generated types regenerated (they had not been since M4, so `participation` and `history` arrived with `reviewerNotes`).
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Field-level authorization over HTTP | `ApplicationFieldsPatchHttpTest` | 11 tests: allowed paths, atomic refusal with the path in `meta`, reviewer notes hidden from the applicant, 409 after submission, `test` mismatch, `remove`, validation, 415, four malformed documents, the JSON:API update cannot write reviewer notes |
+| No token in logs or spans | `SecretsNeverLoggedTest` | success, 401 and provider paths: no person token, service token, client secret or JWT shape in any log line or span attribute |
+| Token gate | `ObservabilityHttpTest` | checks and metrics 401 without the token, 200 with it; live and ready open; `.env.example` sets one |
+| Live walk | `docs/baseline/security_review_2026-09-03.txt` | the same on the running stack, plus the access line for the refused request and zero token hits over 4,800 access lines and the recorded traces |
+| Dependency audits | `docs/baseline/security_audit_2026-09-03.txt` | Composer: 13 advisories in 3 upstream packages; npm: 8 (7 high, 1 critical) in the frontend, 1 in the API's build tooling; none patched here |
+| Suite | `phpunit_after_b7_backend.txt`, `playwright_b7.txt` | backend: see the file; browser: 10 of 11 passed, the sign-out redirect in the sign-in journey timed out at 10 s while the backend suite ran on the same machine and passed on an immediate rerun (both recorded) |
+
+**What went wrong, in order.**
+
+1. The first draft of the patch action passed the application's status enum to an exception whose constructor takes a message string; a type error waiting for the first locked applicant. Caught on reading the constructor, not by a test: the lesson is to read the signature before the call, and the test for the 409 now exists.
+2. A test helper named `patch()` collided with Laravel's own `TestCase::patch()` and PHP refused the narrower visibility; renamed. Frameworks own more names than one remembers.
+3. The mock provider's token endpoint pretty-prints its JSON and signs the issuer with the host the request used, so a `curl` to `localhost` yields a token the API rejects and a one-line `sed` matched nothing; the walk asks `host.docker.internal` and matches the spaced key. Both are the kind of detail a runbook has to carry.
+4. `npm audit` hung for five minutes against the registry on the first try and answered in ninety seconds on the second; the audit file records the second run. A dependency audit needs the network, so a release checklist has to allow for that.
+5. The generated OpenAPI document showed a four-hundred-line diff for a one-path change: the generator samples examples from the live seed, so ids and timestamps churn on every run. Accepted, and noted so the next reviewer does not look for a regression in it.
+
+**Three lessons.**
+
+1. Authorise the whole patch before applying any of it, and make the refusal name the path; a partially applied patch is the worst outcome for both the client and the audit trail.
+2. A threat model earns its keep when each leaf points at a test; the trees are only as honest as the evidence column, and "partly" is a legitimate marker.
+3. Public surfaces are chosen, not discovered: the probes stay open because a platform needs them, the checks close because they describe the system. Write down the reason for each.
+
+**Deferred.** The major upgrades the audits ask for (Next 16, `sharp`, `swiper`), a write-once audit table at the database, SHA-pinned actions and digest-pinned images, a tag for the Swagger UI image, and the upstream findings for the B9 offer.

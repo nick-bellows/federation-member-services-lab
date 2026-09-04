@@ -8,7 +8,10 @@ use App\Federation\Exceptions\ApplicationNotEditableException;
 use App\Federation\Exceptions\DocumentNotAllowedException;
 use App\Federation\Exceptions\DuplicateApplicationException;
 use App\Federation\Exceptions\FederationDomainException;
+use App\Federation\Exceptions\FieldNotAllowedException;
 use App\Federation\Exceptions\IllegalTransitionException;
+use App\Federation\Exceptions\InvalidPatchException;
+use App\Federation\Exceptions\PatchTestFailedException;
 use App\Federation\Exceptions\ReasonRequiredException;
 use App\Federation\Exceptions\RoleNotOfferedException;
 use App\Federation\Exceptions\TransitionNotAllowedForActorException;
@@ -50,6 +53,11 @@ trait RendersDomainExceptions
             $exception instanceof ReasonRequiredException => [422, 'reason_required'],
             $exception instanceof ApplicationIncompleteException => [422, 'application_incomplete'],
             $exception instanceof DocumentNotAllowedException => [422, 'document_not_allowed'],
+            // JSON Patch (ADR-0014): who may not touch what is 403 naming the
+            // path; a stale "test" is 409; a document the parser refuses is 422.
+            $exception instanceof FieldNotAllowedException => [403, 'field_not_allowed'],
+            $exception instanceof PatchTestFailedException => [409, 'patch_test_failed'],
+            $exception instanceof InvalidPatchException => [422, 'invalid_patch'],
             default => [422, 'domain_rule_violated'],
         };
 
@@ -59,6 +67,14 @@ trait RendersDomainExceptions
             'title' => 'Federation rule',
             'detail' => $exception->getMessage(),
         ];
+
+        if ($exception instanceof FieldNotAllowedException) {
+            $error['meta'] = ['path' => $exception->path, 'op' => $exception->operation];
+        }
+
+        if ($exception instanceof PatchTestFailedException) {
+            $error['meta'] = ['path' => $exception->path];
+        }
 
         if ($exception instanceof ApplicationIncompleteException) {
             $error['meta'] = [
