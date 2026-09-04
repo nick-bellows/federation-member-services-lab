@@ -81,9 +81,11 @@ export default async function MemberLayout({
                     )}
                 </div>
             </header>
+            {/* tabIndex -1 lets the skip link move focus here, not only scroll (B9). */}
             <main
                 id="main"
-                className="mx-auto w-full max-w-4xl flex-1 px-6 py-10"
+                tabIndex={-1}
+                className="mx-auto w-full max-w-4xl flex-1 px-6 py-10 focus:outline-none"
             >
                 {children}
             </main>

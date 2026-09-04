@@ -417,3 +417,37 @@ Two Dockerfiles to keep in step; a database queue on RDS instead of SQS for v1; 
 3. You designed the AWS architecture but provisioned nothing. What in the design would you not trust until it ran?
 4. Why is the scheduler a separate service with exactly one task, and what happens if there are two?
 5. Your release image has no `.env`. Where does `APP_KEY` come from, and who can read it?
+
+## M11 / B9 — Case study and demo
+
+### What it does
+
+A case study (`docs/CASE_STUDY.md`) that argues from the starting point through eleven milestones to what was measured and what was not done, every number linked to a retained run; a demo recorded from a Playwright spec against the release images (`docs/assets/demo.webm`, reproducible with one command, skipped in CI); the three accessibility improvements deferred since B6 (a skip link that moves focus, a title per page, described transition buttons) with the review spec asserting each; a final README pass; the upstream offer drafted as one issue and not sent (`docs/UPSTREAM_OFFER.md`); the Auth0 walkthrough written for the tenant the owner creates (`docs/AUTH0_WALKTHROUGH.md`, planned); the approvals the owner still holds, collected in one place.
+
+### Why we built it this way
+
+A case study is the argument a README cannot make in a table: what was inherited, what changed, what it cost, what it proved. A demo recorded from the same spec the tests use shows the build the tests exercised, not a rehearsed screen. The upstream offer is one message that is easy to decline because the fork's value to upstream is four small generic pieces, not the fork. Everything that needs the owner (money, an external account, a message to strangers) is a listed approval, not an assumption.
+
+### Alternatives considered
+
+A hosted case study page (needs GitHub Pages or a host: an approval); a screen recording by hand (not reproducible); four upstream pull requests at once (work the maintainers may not want); running the Auth0 walkthrough on a tenant created without asking (against the rules).
+
+### Failure modes
+
+A skip link whose target cannot take focus; a title helper whose docblock contained the sequence that closes a comment, caught by the type-check; a demo persona whose slot for the organization and role was already taken by an earlier run; a case study that drifts from the README's rows (both cite the same evidence files, on purpose).
+
+### Tradeoffs
+
+A video file in the repository instead of a hosted demo; a case study in Markdown instead of a page; an offer drafted rather than sent; a walkthrough that stays planned until the owner acts.
+
+### Code to locate immediately
+
+`docs/CASE_STUDY.md` · `docs/UPSTREAM_OFFER.md` · `docs/AUTH0_WALKTHROUGH.md` · `e2e/tests/demo.spec.ts` · `web_application/src/lib/federation/metadata.ts` · `web_application/src/app/[lang]/member/layout.tsx` (skip target) · `ReviewActions.tsx` and `ApplicantControls.tsx` (descriptions) · `e2e/tests/accessibility-review.spec.ts` (the three assertions)
+
+### Likely interviewer questions
+
+1. Tell me about this project in two minutes.
+2. What would you do differently if you started again?
+3. What did you offer upstream, and what happened?
+4. Your demo is a video. How do I know it shows the code in the repository?
+5. Which claim in the case study is weakest, and why did you keep it?

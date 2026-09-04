@@ -1,4 +1,5 @@
 import { configuredFederationProviders } from '@/lib/federation/providers';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import SignInButtons from '../components/SignInButtons';
 
@@ -11,6 +12,10 @@ interface SignInPageProps {
  * decided on the server from the environment; the buttons only start the
  * authorization-code flow.
  */
+export function generateMetadata({ params }: SignInPageProps) {
+    return memberMetadata(params.lang, 'sign_in');
+}
+
 export default function SignInPage({ params }: SignInPageProps) {
     const { t } = createTranslation('federation');
     const providers = configuredFederationProviders();

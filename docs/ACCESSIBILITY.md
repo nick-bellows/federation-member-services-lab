@@ -27,11 +27,11 @@ Pages: sign-in, member home, applications list, new application, application det
 
 ## Findings
 
-1. **No skip link.** Each page is short and the navigation has four links, so the cost is small, but a keyboard user tabs through the navigation on every page. Deferred to B9's final pass with a `Skip to content` link in the layout.
-2. **Page titles.** The browser tab title is the same for every member page. A per-page `<title>` (page name, then the site) helps screen-reader users and tab switching. Deferred to B9's final pass.
-3. **Document decision buttons** are named `Accept Proof of age` and `Reject Proof of age`, which reads well; the transition buttons (`Approve`, `Reject`) are unambiguous in context but not out of it; an `aria-describedby` to the application heading would make them so. Deferred.
+1. **Skip link.** A `Skip to content` link existed in the layout but its target, the `main` landmark, was not focusable, so activating it scrolled without moving focus. **Resolved in B9 (2026-09-04):** `main` carries `tabindex="-1"`; the review spec presses Tab, expects the skip link, presses Enter and expects `main#main` to hold focus.
+2. **Page titles.** The browser tab title was the same for every member page. **Resolved in B9:** every member page exports `generateMetadata` through `memberMetadata`, which renders the page name, then the site, in the page's language (`titles` in the federation namespace); the review spec asserts each title.
+3. **Transition buttons.** `Approve`, `Reject`, `Start review`, `Request information`, `Submit application` and `Withdraw application` were unambiguous in context but not out of it. **Resolved in B9:** each carries `aria-describedby` pointing at a visually hidden sentence saying what it does to the application, read before the person confirms; the review spec asserts the description exists and is a sentence.
 
-No serious or critical issue was found; the three findings are improvements, not failures against AA.
+No serious or critical issue was found in B6; the three findings were improvements, not failures against AA, and all three are in place as of B9 (`docs/baseline/a11y_review_2026-09-04.txt`). A screen reader run by ear remains undone.
 
 ## Low bandwidth
 

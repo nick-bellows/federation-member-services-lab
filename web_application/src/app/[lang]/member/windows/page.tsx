@@ -3,6 +3,7 @@ import { fetchFederationIdentity } from '@/lib/federation/api';
 import { requireFederationClient } from '@/lib/federation/client';
 import { listReferenceData, listWindows } from '@/lib/federation/queries';
 import { getOidcAccessToken } from '@/lib/federation/session';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import OpenWindowForm from './OpenWindowForm';
 
@@ -15,6 +16,10 @@ interface PageProps {
  * organization the signed-in administrator manages. The list is reference
  * data every member may read; the form is offered only for administered bodies.
  */
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'windows');
+}
+
 export default async function WindowsPage({ params }: PageProps) {
     const { t } = createTranslation('federation');
     const client = await requireFederationClient(params.lang);

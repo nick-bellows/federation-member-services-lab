@@ -47,6 +47,12 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Pipeline hardening** — image scanning in CI, digest-pinned base images, SHA-pinned actions, the images pushed to a registry under the git SHA (the release checklist assumes a registry).
 - **SQS behind the relay** — the first change after a deployment carries real volume (ADR-0010 mapping; `docs/DEPLOYMENT.md`).
 - **Write-once audit table by database role** — revoke `UPDATE` and `DELETE` on `audit_entries` for the application role, per engine, once RDS exists.
+- **A hosted case study page** — `docs/CASE_STUDY.md` reads on GitHub; serving it as a page needs GitHub Pages on the fork (a visibility setting the owner enables) or a host (B9, approvals list).
+- **A hosted demo** — the recording in `docs/assets/demo.webm` stands in; a running demo is a cost decision (B9, approvals list).
+- **The upstream offer** — drafted in `docs/UPSTREAM_OFFER.md`; sent on the owner's word (decision 7); the four items would be re-cut onto upstream `main` as separate branches once the maintainers say what they want.
+- **The Auth0 walkthrough** — `docs/AUTH0_WALKTHROUGH.md` is planned until the owner's tenant exists; the screenshots it lists turn it validated.
+- **A screen reader by ear** — the accessibility review is a keyboard walk, per-criterion record and axe; NVDA or VoiceOver through the whole journey has not been done.
+- **Upstream's release workflows on the fork** — `release.yml` and `publish.yml` would tag and publish releases; running them is the owner's call (`docs/RELEASE.md`).
 - **Write-once audit trail at the database** — `audit_entries` is append-only in code; a trigger or a revoked `UPDATE`/`DELETE` privilege for the application role would make it so below PHP (B8, per engine).
 - **Pinning** — actions by SHA, images by digest, a tag for upstream's Swagger UI image (B8 release checklist).
 - **Upstream findings for the B9 offer** (threat model, marked Upstream) — the public apply form's super-admin Sanctum token with no expiry, `apply` mapping every `Throwable` to a 422 with its message, the CORS wildcard.

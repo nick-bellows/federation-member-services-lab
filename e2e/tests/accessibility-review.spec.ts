@@ -13,7 +13,8 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 const runId = Date.now().toString(36);
 const applicant = { subject: `mock|a11y-${runId}`, email: `a11y-${runId}@northgate.example`, name: `A11y Reviewer ${runId}` };
 const naslAdmin = { subject: 'mock|nasl-admin', email: 'nasl-admin@northgate.example', name: 'NASL Admin' };
-const reportPath = 'docs/baseline/a11y_review_2026-09-03.txt';
+// B6's record stays as it was; the B9 rerun (skip link, titles, described buttons) writes its own.
+const reportPath = 'docs/baseline/a11y_review_2026-09-04.txt';
 
 function note(line: string) {
     mkdirSync('../docs/baseline', { recursive: true });
@@ -77,21 +78,94 @@ async function bestPracticeScan(page: Page, label: string) {
     expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
 }
 
+/**
+ * B9: every member page names itself before the site in the tab title.
+ */
+const titles: Record<string, string> = {
+    '/en/member/sign-in': 'Sign in',
+    '/en/member': 'Your identity',
+    '/en/member/applications': 'My applications',
+    '/en/member/applications/new': 'Start an application',
+    application: 'Application',
+    '/en/member/review': 'Review queue',
+    review_application: 'Review application',
+    '/en/member/windows': 'Registration windows',
+};
+
+async function expectPageTitle(page: Page, key: string) {
+    const expected = `${titles[key]} · Northgate Soccer Federation`;
+    await expect(page, `${key} has its own title`).toHaveTitle(expected);
+    note(`[title] ${key}: "${expected}"`);
+}
+
+/**
+ * B9: a transition button is described by a visible-to-assistive-technology
+ * sentence saying what it does; the description must exist and be non-empty.
+ */
+async function expectDescribedButton(page: Page, name: string) {
+    const button = page.getByRole('button', { name, exact: true });
+    await expect(button).toBeVisible();
+    const describedBy = await button.getAttribute('aria-describedby');
+    expect(describedBy, `${name} has aria-describedby`).toBeTruthy();
+    const description = (await page.locator(`#${describedBy}`).textContent())?.trim() ?? '';
+    expect(description.length, `${name} description is not empty`).toBeGreaterThan(20);
+    note(`[described] ${name}: "${description}"`);
+}
+
 test.describe.serial('accessibility review of the slice', () => {
     test('a member walks every page with the keyboard', async ({ page }) => {
         note(`# Accessibility review scaffolding, ${new Date().toISOString()} (run ${runId})`);
         await page.goto('/en/member/sign-in');
+        await expectPageTitle(page, '/en/member/sign-in');
         await keyboardWalk(page, 'sign-in');
         await bestPracticeScan(page, 'sign-in');
 
         await signIn(page, applicant);
         for (const path of ['/en/member', '/en/member/applications', '/en/member/applications/new']) {
             await page.goto(path);
+            await expectPageTitle(page, path);
             const walk = await keyboardWalk(page, path);
             expect(walk.stops.length, `${path} is reachable by keyboard`).toBeGreaterThan(0);
             expect(walk.invisible, `${path}: every focused control shows a focus indicator`).toBe(0);
             await bestPracticeScan(page, path);
         }
+
+        // B9: the skip link is the first stop and moves focus to the main landmark.
+        await page.goto('/en/member/applications');
+        await page.locator('body').focus();
+        await page.keyboard.press('Tab');
+        await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+        await page.keyboard.press('Enter');
+        await expect(page.locator('main#main')).toBeFocused();
+        note('[skip-link] first Tab stop is the skip link; Enter moves focus to main#main');
+
+        // B9: the transition buttons carry a description a screen reader
+        // announces before the person confirms. Start an application to reach them.
+        await page.goto('/en/member/applications/new');
+        const naslOption = page.locator('#window option', { hasText: 'Northgate Adult Soccer League' });
+        await page.getByLabel('Organization and season').selectOption((await naslOption.getAttribute('value')) ?? '');
+        await page.getByRole('radio', { name: 'Participant' }).check();
+        await page.getByLabel('Date of birth').fill('2000-05-05');
+        await page.getByRole('button', { name: 'Start' }).click();
+        await expect(page).toHaveURL(/\/en\/member\/applications\/\d+$/);
+        await expectPageTitle(page, 'application');
+        await expectDescribedButton(page, 'Submit application');
+        await expectDescribedButton(page, 'Withdraw application');
+        const walk = await keyboardWalk(page, '/en/member/applications/<id>');
+        expect(walk.invisible, 'application page: every focused control shows a focus indicator').toBe(0);
+        await bestPracticeScan(page, '/en/member/applications/<id>');
+
+        // Submit it, so the reviewer's pass below finds a row and its decision buttons.
+        for (const [type, name] of [['Proof of age', 'proof-of-age.pdf'], ['Photo', 'photo.png']] as const) {
+            await page.getByLabel(`Choose a file for ${type}`).setInputFiles({
+                name,
+                mimeType: name.endsWith('.png') ? 'image/png' : 'application/pdf',
+                buffer: Buffer.from(`synthetic ${type} ${runId}`),
+            });
+            await expect(page.getByRole('status').filter({ hasText: 'Document recorded.' })).toBeVisible();
+        }
+        await page.getByRole('button', { name: 'Submit application' }).click();
+        await expect(page.locator('[data-status="submitted"]').first()).toBeVisible();
         await signOut(page);
     });
 
@@ -99,10 +173,29 @@ test.describe.serial('accessibility review of the slice', () => {
         await signIn(page, naslAdmin);
         for (const path of ['/en/member/review', '/en/member/windows']) {
             await page.goto(path);
+            await expectPageTitle(page, path);
             const walk = await keyboardWalk(page, path);
             expect(walk.stops.length, `${path} is reachable by keyboard`).toBeGreaterThan(0);
             expect(walk.invisible, `${path}: every focused control shows a focus indicator`).toBe(0);
             await bestPracticeScan(page, path);
+        }
+
+        // B9: the decision buttons on a review page are described. The queue
+        // holds whatever earlier runs submitted; skip the check when it is empty.
+        await page.goto('/en/member/review');
+        const firstReview = page.locator('tbody tr').first().getByRole('link', { name: /Review/ });
+        if (await firstReview.count()) {
+            await firstReview.click();
+            await expect(page).toHaveURL(/\/en\/member\/review\/\d+$/);
+            await expectPageTitle(page, 'review_application');
+            for (const name of ['Start review', 'Approve', 'Request information', 'Reject']) {
+                if (await page.getByRole('button', { name, exact: true }).count()) {
+                    await expectDescribedButton(page, name);
+                }
+            }
+            await bestPracticeScan(page, '/en/member/review/<id>');
+        } else {
+            note('[described] review queue empty in this run; decision buttons not checked');
         }
         await signOut(page);
     });

@@ -3,6 +3,7 @@ import {
     fetchFederationIdentity,
 } from '@/lib/federation/api';
 import { getOidcAccessToken } from '@/lib/federation/session';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import { redirect } from 'next/navigation';
 import SignOutButton from './components/SignOutButton';
@@ -16,6 +17,10 @@ interface MemberPageProps {
  * credentials: the access token is read from the encrypted cookie on the
  * server and sent to the API, which validates it and answers from the database.
  */
+export function generateMetadata({ params }: MemberPageProps) {
+    return memberMetadata(params.lang, 'home');
+}
+
 export default async function MemberPage({ params }: MemberPageProps) {
     const { t } = createTranslation('federation');
     const accessToken = await getOidcAccessToken();
