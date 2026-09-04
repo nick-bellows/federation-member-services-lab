@@ -1,0 +1,2 @@
+  Tests:    18 passed (87 assertions)
+  a page of 20 memberships ran 11 queries; the listing must not query per row

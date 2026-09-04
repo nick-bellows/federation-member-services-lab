@@ -1,0 +1,53 @@
+# Accessibility review scaffolding, 2026-09-04T00:19:20.153Z (run mtm7i707)
+[sign-in] focus stops=2 without visible indicator=0
+  a#:Skip to content
+  button#:Continue with Northgate ID
+[sign-in] axe: serious/critical=0 minor/moderate=none
+[/en/member] focus stops=4 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  button#:Sign out
+[/en/member] axe: serious/critical=0 minor/moderate=none
+[/en/member/applications] focus stops=4 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Start an application
+[/en/member/applications] axe: serious/critical=0 minor/moderate=none
+[/en/member/applications/new] focus stops=6 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  select#window:Northgate Youth Soccer Association · 202
+  input#:role
+  input#dateOfBirth:dateOfBirth
+[/en/member/applications/new] axe: serious/critical=0 minor/moderate=none
+[/en/member/review] focus stops=5 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Review queue
+  a#:Registration windows
+[/en/member/review] axe: serious/critical=0 minor/moderate=none
+[/en/member/windows] focus stops=8 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Review queue
+  a#:Registration windows
+  select#window-organization:Northgate Adult Soccer League (NASL)
+  select#window-season:2026/272025/26
+  input#window-opens:
+[/en/member/windows] axe: serious/critical=0 minor/moderate=none
+[slow-3g] new-application page: form usable after 42638 ms, load event after 42640 ms, resources transferred 2061 KiB
+[production build] first-load JS per member page (next build, gzip sizes as printed):
+├ ƒ /[lang]/member                               2.11 kB         100 kB
+├ ƒ /[lang]/member/applications                  197 B          97.5 kB
+├ ƒ /[lang]/member/applications/[id]             5.04 kB        93.5 kB
+├ ƒ /[lang]/member/applications/new              3.86 kB        92.3 kB
+├ ƒ /[lang]/member/review                        197 B          97.5 kB
+├ ƒ /[lang]/member/review/[id]                   4.42 kB        92.9 kB
+├ ƒ /[lang]/member/sign-in                       2.25 kB         100 kB
+├ ƒ /[lang]/member/windows                       3.79 kB        92.2 kB
++ First Load JS shared by all                    88.4 kB

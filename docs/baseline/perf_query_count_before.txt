@@ -1,0 +1,4 @@
+
+  ⨯ a page of memberships costs a bounded number of queries              2.95s  
+  a page of 20 memberships ran 89 queries; the listing must not query per row
+  Tests:    1 failed (6 assertions)

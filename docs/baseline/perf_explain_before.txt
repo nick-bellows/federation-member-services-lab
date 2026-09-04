@@ -1,0 +1,3 @@
+SELECT * FROM memberships WHERE club_id = 1 => type=ALL key=NULL rows=10613
+SELECT COUNT(*) FROM members WHERE membership_id = 5 => type=ALL key=NULL rows=32020
+SELECT * FROM members WHERE club_id = 1 => type=ALL key=NULL rows=32020

@@ -1,0 +1,5 @@
+  2026_09_03_130000_add_club_id_indexes_to_upstream_tables ........... 2s DONE
+members: id,user_id,club_id,membership_id
+SELECT * FROM memberships WHERE club_id = 1 => type=ref key=memberships_club_id_index rows=510
+SELECT COUNT(*) FROM members WHERE membership_id = 5 => type=ref key=members_membership_id_index rows=1
+SELECT * FROM members WHERE club_id = 1 => type=ref key=members_club_id_index rows=1510

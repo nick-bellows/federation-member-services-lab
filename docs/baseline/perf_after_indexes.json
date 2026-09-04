@@ -1,0 +1,29 @@
+{
+  "label": "after_indexes",
+  "vus": 10,
+  "duration": "30s",
+  "generated_at": "2026-09-04T00:14:28.670Z",
+  "scenarios": {
+    "memberships_listing": {
+      "p50_ms": 340,
+      "p95_ms": 482,
+      "max_ms": 609,
+      "rps": 5.4,
+      "failed_rate": 0
+    },
+    "applications_index": {
+      "p50_ms": 215,
+      "p95_ms": 370,
+      "max_ms": 433,
+      "rps": 7,
+      "failed_rate": 0
+    },
+    "identity_me": {
+      "p50_ms": 195,
+      "p95_ms": 328,
+      "max_ms": 433,
+      "rps": 7.3,
+      "failed_rate": 0
+    }
+  }
+}
