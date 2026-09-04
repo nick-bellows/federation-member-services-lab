@@ -28,6 +28,22 @@ class MembershipSchema extends Schema
     /**
      * Get the resource fields.
      */
+    /**
+     * The relations every row's fee needs (docs/PERFORMANCE.md, B6).
+     *
+     * @var array<int, string>
+     */
+    protected array $with = ['membershipType', 'club'];
+
+    /**
+     * A page of memberships loads its member counts and division fees with the
+     * page instead of one query per row (upstream ran about four per row).
+     */
+    public function indexQuery(?\Illuminate\Http\Request $request, \Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->withCount('members')->withMembersDivisionsFee();
+    }
+
     public function fields(): array
     {
         return [
@@ -49,7 +65,8 @@ class MembershipSchema extends Schema
             BelongsTo::make('owner')->type('members'),
             BelongsTo::make('paymentPeriod')->type('payment-periods'),
             Number::make('membersCount')->extractUsing(
-                static fn($model) => $model->members()->count()
+                // Loaded with the page by indexQuery(); the query is the fallback for a single resource.
+                static fn($model) => $model->members_count ?? $model->members()->count()
             )->readOnly(),
             HasMany::make('members')->type('members'),
         ];

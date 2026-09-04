@@ -1,0 +1,29 @@
+{
+  "label": "after_eager",
+  "vus": 10,
+  "duration": "30s",
+  "generated_at": "2026-09-04T00:18:32.110Z",
+  "scenarios": {
+    "memberships_listing": {
+      "p50_ms": 211,
+      "p95_ms": 333,
+      "max_ms": 583,
+      "rps": 7,
+      "failed_rate": 0
+    },
+    "applications_index": {
+      "p50_ms": 205,
+      "p95_ms": 359,
+      "max_ms": 445,
+      "rps": 7.1,
+      "failed_rate": 0
+    },
+    "identity_me": {
+      "p50_ms": 192,
+      "p95_ms": 312,
+      "max_ms": 462,
+      "rps": 7.4,
+      "failed_rate": 0
+    }
+  }
+}

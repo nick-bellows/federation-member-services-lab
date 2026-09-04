@@ -1,0 +1,550 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/federation.js
+        output: -
+
+     scenarios: (100.00%) 3 scenarios, 20 max VUs, 2m10s max duration (incl. graceful stop):
+              * memberships_listing: 10 looping VUs for 30s (exec: membershipsListing, gracefulStop: 30s)
+              * applications_index: 10 looping VUs for 30s (exec: applicationsIndex, startTime: 35s, gracefulStop: 30s)
+              * identity_me: 10 looping VUs for 30s (exec: identityMe, startTime: 1m10s, gracefulStop: 30s)
+
+
+running (0m01.0s), 10/20 VUs, 0 complete and 0 interrupted iterations
+memberships_listing   [   3% ] 10 VUs   01.0s/30s
+applications_index  • [   0% ] waiting  34.0s
+identity_me         • [   0% ] waiting  1m09.0s
+
+running (0m02.0s), 10/20 VUs, 16 complete and 0 interrupted iterations
+memberships_listing   [   7% ] 10 VUs   02.0s/30s
+applications_index  • [   0% ] waiting  33.0s
+identity_me         • [   0% ] waiting  1m08.0s
+
+running (0m03.0s), 10/20 VUs, 31 complete and 0 interrupted iterations
+memberships_listing   [  10% ] 10 VUs   03.0s/30s
+applications_index  • [   0% ] waiting  32.0s
+identity_me         • [   0% ] waiting  1m07.0s
+
+running (0m04.0s), 10/20 VUs, 44 complete and 0 interrupted iterations
+memberships_listing   [  13% ] 10 VUs   04.0s/30s
+applications_index  • [   0% ] waiting  31.0s
+identity_me         • [   0% ] waiting  1m06.0s
+
+running (0m05.0s), 10/20 VUs, 56 complete and 0 interrupted iterations
+memberships_listing   [  17% ] 10 VUs   05.0s/30s
+applications_index  • [   0% ] waiting  30.0s
+identity_me         • [   0% ] waiting  1m05.0s
+
+running (0m06.0s), 10/20 VUs, 72 complete and 0 interrupted iterations
+memberships_listing   [  20% ] 10 VUs   06.0s/30s
+applications_index  • [   0% ] waiting  29.0s
+identity_me         • [   0% ] waiting  1m04.0s
+
+running (0m07.0s), 10/20 VUs, 84 complete and 0 interrupted iterations
+memberships_listing   [  23% ] 10 VUs   07.0s/30s
+applications_index  • [   0% ] waiting  28.0s
+identity_me         • [   0% ] waiting  1m03.0s
+
+running (0m08.0s), 10/20 VUs, 98 complete and 0 interrupted iterations
+memberships_listing   [  27% ] 10 VUs   08.0s/30s
+applications_index  • [   0% ] waiting  27.0s
+identity_me         • [   0% ] waiting  1m02.0s
+
+running (0m09.0s), 10/20 VUs, 113 complete and 0 interrupted iterations
+memberships_listing   [  30% ] 10 VUs   09.0s/30s
+applications_index  • [   0% ] waiting  26.0s
+identity_me         • [   0% ] waiting  1m01.0s
+
+running (0m10.0s), 10/20 VUs, 125 complete and 0 interrupted iterations
+memberships_listing   [  33% ] 10 VUs   10.0s/30s
+applications_index  • [   0% ] waiting  25.0s
+identity_me         • [   0% ] waiting  1m00.0s
+
+running (0m11.0s), 10/20 VUs, 141 complete and 0 interrupted iterations
+memberships_listing   [  37% ] 10 VUs   11.0s/30s
+applications_index  • [   0% ] waiting  24.0s
+identity_me         • [   0% ] waiting  0m59.0s
+
+running (0m12.0s), 10/20 VUs, 154 complete and 0 interrupted iterations
+memberships_listing   [  40% ] 10 VUs   12.0s/30s
+applications_index  • [   0% ] waiting  23.0s
+identity_me         • [   0% ] waiting  0m58.0s
+
+running (0m13.0s), 10/20 VUs, 169 complete and 0 interrupted iterations
+memberships_listing   [  43% ] 10 VUs   13.0s/30s
+applications_index  • [   0% ] waiting  22.0s
+identity_me         • [   0% ] waiting  0m57.0s
+
+running (0m14.0s), 10/20 VUs, 186 complete and 0 interrupted iterations
+memberships_listing   [  47% ] 10 VUs   14.0s/30s
+applications_index  • [   0% ] waiting  21.0s
+identity_me         • [   0% ] waiting  0m56.0s
+
+running (0m15.0s), 10/20 VUs, 198 complete and 0 interrupted iterations
+memberships_listing   [  50% ] 10 VUs   15.0s/30s
+applications_index  • [   0% ] waiting  20.0s
+identity_me         • [   0% ] waiting  0m55.0s
+
+running (0m16.0s), 10/20 VUs, 211 complete and 0 interrupted iterations
+memberships_listing   [  53% ] 10 VUs   16.0s/30s
+applications_index  • [   0% ] waiting  19.0s
+identity_me         • [   0% ] waiting  0m54.0s
+
+running (0m17.0s), 10/20 VUs, 224 complete and 0 interrupted iterations
+memberships_listing   [  57% ] 10 VUs   17.0s/30s
+applications_index  • [   0% ] waiting  18.0s
+identity_me         • [   0% ] waiting  0m53.0s
+
+running (0m18.0s), 10/20 VUs, 241 complete and 0 interrupted iterations
+memberships_listing   [  60% ] 10 VUs   18.0s/30s
+applications_index  • [   0% ] waiting  17.0s
+identity_me         • [   0% ] waiting  0m52.0s
+
+running (0m19.0s), 10/20 VUs, 251 complete and 0 interrupted iterations
+memberships_listing   [  63% ] 10 VUs   19.0s/30s
+applications_index  • [   0% ] waiting  16.0s
+identity_me         • [   0% ] waiting  0m51.0s
+
+running (0m20.0s), 10/20 VUs, 271 complete and 0 interrupted iterations
+memberships_listing   [  67% ] 10 VUs   20.0s/30s
+applications_index  • [   0% ] waiting  15.0s
+identity_me         • [   0% ] waiting  0m50.0s
+
+running (0m21.0s), 10/20 VUs, 281 complete and 0 interrupted iterations
+memberships_listing   [  70% ] 10 VUs   21.0s/30s
+applications_index  • [   0% ] waiting  14.0s
+identity_me         • [   0% ] waiting  0m49.0s
+
+running (0m22.0s), 10/20 VUs, 295 complete and 0 interrupted iterations
+memberships_listing   [  73% ] 10 VUs   22.0s/30s
+applications_index  • [   0% ] waiting  13.0s
+identity_me         • [   0% ] waiting  0m48.0s
+
+running (0m23.0s), 10/20 VUs, 311 complete and 0 interrupted iterations
+memberships_listing   [  77% ] 10 VUs   23.0s/30s
+applications_index  • [   0% ] waiting  12.0s
+identity_me         • [   0% ] waiting  0m47.0s
+
+running (0m24.0s), 10/20 VUs, 327 complete and 0 interrupted iterations
+memberships_listing   [  80% ] 10 VUs   24.0s/30s
+applications_index  • [   0% ] waiting  11.0s
+identity_me         • [   0% ] waiting  0m46.0s
+
+running (0m25.0s), 10/20 VUs, 340 complete and 0 interrupted iterations
+memberships_listing   [  83% ] 10 VUs   25.0s/30s
+applications_index  • [   0% ] waiting  10.0s
+identity_me         • [   0% ] waiting  0m45.0s
+
+running (0m26.0s), 10/20 VUs, 352 complete and 0 interrupted iterations
+memberships_listing   [  87% ] 10 VUs   26.0s/30s
+applications_index  • [   0% ] waiting  09.0s
+identity_me         • [   0% ] waiting  0m44.0s
+
+running (0m27.0s), 10/20 VUs, 365 complete and 0 interrupted iterations
+memberships_listing   [  90% ] 10 VUs   27.0s/30s
+applications_index  • [   0% ] waiting  08.0s
+identity_me         • [   0% ] waiting  0m43.0s
+
+running (0m28.0s), 10/20 VUs, 380 complete and 0 interrupted iterations
+memberships_listing   [  93% ] 10 VUs   28.0s/30s
+applications_index  • [   0% ] waiting  07.0s
+identity_me         • [   0% ] waiting  0m42.0s
+
+running (0m29.0s), 10/20 VUs, 394 complete and 0 interrupted iterations
+memberships_listing   [  97% ] 10 VUs   29.0s/30s
+applications_index  • [   0% ] waiting  06.0s
+identity_me         • [   0% ] waiting  0m41.0s
+
+running (0m30.0s), 10/20 VUs, 410 complete and 0 interrupted iterations
+memberships_listing   [ 100% ] 10 VUs   30.0s/30s
+applications_index  • [   0% ] waiting  05.0s
+identity_me         • [   0% ] waiting  0m40.0s
+
+running (0m31.0s), 00/20 VUs, 420 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  • [   0% ] waiting  04.0s
+identity_me         • [   0% ] waiting  0m39.0s
+
+running (0m32.0s), 00/20 VUs, 420 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  • [   0% ] waiting  03.0s
+identity_me         • [   0% ] waiting  0m38.0s
+
+running (0m33.0s), 00/20 VUs, 420 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  • [   0% ] waiting  02.0s
+identity_me         • [   0% ] waiting  0m37.0s
+
+running (0m34.0s), 00/20 VUs, 420 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  • [   0% ] waiting  01.0s
+identity_me         • [   0% ] waiting  0m36.0s
+
+running (0m35.0s), 00/20 VUs, 420 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  • [   0% ] waiting  00.0s
+identity_me         • [   0% ] waiting  0m35.0s
+
+running (0m36.0s), 10/20 VUs, 430 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [   3% ] 10 VUs   01.0s/30s
+identity_me         • [   0% ] waiting  0m34.0s
+
+running (0m37.0s), 10/20 VUs, 450 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [   7% ] 10 VUs   02.0s/30s
+identity_me         • [   0% ] waiting  0m33.0s
+
+running (0m38.0s), 10/20 VUs, 470 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  10% ] 10 VUs   03.0s/30s
+identity_me         • [   0% ] waiting  0m32.0s
+
+running (0m39.0s), 10/20 VUs, 490 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  13% ] 10 VUs   04.0s/30s
+identity_me         • [   0% ] waiting  0m31.0s
+
+running (0m40.0s), 10/20 VUs, 519 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  17% ] 10 VUs   05.0s/30s
+identity_me         • [   0% ] waiting  0m30.0s
+
+running (0m41.0s), 10/20 VUs, 539 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  20% ] 10 VUs   06.0s/30s
+identity_me         • [   0% ] waiting  0m29.0s
+
+running (0m42.0s), 10/20 VUs, 559 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  23% ] 10 VUs   07.0s/30s
+identity_me         • [   0% ] waiting  0m28.0s
+
+running (0m43.0s), 10/20 VUs, 587 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  27% ] 10 VUs   08.0s/30s
+identity_me         • [   0% ] waiting  0m27.0s
+
+running (0m44.0s), 10/20 VUs, 608 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  30% ] 10 VUs   09.0s/30s
+identity_me         • [   0% ] waiting  0m26.0s
+
+running (0m45.0s), 10/20 VUs, 628 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  33% ] 10 VUs   10.0s/30s
+identity_me         • [   0% ] waiting  0m25.0s
+
+running (0m46.0s), 10/20 VUs, 653 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  37% ] 10 VUs   11.0s/30s
+identity_me         • [   0% ] waiting  0m24.0s
+
+running (0m47.0s), 10/20 VUs, 677 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  40% ] 10 VUs   12.0s/30s
+identity_me         • [   0% ] waiting  0m23.0s
+
+running (0m48.0s), 10/20 VUs, 705 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  43% ] 10 VUs   13.0s/30s
+identity_me         • [   0% ] waiting  0m22.0s
+
+running (0m49.0s), 10/20 VUs, 726 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  47% ] 10 VUs   14.0s/30s
+identity_me         • [   0% ] waiting  0m21.0s
+
+running (0m50.0s), 10/20 VUs, 752 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  50% ] 10 VUs   15.0s/30s
+identity_me         • [   0% ] waiting  0m20.0s
+
+running (0m51.0s), 10/20 VUs, 772 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  53% ] 10 VUs   16.0s/30s
+identity_me         • [   0% ] waiting  0m19.0s
+
+running (0m52.0s), 10/20 VUs, 801 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  57% ] 10 VUs   17.0s/30s
+identity_me         • [   0% ] waiting  0m18.0s
+
+running (0m53.0s), 10/20 VUs, 824 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  60% ] 10 VUs   18.0s/30s
+identity_me         • [   0% ] waiting  0m17.0s
+
+running (0m54.0s), 10/20 VUs, 849 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  63% ] 10 VUs   19.0s/30s
+identity_me         • [   0% ] waiting  0m16.0s
+
+running (0m55.0s), 10/20 VUs, 873 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  67% ] 10 VUs   20.0s/30s
+identity_me         • [   0% ] waiting  0m15.0s
+
+running (0m56.0s), 10/20 VUs, 896 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  70% ] 10 VUs   21.0s/30s
+identity_me         • [   0% ] waiting  0m14.0s
+
+running (0m57.0s), 10/20 VUs, 916 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  73% ] 10 VUs   22.0s/30s
+identity_me         • [   0% ] waiting  0m13.0s
+
+running (0m58.0s), 10/20 VUs, 946 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  77% ] 10 VUs   23.0s/30s
+identity_me         • [   0% ] waiting  0m12.0s
+
+running (0m59.0s), 10/20 VUs, 970 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  80% ] 10 VUs   24.0s/30s
+identity_me         • [   0% ] waiting  0m11.0s
+
+running (1m00.0s), 10/20 VUs, 993 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  83% ] 10 VUs   25.0s/30s
+identity_me         • [   0% ] waiting  0m10.0s
+
+running (1m01.0s), 10/20 VUs, 1016 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  87% ] 10 VUs   26.0s/30s
+identity_me         • [   0% ] waiting  0m09.0s
+
+running (1m02.0s), 10/20 VUs, 1042 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  90% ] 10 VUs   27.0s/30s
+identity_me         • [   0% ] waiting  0m08.0s
+
+running (1m03.0s), 10/20 VUs, 1069 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  93% ] 10 VUs   28.0s/30s
+identity_me         • [   0% ] waiting  0m07.0s
+
+running (1m04.0s), 10/20 VUs, 1094 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [  97% ] 10 VUs   29.0s/30s
+identity_me         • [   0% ] waiting  0m06.0s
+
+running (1m05.0s), 10/20 VUs, 1118 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index    [ 100% ] 10 VUs   30.0s/30s
+identity_me         • [   0% ] waiting  0m05.0s
+
+running (1m06.0s), 00/20 VUs, 1128 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  ✓ [ 100% ] 10 VUs   30s
+identity_me         • [   0% ] waiting  0m04.0s
+
+running (1m07.0s), 00/20 VUs, 1128 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  ✓ [ 100% ] 10 VUs   30s
+identity_me         • [   0% ] waiting  0m03.0s
+
+running (1m08.0s), 00/20 VUs, 1128 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  ✓ [ 100% ] 10 VUs   30s
+identity_me         • [   0% ] waiting  0m02.0s
+
+running (1m09.0s), 00/20 VUs, 1128 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  ✓ [ 100% ] 10 VUs   30s
+identity_me         • [   0% ] waiting  0m01.0s
+
+running (1m10.0s), 00/20 VUs, 1128 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs   30s
+applications_index  ✓ [ 100% ] 10 VUs   30s
+identity_me         • [   0% ] waiting  0m00.0s
+
+running (1m11.0s), 10/20 VUs, 1143 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [   3% ] 10 VUs  01.0s/30s
+
+running (1m12.0s), 10/20 VUs, 1168 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [   7% ] 10 VUs  02.0s/30s
+
+running (1m13.0s), 10/20 VUs, 1192 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  10% ] 10 VUs  03.0s/30s
+
+running (1m14.0s), 10/20 VUs, 1215 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  13% ] 10 VUs  04.0s/30s
+
+running (1m15.0s), 10/20 VUs, 1240 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  17% ] 10 VUs  05.0s/30s
+
+running (1m16.0s), 10/20 VUs, 1265 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  20% ] 10 VUs  06.0s/30s
+
+running (1m17.0s), 10/20 VUs, 1285 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  23% ] 10 VUs  07.0s/30s
+
+running (1m18.0s), 10/20 VUs, 1312 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  27% ] 10 VUs  08.0s/30s
+
+running (1m19.0s), 10/20 VUs, 1338 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  30% ] 10 VUs  09.0s/30s
+
+running (1m20.0s), 10/20 VUs, 1360 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  33% ] 10 VUs  10.0s/30s
+
+running (1m21.0s), 10/20 VUs, 1384 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  37% ] 10 VUs  11.0s/30s
+
+running (1m22.0s), 10/20 VUs, 1414 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  40% ] 10 VUs  12.0s/30s
+
+running (1m23.0s), 10/20 VUs, 1436 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  43% ] 10 VUs  13.0s/30s
+
+running (1m24.0s), 10/20 VUs, 1464 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  47% ] 10 VUs  14.0s/30s
+
+running (1m25.0s), 10/20 VUs, 1487 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  50% ] 10 VUs  15.0s/30s
+
+running (1m26.0s), 10/20 VUs, 1510 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  53% ] 10 VUs  16.0s/30s
+
+running (1m27.0s), 10/20 VUs, 1535 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  57% ] 10 VUs  17.0s/30s
+
+running (1m28.0s), 10/20 VUs, 1563 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  60% ] 10 VUs  18.0s/30s
+
+running (1m29.0s), 10/20 VUs, 1585 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  63% ] 10 VUs  19.0s/30s
+
+running (1m30.0s), 10/20 VUs, 1611 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  67% ] 10 VUs  20.0s/30s
+
+running (1m31.0s), 10/20 VUs, 1637 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  70% ] 10 VUs  21.0s/30s
+
+running (1m32.0s), 10/20 VUs, 1664 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  73% ] 10 VUs  22.0s/30s
+
+running (1m33.0s), 10/20 VUs, 1684 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  77% ] 10 VUs  23.0s/30s
+
+running (1m34.0s), 10/20 VUs, 1713 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  80% ] 10 VUs  24.0s/30s
+
+running (1m35.0s), 10/20 VUs, 1733 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  83% ] 10 VUs  25.0s/30s
+
+running (1m36.0s), 10/20 VUs, 1756 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  87% ] 10 VUs  26.0s/30s
+
+running (1m37.0s), 10/20 VUs, 1778 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  90% ] 10 VUs  27.0s/30s
+
+running (1m38.0s), 10/20 VUs, 1806 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  93% ] 10 VUs  28.0s/30s
+
+running (1m39.0s), 10/20 VUs, 1827 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [  97% ] 10 VUs  29.0s/30s
+
+running (1m40.0s), 10/20 VUs, 1852 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me           [ 100% ] 10 VUs  30.0s/30s
+     ✓ memberships 200
+     ✓ applications 200
+     ✓ me 200
+
+     checks...............................: 100.00% ✓ 1862      ✗ 0   
+     data_received........................: 35 MB   346 kB/s
+     data_sent............................: 1.6 MB  16 kB/s
+     http_req_blocked.....................: avg=10.81µs  min=1.29µs   med=4.63µs   p(90)=6.48µs   p(95)=7.68µs   max=828.76µs
+     http_req_connecting..................: avg=2.63µs   min=0s       med=0s       p(90)=0s       p(95)=0s       max=402.81µs
+     http_req_duration....................: avg=287.58ms min=142.02ms med=221.59ms p(90)=517.42ms p(95)=581.25ms max=1.25s   
+       { expected_response:true }.........: avg=287.58ms min=142.02ms med=221.59ms p(90)=517.42ms p(95)=581.25ms max=1.25s   
+     ✓ { scenario:applications_index }....: avg=226.05ms min=155.93ms med=205.56ms p(90)=300ms    p(95)=320.97ms max=774.51ms
+     ✓ { scenario:identity_me }...........: avg=212.23ms min=142.02ms med=194.61ms p(90)=281.67ms p(95)=318.39ms max=416.78ms
+     ✓ { scenario:memberships_listing }...: avg=522.97ms min=412.69ms med=504.22ms p(90)=624.76ms p(95)=663.4ms  max=1.25s   
+     http_req_failed......................: 0.00%   ✓ 0         ✗ 1862
+     ✓ { scenario:applications_index }....: 0.00%   ✓ 0         ✗ 708 
+     ✓ { scenario:identity_me }...........: 0.00%   ✓ 0         ✗ 734 
+     ✓ { scenario:memberships_listing }...: 0.00%   ✓ 0         ✗ 420 
+     http_req_receiving...................: avg=156.31µs min=15.18µs  med=97.19µs  p(90)=377.69µs p(95)=428.32µs max=3.62ms  
+     http_req_sending.....................: avg=21.16µs  min=5.55µs   med=16.11µs  p(90)=37.85µs  p(95)=42.52µs  max=341.24µs
+     http_req_tls_handshaking.............: avg=0s       min=0s       med=0s       p(90)=0s       p(95)=0s       max=0s      
+     http_req_waiting.....................: avg=287.4ms  min=141.97ms med=221.5ms  p(90)=517.06ms p(95)=580.81ms max=1.25s   
+     http_reqs............................: 1862    18.538262/s
+     ✓ { scenario:applications_index }....: 708     7.04892/s
+     ✓ { scenario:identity_me }...........: 734     7.307779/s
+     ✓ { scenario:memberships_listing }...: 420     4.181563/s
+     iteration_duration...................: avg=488.36ms min=342.52ms med=422.52ms p(90)=718.19ms p(95)=782.33ms max=1.45s   
+     iterations...........................: 1862    18.538262/s
+     vus..................................: 10      min=0       max=10
+     vus_max..............................: 20      min=20      max=20
+running (1m40.4s), 00/20 VUs, 1862 complete and 0 interrupted iterations
+memberships_listing ✓ [ 100% ] 10 VUs  30s
+applications_index  ✓ [ 100% ] 10 VUs  30s
+identity_me         ✓ [ 100% ] 10 VUs  30s

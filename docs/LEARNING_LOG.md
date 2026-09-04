@@ -332,3 +332,40 @@ _Pending; recorded in the internal review file._
 3. Readiness is a routing decision, not a health opinion. It fails on what the pages need and reports the rest.
 
 **Deferred.** Scheduling and alert delivery (B8); auto-instrumentation; a development profile for upstream's checks.
+
+## 2026-09-03 — B6 (M9): accessibility and performance
+
+**Goal.** A manual WCAG 2.1 AA review of the slice, a low-bandwidth pass, and synthetic load on three endpoints with retained before-and-after numbers; the missing indexes as the first finding.
+
+**Decisions (owner, at the start).** k6 in Docker; single-column indexes, measured; a manual review of the slice. ADR-0013 records the alternatives.
+
+**Built.** `PerformanceSeeder` (30,000 synthetic members in 19 s); `perf/k6/federation.js` with three scenarios and retained JSON summaries; a migration adding five indexes (`club_id` on four upstream tables, `membership_id` on members) with a guard test on every engine; the memberships listing eager-loaded (`withCount`, the fee subselect, two relations) with a query-count guard; the API rate limit as configuration; `docs/PERFORMANCE.md`; `e2e/tests/accessibility-review.spec.ts` (keyboard walk, focus visibility, best-practice axe, slow-3G timing); `docs/ACCESSIBILITY.md` per criterion.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Query plans | `docs/baseline/perf_explain_before.txt`, `perf_explain_after.txt` | full scans of 10,613 and 32,020 rows → index lookups of 510, 1 and 1,510 |
+| Query count, page of 20 memberships | `perf_query_count_before.txt`, `perf_query_count_after.txt` | 89 → 11 |
+| k6, memberships listing (10 users, 30 s) | `perf_before.json`, `perf_after_indexes.json`, `perf_after_eager.json` | p50 504 → 340 → 211 ms; p95 663 → 482 → 333 ms; 0 % failures |
+| k6, federation endpoints | same files | unchanged within noise (p95 about 320 to 370 ms), as expected |
+| Accessibility walk | `a11y_review_2026-09-03.txt` | every page reachable, zero focus stops without an indicator, best-practice scan clean |
+| Slow 3G | same file | development server 42.6 s and 2.06 MiB; production first-load JavaScript 92 to 100 kB per page |
+| Suite | `phpunit_after_b6_backend.txt`, `playwright_b6.txt` | 222 passed; 7 passed |
+
+**What went wrong, in order.**
+
+1. The first load run failed four requests in five: upstream's 60-per-minute-per-user limit, applied to the federation routes as well. The limit is a config key now, raised for the window and restored; the discarded run is noted in the document.
+2. The k6 container received Git-Bash-style volume paths and wrote nothing; Windows paths with path conversion disabled fixed it.
+3. The login token lives in the response's `meta`, not in the resource attributes; read the response before scripting against it.
+4. The API container applies pending migrations on every restart, so the index migration had to step aside while the baseline was captured.
+5. `next build`, run for the bundle sizes, wrote into the `.next` directory the running dev server serves from and broke sign-in for every journey until the directory was cleaned and the server restarted. Recorded in future work.
+6. The dev server's slow-3G number (42 s) is not the product's; the production build's sizes are, and the document says which is which.
+
+**Three lessons.**
+
+1. Measure through the same path users take and read the failure rate first; a load run with a 79 % failure rate measures the rate limiter, not the code.
+2. A fix without a guard is a rumour; the index test and the query-count test are what make the numbers durable.
+3. Automated accessibility is the floor; the walk and the per-criterion record are the review. Say what was not done (a screen reader by ear).
+
+**Deferred.** A skip link, per-page titles and described transition buttons (B9); a production frontend measurement (B8); composite indexes if a plan asks for them.

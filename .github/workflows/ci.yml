@@ -169,8 +169,8 @@ jobs:
           FORK_MIGRATIONS=$(git diff --name-only --diff-filter=A FETCH_HEAD...HEAD -- database/migrations | sed 's|^api/||')
           vendor/bin/pint --test \
             app/Federation app/Support \
-            tests/Unit/Federation tests/Feature/Federation tests/Feature/Export tests/Unit/WebApplicationUrlConfigTest.php \
-            database/factories/Federation database/seeders/NorthgateDemoSeeder.php \
+            tests/Unit/Federation tests/Feature/Federation tests/Feature/Export tests/Feature/Performance tests/Unit/WebApplicationUrlConfigTest.php \
+            database/factories/Federation database/seeders/NorthgateDemoSeeder.php database/seeders/PerformanceSeeder.php \
             $FORK_MIGRATIONS
       - name: Pint on the whole tree (upstream carries 215 pre-existing issues; reported, not enforced)
         continue-on-error: true

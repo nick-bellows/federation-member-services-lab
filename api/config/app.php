@@ -74,6 +74,8 @@ return [
 
     'club_admin_login_path' => env('CLUB_ADMIN_LOGIN_PATH', '/admin/login'),
 
+    'api_rate_limit_per_minute' => (int) env('API_RATE_LIMIT_PER_MINUTE', 60),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

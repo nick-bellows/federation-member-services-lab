@@ -315,3 +315,37 @@ Four hand-written spans instead of auto-instrumentation; readiness ignores parke
 3. Which three numbers would you alert on first for this system, and at what thresholds?
 4. Why does a slow Learning Center not make the service unready?
 5. Your traces cross a queue. How does the worker's span know its parent?
+
+## M9 / B6 — Accessibility and performance
+
+### What it does
+
+A manual WCAG 2.1 AA review of the seven slice pages, walked keyboard-only with the focus order and focus visibility recorded and a best-practice axe scan on top, each criterion written down with its evidence and three improvements deferred; a slow-3G pass recorded with the production bundle sizes and the caveat that the development server is not the product; and synthetic load with k6 on three endpoints, before and after five missing indexes and an eager-loaded listing, with the query plans, the query counts and the numbers retained.
+
+### Why we built it this way
+
+Automated scans find about a third of accessibility problems, so the review is by hand and recorded per criterion. An index is a claim about a query and has to be measured on data large enough to matter; the same load run exposed the per-row queries, which is what load runs are for. Numbers from a laptop are honest only with their caveats attached.
+
+### Alternatives considered
+
+Artillery or ApacheBench; composite indexes first; automated accessibility only; reviewing upstream's pages too (ADR-0013).
+
+### Failure modes
+
+Upstream's 60-per-minute rate limit made the first load run fail four in five requests and was discarded; a production build written into the running dev server's directory broke sign-in until the directory was cleaned; the per-row fee lookup hid inside a model method that ran its own query; a development-server bandwidth number that looks like a product number.
+
+### Tradeoffs
+
+Single-column indexes before composite ones; a raised rate limit for the measurement window only; the throttled timing skipped in CI; a screen reader not run by ear.
+
+### Code to locate immediately
+
+`docs/PERFORMANCE.md` · `docs/ACCESSIBILITY.md` · `perf/k6/federation.js` · `api/database/migrations/2026_09_03_130000_add_club_id_indexes_to_upstream_tables.php` · `api/tests/Feature/Performance/` · `api/app/JsonApi/V1/Memberships/MembershipSchema.php` (`indexQuery`) · `api/database/seeders/PerformanceSeeder.php` · `e2e/tests/accessibility-review.spec.ts`
+
+### Likely interviewer questions
+
+1. Your accessibility scan is green. What does that prove, and what did your manual review find that it could not?
+2. You added indexes. Show me the before-and-after and tell me what would make the numbers lie.
+3. How would you keep a page from regressing to two queries per row after you leave?
+4. Why did you raise the rate limit for the load run, and what does that do to the numbers' meaning?
+5. The page took forty seconds on slow 3G in your record. Is the product slow?

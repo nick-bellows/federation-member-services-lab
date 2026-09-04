@@ -38,3 +38,7 @@ The single home for deferred ideas. Items move out of here into a milestone or a
 - **Scheduling and alert delivery** — the worker, the reconciliation, `health:check` and `outbox-status` run by hand; B8 defines the scheduler and where a non-zero exit code goes.
 - **Auto-instrumentation** — the OpenTelemetry Laravel extension would add database and HTTP client spans without hand-written code; the four hand-written spans are the ones that matter for the incidents.
 - **Upstream health checks in development** — `EnvironmentCheck` and `DebugModeCheck` expect production and the two pings target upstream's public URLs from inside the container; a development profile for the checks, or none, is upstream's call.
+- **Accessibility improvements deferred to B9** — a skip link, per-page titles, and `aria-describedby` on the transition buttons (`docs/ACCESSIBILITY.md`).
+- **Production frontend measurement** — the slow-3G number from the development server is not the product; measure a built image once B8 serves one.
+- **Composite indexes** — if a listing's filter and sort show in a plan, `(club_id, status)` and friends; the single-column baseline is in place.
+- **Building next to a running dev server** — `next build` writes into the `.next` directory the dev server serves from and breaks it; a separate `distDir` for builds, or stop the dev server first.

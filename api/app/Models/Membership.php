@@ -84,10 +84,13 @@ class Membership extends Model
     {
         $membershipTypeFee = $this->membershipType?->monthly_fee ?? 0;
 
-        $selectedDivisionsFee = (static::where('id', $this->id)
-            ->withMembersDivisionsFee()
-            ->first()
-            ->members_divisions_fee ?? 0) / 100;
+        // Loaded with the page when the listing selected it (MembershipSchema::indexQuery);
+        // a single resource still asks for it once.
+        $membersDivisionsFee = array_key_exists('members_divisions_fee', $this->attributes)
+            ? $this->attributes['members_divisions_fee']
+            : static::where('id', $this->id)->withMembersDivisionsFee()->first()?->members_divisions_fee;
+
+        $selectedDivisionsFee = ($membersDivisionsFee ?? 0) / 100;
 
         $voluntaryContribution = $this->club?->allow_voluntary_contribution
             ? $this->voluntary_contribution
