@@ -1,0 +1,34 @@
+# Applies to builds of docker/api/api.release.Dockerfile only (BuildKit reads
+# <Dockerfile>.dockerignore beside the Dockerfile). The root .dockerignore
+# does not exclude api/.env, so the development image would carry a
+# developer's secrets; the release image carries no environment file at all.
+.git
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/vendor
+**/.next
+**/storage/app/public/*
+**/storage/framework/cache/*
+**/storage/framework/sessions/*
+**/storage/framework/testing/*
+**/storage/framework/views/*
+**/storage/logs/*
+**/bootstrap/cache/*.php
+api/public/storage
+api/public/build
+api/tests
+api/phpunit.xml
+api/.phpunit.result.cache
+web_application
+e2e
+perf
+docs
+deploy
+docker/tooling
+docker/web_application
+docker/learning-center-mock
+docker/oidc
+.github
+*.md

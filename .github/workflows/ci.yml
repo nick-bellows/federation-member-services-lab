@@ -141,6 +141,41 @@ jobs:
           php artisan migrate:fresh --seeder=NorthgateDemoSeeder --no-interaction --force
           php artisan federation:outbox-status
 
+  dependency-audit:
+    name: Dependency audit (Composer and npm, report only)
+    # The threat model's update policy (docs/THREAT_MODEL.md, ADR-0015): both
+    # audits run on every pull request and their summaries land in the job
+    # summary. Report only: reachability is a judgement the release checklist
+    # makes (docs/RELEASE.md), not one a job can make.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: composer audit (api)
+        continue-on-error: true
+        working-directory: api
+        run: |
+          echo "## composer audit (api)" >> "$GITHUB_STEP_SUMMARY"
+          composer audit --format=summary --no-interaction 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: npm audit (web_application)
+        continue-on-error: true
+        working-directory: web_application
+        run: |
+          echo "## npm audit (web_application)" >> "$GITHUB_STEP_SUMMARY"
+          npm audit --audit-level=high 2>&1 | tail -n 15 | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: npm audit (api build tooling)
+        continue-on-error: true
+        working-directory: api
+        run: |
+          echo "## npm audit (api build tooling)" >> "$GITHUB_STEP_SUMMARY"
+          npm audit --audit-level=high 2>&1 | tail -n 15 | tee -a "$GITHUB_STEP_SUMMARY"
+
   backend-style:
     name: Backend style (Pint, report only) and env() guard
     runs-on: ubuntu-latest

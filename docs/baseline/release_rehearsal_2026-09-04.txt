@@ -1,0 +1,174 @@
+# Release rehearsal, 2026-09-04 (B8, docs/RELEASE.md lines 5 to 12)
+# Release images with no bind mount, beside the development stack. Tokens are never printed.
+
+## Images
+federation-api:release 483MB (created About a minute ago)
+federation-web:release 287MB (created 37 minutes ago)
+
+## Line 6: no environment file inside the API image; configuration comes from the environment
+$ docker run --rm federation-api:release sh -c 'test ! -e /var/www/html/.env && echo no-env-file; ls /var/www/html/vendor | wc -l; ls /var/www/html/public/build | head -3; test ! -d /var/www/html/tests && echo no-tests'
+no-env-file
+vendor packages: 59
+assets
+manifest.json
+no-tests
+composer: not shipped
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+$ docker run --rm --entrypoint sh federation-web:release -c 'ls -a /app | tr "\n" " "; test ! -e /app/.env.local && echo no-env-local'
+. .. .next node_modules package.json public server.js 
+no-env-local
+uid=1001(nextjs) gid=65533(nogroup) groups=65533(nogroup),65533(nogroup)
+
+## Line 9: the one-off migration task
+$ docker compose -p federation-release -f deploy/compose.release.yml --profile release run --rm migrate
+  2026_09_02_100005_alter_members_table_add_user_id_column ........... [1] Ran  
+  2026_09_02_100006_create_registration_applications_table ........... [1] Ran  
+  2026_09_02_100007_create_audit_entries_table ....................... [1] Ran  
+  2026_09_02_110000_alter_users_table_add_oidc_identity_columns ...... [1] Ran  
+  2026_09_02_120000_create_registration_windows_table ................ [1] Ran  
+  2026_09_02_120001_alter_registration_applications_table_add_details_columns  [1] Ran  
+  2026_09_02_120002_create_application_documents_table ............... [1] Ran  
+  2026_09_03_100000_create_credential_snapshots_table ................ [1] Ran  
+  2026_09_03_110000_create_federation_outbox_tables .................. [1] Ran  
+  2026_09_03_120000_add_traceparent_to_outbox_events_table ........... [1] Ran  
+  2026_09_03_130000_add_club_id_indexes_to_upstream_tables ........... [1] Ran  
+  2026_09_03_140000_add_reviewer_notes_to_registration_applications_table  [1] Ran  
+
+## Line 10: start everything; wait for readiness
+$ docker compose -p federation-release -f deploy/compose.release.yml up -d
+ Container federation-release-worker-1 Started 
+ Container federation-release-scheduler-1 Started 
+ Container federation-release-web-1 Started 
+readiness after 6 s: HTTP 200
+$ curl -s http://localhost:3011/api/health/live
+{"status":"ok","time":"2026-09-04T08:43:49+00:00"}
+$ curl -s http://localhost:3011/api/health/ready
+{"status":"ready","checks":{"database":{"status":"ok","required":true},"outbox":{"status":"ok","required":true,"detail":"oldest unpublished 0s, parked 0"},"learning_center":{"status":"ok","required":false}},"time":"2026-09-04T08:43:49+00:00"}
+$ docker compose -p federation-release -f deploy/compose.release.yml ps --format 'table {{.Service}}\t{{.Status}}'
+SERVICE           STATUS
+api               Up 11 seconds (health: starting)
+database          Up 3 minutes (healthy)
+learning-center   Up 13 seconds
+oidc              Up 13 seconds
+scheduler         Up 11 seconds (health: starting)
+web               Up 7 seconds
+worker            Up 11 seconds (health: starting)
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan schedule:list
+  0    0 * * *  php artisan sanctum:prune-expired --hours=24  Next Due: 15 hours from now
+  *    * * * *  php artisan health:queue-check-heartbeat  Next Due: 9 seconds from now
+  *    * * * *  php artisan health:schedule-check-heartbeat  Next Due: 9 seconds from now
+  0    * * * *  php artisan federation:reconcile-credentials  Next Due: 16 minutes from now
+  */15 * * * *  php artisan federation:outbox-status  Next Due: 1 minute from now
+  */15 * * * *  php artisan health:check ......... Next Due: 1 minute from now
+  0    3 * * *  App\Jobs\CleanupMedia ............ Next Due: 18 hours from now
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan about --only=environment
+  Environment ................................................................  
+  Application Name ...................................... Northgate Federation  
+  Laravel Version .................................................... 13.30.1  
+  PHP Version ......................................................... 8.3.33  
+  Composer Version ......................................................... -  
+  Environment ..................................................... production  
+  Debug Mode ............................................................. OFF  
+  URL ......................................................... localhost:3011  
+  Maintenance Mode ....................................................... OFF  
+  Timezone ............................................................... UTC  
+  Locale .................................................................. en  
+
+## Line 12: checks and metrics require the scrape token
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3011/api/health/checks
+401
+$ curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3011/api/health/checks
+200
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3011/api/metrics
+401
+$ curl -s -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3011/api/metrics | head -3
+# HELP federation_outbox_unpublished Outbox facts not yet relayed.
+# TYPE federation_outbox_unpublished gauge
+federation_outbox_unpublished 0
+
+## The web image answers
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3010/en/member/sign-in
+200
+
+## Worker and scheduler logs (first lines)
+   INFO  Configuration cached successfully.  
+   INFO  Routes cached successfully.  
+   INFO  Blade templates cached successfully.  
+   INFO  Configuration cached successfully.  
+   INFO  Routes cached successfully.  
+   INFO  Blade templates cached successfully.  
+
+# The signed-in journey (line 11) is run by the browser spec against WEB_URL=http://localhost:3010; see the same file below.
+
+## Line 11: the signed-in journeys against the release web image (WEB_URL=http://localhost:3010), 2026-09-04T08:45:34Z
+    Test timeout of 60000ms exceeded.
+    Error: locator.getAttribute: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('#window option').filter({ hasText: 'Northgate Adult Soccer League' })
+      69 |         await expectAccessible(page);
+      70 |         const naslOption = page.locator('#window option', { hasText: 'Northgate Adult Soccer League' });
+    > 71 |         await page.getByLabel('Organization and season').selectOption((await naslOption.getAttribute('value')) ?? '');
+         |                                                                                         ^
+      72 |         await page.getByRole('radio', { name: 'Participant' }).check();
+      73 |         await page.getByLabel('Date of birth').fill('2001-03-09');
+      74 |         await page.getByRole('button', { name: 'Start' }).click();
+        at D:\PortfolioProjects\federation-member-services-lab\e2e\tests\registration-review.spec.ts:71:89
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\registration-review-regist-955c9--and-submits-an-application-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+    Error Context: test-results\registration-review-regist-955c9--and-submits-an-application-chromium\error-context.md
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\registration-review-regist-955c9--and-submits-an-application-chromium\trace.zip
+    Usage:
+        npx playwright show-trace test-results\registration-review-regist-955c9--and-submits-an-application-chromium\trace.zip
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+  1 failed
+    [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application 
+  3 did not run
+  3 passed (1.0m)
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=0
+$ ... logs worker | grep -c outbox.process
+0
+
+## Line 11, second attempt: the release database seeded with the synthetic demo data (the first run had provisioned users through sign-in before the seeder ran), 2026-09-04T08:49:16Z
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan migrate:fresh --seed --seeder=NorthgateDemoSeeder --force
+  Database\Seeders\FakeReceiptSeeder .......................... 20,668 ms DONE  
+  Database\Seeders\FakeDatabaseSeeder ........................ 130,799 ms DONE  
+  Database\Seeders\NorthgateDemoSeeder ....................... 134,567 ms DONE  
+$ WEB_URL=http://localhost:3010 npx playwright test tests/registration-review.spec.ts
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application (3.8s)
+  ✓  2 [chromium] › tests\registration-review.spec.ts:104:9 › registration review slice › a reviewer works the queue and approves (3.7s)
+  ✓  3 [chromium] › tests\registration-review.spec.ts:138:9 › registration review slice › the applicant sees the decision and the history (1.4s)
+  ✓  4 [chromium] › tests\registration-review.spec.ts:159:9 › registration review slice › an organization administrator can open a registration window (1.3s)
+  4 passed (11.1s)
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=10
+$ docker compose -p federation-release -f deploy/compose.release.yml logs --no-log-prefix worker | grep -c '"consumer"'   # consumer log lines from the worker container
+0
+$ docker compose -p federation-release -f deploy/compose.release.yml ps
+SERVICE           STATUS
+api               Up 10 minutes (healthy)
+database          Up 13 minutes (healthy)
+learning-center   Up 10 minutes
+oidc              Up 10 minutes
+scheduler         Up 8 minutes (unhealthy)
+web               Up 10 minutes
+worker            Up 8 minutes (unhealthy)
+
+## Worker and scheduler after the health check that asked nginx was disabled for them (compose change), 2026-09-04T08:54:40Z
+$ docker compose -p federation-release -f deploy/compose.release.yml ps
+SERVICE           STATUS
+api               Up 11 minutes (healthy)
+database          Up 14 minutes (healthy)
+learning-center   Up 11 minutes
+oidc              Up 11 minutes
+scheduler         Up 8 seconds
+web               Up 10 minutes
+worker            Up 8 seconds
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T worker id
+uid=1000(verein) gid=1000(verein) groups=1000(verein)
+
+# End of rehearsal. The stack is left running for the demo recording (B9) and torn down afterwards.

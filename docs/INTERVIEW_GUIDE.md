@@ -383,3 +383,37 @@ A second update path with its own error codes; a token every deployment must set
 3. What in this system would you never log, and how do you know you do not?
 4. Your audit lists thirteen Composer advisories and eight npm ones, and you patched none. Defend that.
 5. Why are liveness and readiness open while checks and metrics are not?
+
+## M10 / B8 — Release engineering
+
+### What it does
+
+Release images for the API (dependencies and admin assets built in stages, no toolchain, no environment file, a health check) and the web app (upstream's standalone image with an ignore list that keeps `.env.local` out); a release entrypoint that caches configuration, waits for the configured database through PDO and migrates only when told to, so a one-off task migrates once and replicas never race; the worker and the scheduler as services on the same image, with the federation's schedule registered in code and a failure hook that writes the line an alarm attaches to; a release rehearsal in Compose that runs all of it with no bind mount; a deployment architecture on managed services, labelled planned and priced at nothing; a release checklist with a rollback plan whose precondition is expand-and-contract migrations; a report-only dependency audit job in CI and the within-major fixes applied.
+
+### Why we built it this way
+
+A development image with the source bind-mounted over it is not a release artifact; the release image is what a deployment runs, so it has to be built, inspected and started on its own. Migrating in the entrypoint is upstream's convenience and a production race. The scheduler in code is testable; a crontab on a host is not. Designing the deployment without provisioning it keeps the workspace rule (no cost without approval) and still forces every decision a deployment needs: engine, queue, secrets, network, signals.
+
+### Alternatives considered
+
+One image for both; migrate in the entrypoint; a supervisor in one container; SQS from the start; Terraform labelled untested; provisioning a minimal environment (ADR-0015).
+
+### Failure modes
+
+The development image would ship `api/.env` because nothing excluded it; the web build context would include `.env.local` with upstream's super-admin token; the Filament theme imports from `vendor/`, so an asset stage without it fails; a Compose build skips a service behind a profile, so the API image was not built on the first try; a background build piped through `tail` reports success whatever happened; a `migrate:rollback` after a create-table migration discards rows.
+
+### Tradeoffs
+
+Two Dockerfiles to keep in step; a database queue on RDS instead of SQS for v1; no Terraform rather than untested Terraform; a design that cannot prove sizing or IAM until it runs.
+
+### Code to locate immediately
+
+`docker/api/api.release.Dockerfile` and its `.dockerignore` · `docker/api/release-entrypoint.sh` · `docker/web_application/web_application.Dockerfile.dockerignore` · `deploy/compose.release.yml` · `deploy/release.env.example` · `FederationServiceProvider` (the schedule) · `api/tests/Feature/Federation/ScheduleTest.php` · `docs/DEPLOYMENT.md` · `docs/RELEASE.md` · `.github/workflows/ci.yml` (`dependency-audit`)
+
+### Likely interviewer questions
+
+1. Walk me from a merged pull request to a running release: what is built, what is tested, what is migrated, and where can it stop?
+2. How do you roll back a release that includes a migration?
+3. You designed the AWS architecture but provisioned nothing. What in the design would you not trust until it ran?
+4. Why is the scheduler a separate service with exactly one task, and what happens if there are two?
+5. Your release image has no `.env`. Where does `APP_KEY` come from, and who can read it?
