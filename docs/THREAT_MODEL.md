@@ -151,7 +151,7 @@ Goal: run code the maintainers did not write, through a dependency, an image or 
 4. **Fix requires a major** (Next 16, `sharp` 0.35, `swiper` 14): record in `docs/future-work.md` with the advisory and the reason it waits; re-evaluate at each release; never silently ignore.
 5. The B8 release checklist runs both audits and blocks a release on a high or critical advisory in a runtime package that rule 1 or 2 covers.
 
-None of the advisories above has been patched in B7: the review's job was to know what is reachable and to write the policy; the updates are B8's, where the suite and the release notes catch them.
+None of the advisories above was patched in B7: the review's job was to know what is reachable and to write the policy. B8 applied rules 2 and 3 (`docs/baseline/security_audit_after_b8_2026-09-04.txt`): Composer 13 → 0 advisories (Filament 5.7.8, commonmark 2.10.0, Livewire 4.4.3, the framework following to 13.30.1 within the major); npm 8 → 4 in the frontend (the four that need a major: `next`, `postcss` under it, `sharp`, `swiper`) and 1 → 0 in the API's build tooling. Rule 4 holds the four majors in `docs/future-work.md`; rule 5 is the `dependency-audit` job in CI plus the release checklist (`docs/RELEASE.md`).
 
 ## What this review did not do
 

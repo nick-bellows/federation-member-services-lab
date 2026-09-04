@@ -404,3 +404,40 @@ _Pending; recorded in the internal review file._
 3. Public surfaces are chosen, not discovered: the probes stay open because a platform needs them, the checks close because they describe the system. Write down the reason for each.
 
 **Deferred.** The major upgrades the audits ask for (Next 16, `sharp`, `swiper`), a write-once audit table at the database, SHA-pinned actions and digest-pinned images, a tag for the Swagger UI image, and the upstream findings for the B9 offer.
+
+## 2026-09-04 — B8 (M10): release engineering
+
+**Goal.** Production images, a deployment architecture, a rollback plan and a release checklist; no provisioning and no cost without approval.
+
+**Decision.** The owner asked on 2026-09-04 for B8 and B9 to be completed without a pause and for every approval to be collected at the end; the opening decision (design only versus opt-in provisioning) therefore defaulted to design only, the one option the workspace rules allow, and provisioning is on the approvals list. ADR-0015 records the alternatives.
+
+**Built.** `docker/api/api.release.Dockerfile` with its own ignore list (dependencies and admin assets in stages, no toolchain, no `.env`, a health check); `docker/api/release-entrypoint.sh` (caches, waits for the configured database through PDO, migrates only with `RUN_MIGRATIONS=1`); an ignore list for the web image that keeps `.env.local` out; `deploy/compose.release.yml` (database, one-off migration, API, worker, scheduler, web, the two development mocks) with `deploy/release.env.example`; the federation schedule registered in `FederationServiceProvider` with failure hooks and a test; a report-only `dependency-audit` CI job; the within-major dependency fixes; `docs/DEPLOYMENT.md`, `docs/RELEASE.md`.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Image contents | `docs/baseline/release_rehearsal_2026-09-04.txt` | no `.env` in either image, no tests, no Composer in the API image, `.next` and `node_modules` only in the built form; the web image runs as `nextjs` |
+| One-off migration | same | 86 migrations (upstream's and the fork's 17) applied once by the `migrate` task; the API replicas start without migrating |
+| Start-up | same | readiness 200 after 6 s; `schedule:list` shows the three federation tasks beside upstream's; environment `production`, debug off |
+| Token gate | same | checks and metrics 401 without the scrape token, 200 with it |
+| Journeys against the release images | same | sign-in 3 of 3; registration review 4 of 4 after the seed; the worker processed 10 outbox events; worker and scheduler run as `verein` |
+| Dependency audits | `security_audit_after_b8_2026-09-04.txt` | Composer 13 → 0; npm 8 → 4 (frontend, the four majors) and 1 → 0 (API tooling) |
+| Suite | `phpunit_after_b8_backend.txt` | 237 passed on SQLite after the framework moved from 13.23 to 13.30 with the update; the three engines in CI on the pull request |
+
+**What went wrong, in order.**
+
+1. `docker compose build` skipped the API image because its `build:` block sat on the `migrate` service, which is behind a profile; the first `up` then tried to build it and failed. The build block moved to the `api` service.
+2. The admin theme stylesheet imports Filament's from `vendor/`, so an asset stage without `vendor/` fails; the stage now copies it from the dependency stage.
+3. A background build piped through `tail` reports exit 0 whatever happened; `set -o pipefail` and an explicit exit line fixed the record.
+4. The registration journey failed on a fresh release database: no windows. Seeding after sign-ins had provisioned users collided on the unique e-mail, so the rehearsal reseeds from `migrate:fresh` and says so.
+5. The worker and scheduler inherited the image's HTTP health check and showed unhealthy; disabled for the two containers that serve no port.
+6. The API container starts as root so nginx and PHP-FPM can bind and drop privileges, as upstream's does; the ADR's first draft said "non-root" and was corrected. The worker and scheduler run as the application user outright.
+
+**Three lessons.**
+
+1. A release image is judged by what is not in it: no secrets, no toolchain, no tests, no migration on start. Write the ignore list first.
+2. Rehearse the release in the same shape a deployment would use (one-off task, separate services, environment from outside), or the checklist is a wish.
+3. Design what you cannot afford to run, label it planned, and list what it does not prove; that is more useful to a reviewer than untested infrastructure code.
+
+**Deferred.** Provisioning (owner's approval and money); Terraform or CDK once an account exists; image scanning and digest pinning; SQS behind the relay; a rootless nginx variant; the four dependency majors.

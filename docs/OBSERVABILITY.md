@@ -25,6 +25,7 @@ Fields and where they come from:
 - `context.user_id`: the acting user's id, attached by `TraceRequest` through Laravel's shared log context for the length of the request. Never the e-mail, never the token.
 - `extra.trace_id`, `extra.span_id`: the active OpenTelemetry span, stamped by `LogContextProcessor` on every record, in the web process and in the worker.
 - Worker lines carry `event_id` and `consumer` as well (`ProcessOutboxEvent` shares them while it runs a consumer).
+- The scheduler writes `{"message":"scheduled_task_failed","context":{"task":"federation:outbox-status"}}` (or the other two federation tasks) when a scheduled command exits non-zero (ADR-0015). It is the line an alarm attaches to; `docs/DEPLOYMENT.md` designs the metric filter.
 
 Finding everything one request did:
 

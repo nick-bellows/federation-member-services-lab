@@ -32,6 +32,7 @@ use App\Federation\Policies\ReadOnlyPolicy;
 use App\Federation\Policies\RegistrationApplicationPolicy;
 use App\Federation\Policies\RegistrationWindowPolicy;
 use App\Federation\Support\AuditRecorder;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -175,5 +176,28 @@ class FederationServiceProvider extends ServiceProvider
         Route::middleware('api')
             ->prefix('api')
             ->group(base_path('routes/federation.php'));
+
+        // The scheduler owns what an operator ran by hand until B8 (ADR-0015):
+        // the reconciliation, the outbox status (exit 1 when anything is parked
+        // or failed) and upstream's health checks. A failed run writes one JSON
+        // line with a stable message, which is where an alarm attaches
+        // (docs/DEPLOYMENT.md, docs/RUNBOOK.md).
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            $failed = static fn (string $task) => static fn () => Log::error('scheduled_task_failed', ['task' => $task]);
+
+            $schedule->command('federation:reconcile-credentials')
+                ->hourly()
+                ->withoutOverlapping()
+                ->onFailure($failed('federation:reconcile-credentials'));
+
+            $schedule->command('federation:outbox-status')
+                ->everyFifteenMinutes()
+                ->onFailure($failed('federation:outbox-status'));
+
+            $schedule->command('health:check')
+                ->everyFifteenMinutes()
+                ->withoutOverlapping()
+                ->onFailure($failed('health:check'));
+        });
     }
 }

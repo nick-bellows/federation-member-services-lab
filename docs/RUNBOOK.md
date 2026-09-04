@@ -6,10 +6,11 @@ The operator's half of the contract (ADR-0012): for each situation, the symptom,
 
 | When | Command | Good answer |
 |---|---|---|
-| Every deploy, every restart | `docker compose exec -d -u verein api php artisan federation:work` | `federation_outbox_oldest_unpublished_seconds` stays near 0 |
-| Daily | `php artisan federation:reconcile-credentials` | `refreshed=n changed=m unavailable=0` |
-| Hourly, or on a page | `php artisan federation:outbox-status` | exit code 0, `failed_events=0 failed_jobs=0` |
-| Hourly | `php artisan health:check` then `GET /api/health/checks` with `Authorization: Bearer $METRICS_TOKEN` | `status: ok` (in development two checks expect production and fail by design) |
+| Every deploy, every restart (development stack) | `docker compose exec -d -u verein api php artisan federation:work` | `federation_outbox_oldest_unpublished_seconds` stays near 0 |
+| Continuously (release images, ADR-0015) | the `worker` and `scheduler` services in `deploy/compose.release.yml`; `php artisan schedule:list` shows the three federation tasks | both containers up; no `scheduled_task_failed` line in the scheduler's log |
+| Hourly, by the scheduler (by hand in development) | `php artisan federation:reconcile-credentials` | `refreshed=n changed=m unavailable=0` |
+| Every fifteen minutes, by the scheduler (or on a page) | `php artisan federation:outbox-status` | exit code 0, `failed_events=0 failed_jobs=0`; a non-zero exit writes `scheduled_task_failed` with `task: federation:outbox-status` |
+| Every fifteen minutes, by the scheduler | `php artisan health:check` then `GET /api/health/checks` with `Authorization: Bearer $METRICS_TOKEN` | `status: ok` (in development two checks expect production and fail by design) |
 | Before trusting anything | `GET /api/health/ready` | `status: ready`; `learning_center` may read `degraded` without affecting readiness |
 
 ## Situations

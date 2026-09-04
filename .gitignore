@@ -19,3 +19,5 @@ yarn-error.log
 docker-compose.override.yml
 /storage/logs/*
 /public/storage
+# Release rehearsal environment (deploy/compose.release.yml); the example is tracked.
+/deploy/*.env

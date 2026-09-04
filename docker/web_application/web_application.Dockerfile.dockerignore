@@ -1,0 +1,22 @@
+# Applies to builds of docker/web_application/web_application.Dockerfile
+# (BuildKit reads <Dockerfile>.dockerignore beside the Dockerfile). The root
+# .dockerignore excludes node_modules and .next at the root only, and nothing
+# excludes web_application/.env.local, which holds upstream's super-admin
+# token in development; the release image must carry none of them.
+.git
+**/node_modules
+**/.next
+**/.env
+**/.env.*
+!**/.env.local.example
+api
+e2e
+perf
+docs
+deploy
+docker/api
+docker/tooling
+docker/learning-center-mock
+docker/oidc
+.github
+*.md

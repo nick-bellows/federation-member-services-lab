@@ -31,7 +31,9 @@ The sibling project [learning-center-reference](https://github.com/nick-bellows/
 
 | B7 Security review | A threat model as six attack trees (alter an application, read another organization, obtain or forge a token, disrupt the queue or provider, learn from public surfaces, supply chain), every leaf tied to a control and its test or to a recorded gap; RFC 6902 JSON Patch on applications with field-level authorization, where every operation is authorised before any is applied and one refusal refuses the patch; reviewer notes the applicant never sees; the checks and metrics endpoints behind a scrape token by default; a test that no log line or span carries a token; the dependency audits re-run and an update policy written, nothing patched yet | [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md), [ADR-0014](docs/adr/0014-security-review.md), `docs/baseline/security_audit_2026-09-03.txt`, `docs/baseline/security_review_2026-09-03.txt` |
 
-Planned, not built: release engineering (B8), the case study and demo (B9). The order and gates are in [`ROADMAP.md`](ROADMAP.md).
+| M10 Release engineering | Release images for the API and the web app (dependencies and assets built in stages, no toolchain, no environment file, a health check); a release entrypoint that migrates only as a one-off task; the worker and the scheduler as services with the schedule registered in code and tested; a release rehearsal in Compose with no bind mount; a deployment architecture on managed services, labelled planned and provisioned nowhere; a release checklist and rollback plan; a dependency audit job in CI and the within-major fixes applied | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md), [`docs/RELEASE.md`](docs/RELEASE.md), [ADR-0015](docs/adr/0015-release-engineering.md), [`deploy/compose.release.yml`](deploy/compose.release.yml), `docs/baseline/release_rehearsal_2026-09-04.txt`, `docs/baseline/security_audit_after_b8_2026-09-04.txt` |
+
+Planned, not built: the case study and demo (B9); any deployment. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Architecture
 

@@ -1,0 +1,155 @@
+# Release rehearsal (ADR-0015, docs/RELEASE.md): the release images running
+# with no bind mount, beside the development stack, on their own ports.
+#
+#   cp deploy/release.env.example deploy/release.env   # then set APP_KEY
+#   docker compose -p federation-release -f deploy/compose.release.yml build
+#   docker compose -p federation-release -f deploy/compose.release.yml --profile release run --rm migrate
+#   docker compose -p federation-release -f deploy/compose.release.yml up -d
+#
+# The mock identity provider and the mock Learning Center are here so the
+# rehearsal can sign in and refresh credentials; a deployment replaces them
+# with the real providers (docs/DEPLOYMENT.md) and must never ship them.
+#
+# Ports: web 3010, API 3011, identity provider 3014 (the development stack
+# holds 3000, 3001 and 3004).
+
+name: federation-release
+
+services:
+  database:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: release-rehearsal-root
+      MARIADB_DATABASE: verein
+      MARIADB_USER: verein
+      MARIADB_PASSWORD: release-rehearsal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - release-database:/var/lib/mysql
+    networks: [release]
+
+  # One-off: runs the migrations once, then exits. `--profile release run --rm migrate`.
+  migrate:
+    image: federation-api:release
+    env_file: release.env
+    environment:
+      RUN_MIGRATIONS: "1"
+    command: ["php", "artisan", "migrate:status"]
+    depends_on:
+      database:
+        condition: service_healthy
+    networks: [release]
+    profiles: [release]
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api/api.release.Dockerfile
+    image: federation-api:release
+    env_file: release.env
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "3011:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [release]
+    restart: unless-stopped
+
+  # The worker and the scheduler run as the application user; only the API
+  # container starts as root, for nginx and PHP-FPM to bind and drop privileges.
+  worker:
+    image: federation-api:release
+    env_file: release.env
+    user: "1000:1000"
+    command: ["php", "artisan", "federation:work"]
+    healthcheck:
+      disable: true # the image's check asks nginx, which this container does not run
+    depends_on:
+      database:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [release]
+    restart: unless-stopped
+
+  scheduler:
+    image: federation-api:release
+    env_file: release.env
+    user: "1000:1000"
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      disable: true
+    depends_on:
+      database:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [release]
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/web_application/web_application.Dockerfile
+    image: federation-web:release
+    environment:
+      WEB_APPLICATION_URL: http://localhost:3010
+      WEBSITE_URL: http://localhost:3010
+      API_DOMAIN: http://api
+      API_PATH: /api/v1
+      API_BEARER_TOKEN: ""
+      NEXTAUTH_URL: http://localhost:3010
+      NEXTAUTH_SECRET: release-rehearsal-only-not-a-secret
+      ADMIN_LOGIN_PATHNAME: /admin/auth/login
+      OIDC_ISSUER: http://host.docker.internal:3014/default
+      OIDC_CLIENT_ID: northgate-web
+      OIDC_CLIENT_SECRET: northgate-web-secret
+      OIDC_AUDIENCE: https://api.northgate.example
+      SIGNAL_INVITE_URL: https://example.invalid
+      SUPPORT_EMAIL_ADDRESS: support@northgate.example
+      SUPPORT_PHONE_NUMBER: "000"
+    depends_on:
+      - api
+    ports:
+      - "3010:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [release]
+    restart: unless-stopped
+
+  # Development-only providers for the rehearsal. Not part of a deployment.
+  oidc:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+    environment:
+      SERVER_PORT: "8080"
+      JSON_CONFIG_PATH: /config.json
+    volumes:
+      - ../docker/oidc/config.json:/config.json:ro
+    ports:
+      - "3014:8080"
+    networks: [release]
+
+  learning-center:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["node", "/app/server.js"]
+    environment:
+      PORT: "3005"
+      MOCK_DELAY_MS: "0"
+      FIXTURES_DIR: /fixtures
+    volumes:
+      - ../docker/learning-center-mock:/app:ro
+      - ../api/tests/Fixtures/learning-center/credentials:/fixtures:ro
+    networks: [release]
+
+networks:
+  release:
+
+volumes:
+  release-database:
