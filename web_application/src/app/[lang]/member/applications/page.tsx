@@ -1,5 +1,6 @@
 import { requireFederationClient } from '@/lib/federation/client';
 import { listApplications } from '@/lib/federation/queries';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import Link from 'next/link';
 import { ApplicationStatusBadge } from '../components/StatusBadge';
@@ -12,6 +13,10 @@ interface PageProps {
  * Federation (fork): the signed-in person's applications. The API returns
  * only what this user may see; reviewers land here too and see their own.
  */
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'applications');
+}
+
 export default async function ApplicationsPage({ params }: PageProps) {
     const { t } = createTranslation('federation');
     const client = await requireFederationClient(params.lang);

@@ -101,6 +101,8 @@ export default function ReviewActions({ lang, applicationId, status }: Props) {
                     </p>
                 </div>
             )}
+            {/* Each decision button is described by what it does to the
+                application, read before the person confirms (B9, ACCESSIBILITY.md). */}
             <div className="mt-3 flex flex-wrap gap-3">
                 {available.includes('start-review') && (
                     <button
@@ -108,6 +110,7 @@ export default function ReviewActions({ lang, applicationId, status }: Props) {
                         onClick={() => run('start-review')}
                         disabled={pending}
                         aria-busy={pending}
+                        aria-describedby="decision-start-review-help"
                         className="rounded border border-slate-900 bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {t('review.start')}
@@ -119,6 +122,7 @@ export default function ReviewActions({ lang, applicationId, status }: Props) {
                         onClick={() => run('approve')}
                         disabled={pending}
                         aria-busy={pending}
+                        aria-describedby="decision-approve-help"
                         className="rounded border border-green-800 bg-green-800 px-4 py-2 font-medium text-white hover:bg-green-900 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {t('review.approve')}
@@ -130,6 +134,7 @@ export default function ReviewActions({ lang, applicationId, status }: Props) {
                         onClick={() => run('request-information')}
                         disabled={pending}
                         aria-busy={pending}
+                        aria-describedby="decision-request-information-help"
                         className="rounded border border-slate-900 px-4 py-2 font-medium hover:bg-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {t('review.request_information')}
@@ -141,11 +146,20 @@ export default function ReviewActions({ lang, applicationId, status }: Props) {
                         onClick={() => run('reject')}
                         disabled={pending}
                         aria-busy={pending}
+                        aria-describedby="decision-reject-help"
                         className="rounded border border-red-700 px-4 py-2 font-medium text-red-900 hover:bg-red-50 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {t('review.reject')}
                     </button>
                 )}
+            </div>
+            <div className="sr-only">
+                <p id="decision-start-review-help">{t('review.start_help')}</p>
+                <p id="decision-approve-help">{t('review.approve_help')}</p>
+                <p id="decision-request-information-help">
+                    {t('review.request_information_help')}
+                </p>
+                <p id="decision-reject-help">{t('review.reject_help')}</p>
             </div>
             <ActionMessage
                 result={result}

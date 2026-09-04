@@ -5,7 +5,8 @@
         "home": "Your identity",
         "applications": "My applications",
         "review": "Review queue",
-        "windows": "Registration windows"
+        "windows": "Registration windows",
+        "site": "Northgate Soccer Federation"
     },
     "common": {
         "working": "Working…",
@@ -108,7 +109,9 @@
         "resubmit": "Submit again",
         "cancel": "Withdraw application",
         "cancel_confirm": "Yes, withdraw it",
-        "history": "History"
+        "history": "History",
+        "submit_help": "Sends your application to the organization for review. You can no longer change it after this.",
+        "cancel_help": "Withdraws your application. You can start a new one while the window is open."
     },
     "documents": {
         "missing": "Not provided yet",
@@ -136,7 +139,11 @@
         "start": "Start review",
         "approve": "Approve",
         "request_information": "Request information",
-        "reject": "Reject"
+        "reject": "Reject",
+        "start_help": "Takes this application under review. The applicant can no longer change it.",
+        "approve_help": "Approves this application for the season and role. The applicant is told and their credentials are checked.",
+        "request_information_help": "Sends this application back to the applicant with your reason. They can change it and submit again.",
+        "reject_help": "Rejects this application with your reason. The applicant is told; the decision is final for this window."
     },
     "windows": {
         "heading": "Registration windows",
@@ -188,5 +195,15 @@
         "fetched_at": "Fetched {{fetched}}; evaluated by the Learning Center {{asOf}}.",
         "never_fetched": "Not fetched yet. Credentials are fetched after an approval, on request, and by the daily reconciliation.",
         "refresh": "Refresh from Learning Center"
+    },
+    "titles": {
+        "home": "Your identity",
+        "applications": "My applications",
+        "start": "Start an application",
+        "application": "Application",
+        "review": "Review queue",
+        "review_application": "Review application",
+        "windows": "Registration windows",
+        "sign_in": "Sign in"
     }
 }

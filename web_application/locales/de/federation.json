@@ -5,7 +5,8 @@
         "home": "Deine Identität",
         "applications": "Meine Anträge",
         "review": "Prüfungsliste",
-        "windows": "Registrierungszeiträume"
+        "windows": "Registrierungszeiträume",
+        "site": "Northgate Soccer Federation"
     },
     "common": {
         "working": "Bitte warten…",
@@ -108,7 +109,9 @@
         "resubmit": "Erneut einreichen",
         "cancel": "Antrag zurückziehen",
         "cancel_confirm": "Ja, zurückziehen",
-        "history": "Verlauf"
+        "history": "Verlauf",
+        "submit_help": "Schickt deinen Antrag zur Prüfung an die Organisation. Danach kannst du ihn nicht mehr ändern.",
+        "cancel_help": "Zieht deinen Antrag zurück. Solange der Zeitraum offen ist, kannst du einen neuen starten."
     },
     "documents": {
         "missing": "Noch nicht vorhanden",
@@ -136,7 +139,11 @@
         "start": "Prüfung beginnen",
         "approve": "Genehmigen",
         "request_information": "Angaben nachfordern",
-        "reject": "Ablehnen"
+        "reject": "Ablehnen",
+        "start_help": "Nimmt diesen Antrag in die Prüfung. Die antragstellende Person kann ihn danach nicht mehr ändern.",
+        "approve_help": "Genehmigt diesen Antrag für Saison und Rolle. Die antragstellende Person wird informiert, ihre Nachweise werden geprüft.",
+        "request_information_help": "Schickt den Antrag mit deiner Begründung zurück. Die antragstellende Person kann ihn ändern und erneut einreichen.",
+        "reject_help": "Lehnt den Antrag mit deiner Begründung ab. Die antragstellende Person wird informiert; die Entscheidung gilt für diesen Zeitraum."
     },
     "windows": {
         "heading": "Registrierungszeiträume",
@@ -188,5 +195,15 @@
         "fetched_at": "Abgerufen {{fetched}}; vom Learning Center bewertet {{asOf}}.",
         "never_fetched": "Noch nicht abgerufen. Nachweise werden nach einer Genehmigung, auf Anfrage und beim täglichen Abgleich abgerufen.",
         "refresh": "Vom Learning Center aktualisieren"
+    },
+    "titles": {
+        "home": "Deine Identität",
+        "applications": "Meine Anträge",
+        "start": "Antrag starten",
+        "application": "Antrag",
+        "review": "Prüfungsliste",
+        "review_application": "Antrag prüfen",
+        "windows": "Registrierungszeiträume",
+        "sign_in": "Anmelden"
     }
 }

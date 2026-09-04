@@ -1,0 +1,63 @@
+# Accessibility review scaffolding, 2026-09-04T09:11:36.107Z (run mtmqioxx)
+[title] /en/member/sign-in: "Sign in · Northgate Soccer Federation"
+[sign-in] focus stops=2 without visible indicator=0
+  a#:Skip to content
+  button#:Continue with Northgate ID
+[sign-in] axe: serious/critical=0 minor/moderate=none
+[title] /en/member: "Your identity · Northgate Soccer Federation"
+[/en/member] focus stops=4 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  button#:Sign out
+[/en/member] axe: serious/critical=0 minor/moderate=none
+[title] /en/member/applications: "My applications · Northgate Soccer Federation"
+[/en/member/applications] focus stops=4 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Start an application
+[/en/member/applications] axe: serious/critical=0 minor/moderate=none
+[title] /en/member/applications/new: "Start an application · Northgate Soccer Federation"
+[/en/member/applications/new] focus stops=6 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  select#window:Northgate Youth Soccer Association · 202
+  input#:role
+  input#dateOfBirth:dateOfBirth
+[/en/member/applications/new] axe: serious/critical=0 minor/moderate=none
+[skip-link] first Tab stop is the skip link; Enter moves focus to main#main
+[title] application: "Application · Northgate Soccer Federation"
+[described] Submit application: "Sends your application to the organization for review. You can no longer change it after this."
+[described] Withdraw application: "Withdraws your application. You can start a new one while the window is open."
+[/en/member/applications/<id>] focus stops=4 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  input#details-dob:
+[/en/member/applications/<id>] axe: serious/critical=0 minor/moderate=none
+[title] /en/member/review: "Review queue · Northgate Soccer Federation"
+[/en/member/review] focus stops=6 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Review queue
+  a#:Registration windows
+  a#:Review A11y Reviewer mtmqioxx
+[/en/member/review] axe: serious/critical=0 minor/moderate=none
+[title] /en/member/windows: "Registration windows · Northgate Soccer Federation"
+[/en/member/windows] focus stops=8 without visible indicator=0
+  a#:Skip to content
+  a#:Your identity
+  a#:My applications
+  a#:Review queue
+  a#:Registration windows
+  select#window-organization:Northgate Adult Soccer League (NASL)
+  select#window-season:2026/272025/26
+  input#window-opens:
+[/en/member/windows] axe: serious/critical=0 minor/moderate=none
+[title] review_application: "Review application · Northgate Soccer Federation"
+[described] Start review: "Takes this application under review. The applicant can no longer change it."
+[/en/member/review/<id>] axe: serious/critical=0 minor/moderate=none
+[slow-3g] new-application page: form usable after 42686 ms, load event after 42688 ms, resources transferred 2061 KiB

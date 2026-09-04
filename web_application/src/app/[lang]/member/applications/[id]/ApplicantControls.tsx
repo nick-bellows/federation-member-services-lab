@@ -86,6 +86,7 @@ export default function ApplicantControls({
                         onClick={() => run('submit')}
                         disabled={pending}
                         aria-busy={pending}
+                        aria-describedby="action-submit-help"
                         className="rounded border border-slate-900 bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {status === 'needs_information'
@@ -98,11 +99,17 @@ export default function ApplicantControls({
                         type="button"
                         onClick={() => setConfirmCancel(true)}
                         disabled={pending}
+                        aria-describedby="action-cancel-help"
                         className="rounded border border-slate-900 px-4 py-2 font-medium hover:bg-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 disabled:opacity-60"
                     >
                         {t('application.cancel')}
                     </button>
                 )}
+                {/* Read by assistive technology before the person confirms (B9). */}
+                <div className="sr-only">
+                    <p id="action-submit-help">{t('application.submit_help')}</p>
+                    <p id="action-cancel-help">{t('application.cancel_help')}</p>
+                </div>
                 {canCancel && confirmCancel && (
                     <>
                         <button

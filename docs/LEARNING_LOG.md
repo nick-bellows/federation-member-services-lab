@@ -441,3 +441,34 @@ _Pending; recorded in the internal review file._
 3. Design what you cannot afford to run, label it planned, and list what it does not prove; that is more useful to a reviewer than untested infrastructure code.
 
 **Deferred.** Provisioning (owner's approval and money); Terraform or CDK once an account exists; image scanning and digest pinning; SQS behind the relay; a rootless nginx variant; the four dependency majors.
+
+## 2026-09-04 — B9 (M11): case study and demo
+
+**Goal.** The case study, the demo, the final README and interview-guide pass, the three accessibility improvements deferred since B6, the upstream offer and the Auth0 walkthrough; everything that needs the owner collected as approvals rather than assumed.
+
+**Built.** `docs/CASE_STUDY.md` (starting point, what was built in order, three decisions worth explaining, numbers with caveats, what was not done, how to read the repository in five minutes, how it was built); `e2e/tests/demo.spec.ts` and `docs/assets/demo.webm` (recorded against the release images from B8's rehearsal stack: applicant starts, attaches, submits; reviewer starts review, accepts, approves, refreshes credentials; applicant sees participation); the skip link made to move focus (`main` with `tabindex="-1"`), a title per member page (`memberMetadata`, `titles` in both locales), `aria-describedby` on the six transition buttons with hidden sentences in both languages, and the review spec asserting all three; `docs/UPSTREAM_OFFER.md` (one issue, drafted, not sent); `docs/AUTH0_WALKTHROUGH.md` (planned; tenant settings, environment, the screenshots to take, what the mock cannot prove); the README's rows, numbers and upstream paragraph brought current; the interview guide through B9; the roadmap's Phase A checklist box for visibility approval ticked with the date it was given.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Accessibility improvements | `docs/baseline/a11y_review_2026-09-04.txt` | every member page titled "page · Northgate Soccer Federation"; first Tab is the skip link and Enter focuses `main#main`; the applicant's and the reviewer's transition buttons carry a sentence each; axe serious/critical 0 on every page; 3 of 3 spec tests |
+| Demo | `docs/assets/demo.webm` | 29 s, 1.9 MB, recorded by the spec against the release images with the Alex persona (known to the Learning Center mock) |
+| Type-check and lint | this session | `tsc` clean; the two lint warnings are upstream's pre-existing ones |
+| Case study numbers | `docs/CASE_STUDY.md` | each links to the retained run it comes from |
+
+**What went wrong, in order.**
+
+1. `getT` from next-translate answered with raw keys inside `generateMetadata`, so the first titles read `titles.sign_in · nav.site`; the helper imports the locale files directly now, and the spec would have caught it in CI.
+2. The helper's docblock mentioned a glob whose characters close a block comment; the type-check failed on a "regular expression" and the wording changed.
+3. The B6 record had listed the skip link as missing; it existed but its target could not take focus, so the improvement was one attribute and one assertion, not a component.
+4. The reviewer's queue was empty in the first B9 run, so the decision buttons went unchecked; the member walk now submits its application so the reviewer pass finds a row.
+5. The demo's first draft would have used a fresh identity, which the Learning Center mock does not know; the participation panel would have shown `unknown` (true, but not the story); the spec takes a persona from the environment and defaults to one the mock knows.
+
+**Three lessons.**
+
+1. The last pass is a deletion pass: every stale number and every "will" that has become "does" is a small lie a reviewer finds first.
+2. An improvement deferred with a precise description costs an hour when it comes due; one deferred vaguely costs a rediscovery.
+3. Things that need another person are listed, dated and left undone; doing them anyway would be the only way to fail this milestone.
+
+**Not done, on the owner.** Sending the upstream offer; creating the Auth0 tenant and taking the screenshots; enabling GitHub Pages for the case study or hosting a demo; provisioning anything from `docs/DEPLOYMENT.md`; running upstream's release workflows on the fork.

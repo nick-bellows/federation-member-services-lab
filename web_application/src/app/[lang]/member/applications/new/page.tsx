@@ -1,10 +1,15 @@
 import { requireFederationClient } from '@/lib/federation/client';
 import { listOpenWindows } from '@/lib/federation/queries';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import StartApplicationForm from './StartApplicationForm';
 
 interface PageProps {
     params: { lang: string };
+}
+
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'start');
 }
 
 export default async function NewApplicationPage({ params }: PageProps) {

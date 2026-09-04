@@ -5,6 +5,7 @@ import {
     editableStatuses,
     requiredDocumentsByRole,
 } from '@/lib/federation/types';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import { notFound } from 'next/navigation';
 import HistoryList from '../../components/HistoryList';
@@ -23,6 +24,10 @@ interface PageProps {
  * changed depends on the status; the API is the authority, the page only
  * hides controls that would be refused anyway.
  */
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'application');
+}
+
 export default async function ApplicationPage({ params }: PageProps) {
     const { t } = createTranslation('federation');
     const client = await requireFederationClient(params.lang);

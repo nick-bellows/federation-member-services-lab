@@ -1,6 +1,7 @@
 import { requireFederationClient } from '@/lib/federation/client';
 import { getApplication } from '@/lib/federation/queries';
 import { requiredDocumentsByRole } from '@/lib/federation/types';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import { notFound } from 'next/navigation';
 import HistoryList from '../../components/HistoryList';
@@ -18,6 +19,10 @@ interface PageProps {
  * who may see and decide; a 403 becomes "not found" here so the page never
  * confirms that an application exists to someone who may not see it.
  */
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'review_application');
+}
+
 export default async function ReviewApplicationPage({ params }: PageProps) {
     const { t } = createTranslation('federation');
     const client = await requireFederationClient(params.lang);

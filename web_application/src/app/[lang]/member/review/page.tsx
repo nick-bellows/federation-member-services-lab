@@ -1,6 +1,7 @@
 import { formatDate } from '@/lib/federation/format';
 import { requireFederationClient } from '@/lib/federation/client';
 import { listApplications } from '@/lib/federation/queries';
+import { memberMetadata } from '@/lib/federation/metadata';
 import createTranslation from 'next-translate/createTranslation';
 import Link from 'next/link';
 import { ApplicationStatusBadge } from '../components/StatusBadge';
@@ -14,6 +15,10 @@ interface PageProps {
  * organizations the signed-in reviewer administers; a non-reviewer sees only
  * their own applications here, which is harmless and honest.
  */
+export function generateMetadata({ params }: PageProps) {
+    return memberMetadata(params.lang, 'review');
+}
+
 export default async function ReviewQueuePage({ params }: PageProps) {
     const { t } = createTranslation('federation');
     const client = await requireFederationClient(params.lang);
