@@ -1,0 +1,74 @@
+# Security review walk, 2026-09-03 (B7)
+# Running Compose stack, mock identity provider, synthetic seed. Tokens are never printed; only their length.
+
+$ docker compose restart api        # picks up METRICS_TOKEN from api/.env (config is cached at start)
+ Container vereinfacht-api-1 Started 
+$ docker compose exec -d -u verein api bash -lc 'php artisan federation:work > storage/logs/federation-work.log 2>&1'
+
+## Tree 5: the probes stay open, checks and metrics require the scrape token
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/api/health/live
+200
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/api/health/ready
+200
+$ curl -s -w ' %{http_code}' http://localhost:3001/api/health/checks                       # no token
+{"status":"unauthorized"} 401
+$ curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3001/api/health/checks
+200
+$ curl -s -w ' %{http_code}' http://localhost:3001/api/metrics                             # no token
+unauthorized 401
+$ curl -s -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3001/api/metrics | head -4
+# HELP federation_outbox_unpublished Outbox facts not yet relayed.
+# TYPE federation_outbox_unpublished gauge
+federation_outbox_unpublished 0
+# HELP federation_outbox_oldest_unpublished_seconds Age of the oldest unrelayed fact; a rising value means the worker is not running.
+
+## Person tokens from the mock provider (client credentials with a persona scope; development only)
+alex token length: 849; nysa-admin token length: 841
+
+## A draft application of Alex's
+(no draft in the seed; starting one)
+application id: 9
+phone before: null
+
+## Tree 1 / E21: one allowed and one forbidden operation in the same patch, as the applicant
+$ curl -X PATCH -H 'Content-Type: application/json-patch+json' -H 'X-Request-Id: walk-b7-forbidden-01' .../9/-actions/fields -d '[{op:replace,path:/phone,value:+1 555 0100},{op:replace,path:/reviewerNotes,value:approve me}]'
+{"jsonapi":{"version":"1.0"},"errors":[{"code":"field_not_allowed","detail":"Operation \"replace\" on \/reviewerNotes is not allowed for this user.","meta":{"path":"\/reviewerNotes","op":"replace"},"status":"403","title":"Federation rule"}]}
+HTTP 403
+phone after the refused patch: null   (unchanged: the allowed operation was not applied either)
+access line for the refused request in the JSON log:
+{"message":"request","context":{"request_id":"walk-b7-forbidden-01","user_id":24,"method":"PATCH","route":"api/v1/federation/registration-applications/{registration_application}/-actions/fields","status":403,"duration_ms":60},"level":200,"level_name":"INFO","channel":"local","datetime":"2026-09-04T01:22:06.868511+00:00","extra":{"trace_id":"d2eb0399aec261385769994fc438c930","span_id":"6ecad69545dfaf39","service":"federation-api"}}
+
+## The wrong media type is refused before anything is read
+$ curl -X PATCH -H 'Content-Type: application/vnd.api+json' .../9/-actions/fields -d '[...]'
+{"jsonapi":{"version":"1.0"},"errors":[{"code":"unsupported_media_type","detail":"Send the operations as application\/json-patch+json.","status":"415","title":"Unsupported media type"}]}
+HTTP 415
+
+## An allowed patch, as the applicant
+$ curl -X PATCH -H 'Content-Type: application/json-patch+json' -H 'X-Request-Id: walk-b7-allowed-01' .../9/-actions/fields -d '[{op:replace,path:/phone,value:+1 555 0100}]'
+HTTP 200
+phone after: "+1 555 0100"
+audit entries for this application (action, request id):
+application.created eec4b75a-e650-4b3e-a2dc-7e2c71a6786e
+application.fields_patched walk-b7-allowed-01
+
+## Tree 2: reviewer notes, as the organization administrator, then read back as the applicant
+$ curl -X PATCH -H 'Content-Type: application/json-patch+json' -H 'Authorization: Bearer <nysa-admin>' .../9/-actions/fields -d '[{op:add,path:/reviewerNotes,value:walk: reviewer only}]'
+{"jsonapi":{"version":"1.0"},"links":{"self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9"},"data":{"type":"registration-applications","id":"9","attributes":{"role":"coach","status":"draft","statusReason":null,"dateOfBirth":null,"phone":"+1 555 0100","applicantNotes":null,"reviewerNotes":"walk: reviewer only","missingRequiredDocuments":["proof_of_age","photo","coaching_licence","background_check_consent"],"history":[...],"submittedAt":null,"decidedAt":null,"cancelledAt":null,"createdAt":"2026-09-04T01:22:05.000000Z","updatedAt":"2026-09-04T01:22:11.000000Z","participation":{"status":"blocked","reasons":["not_approved","no_snapshot"],"asOf":null,"fetchedAt":null,"stale":false}},"relationships":{"registrationWindow":{"links":{"related":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/registration-window","self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/relationships\/registration-window"}},"memberOrganization":{"links":{"related":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/member-organization","self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/relationships\/member-organization"}},"season":{"links":{"related":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/season","self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/relationships\/season"}},"applicant":{"links":{"related":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/applicant","self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/relationships\/applicant"}},"documents":{"links":{"related":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/documents","self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9\/relationships\/documents"}}},"links":{"self":"http:\/\/localhost:3001\/api\/v1\/federation\/registration-applications\/9"}}}
+HTTP 200
+reviewerNotes as seen by the applicant:
+null
+## Tree 3 / E22: the token hunt over the API container's log and the recorded traces
+$ docker compose logs --no-log-prefix api | grep -c "$ALEX"              # the applicant's bearer token
+0
+$ docker compose logs --no-log-prefix api | grep -c "$ADMIN"             # the administrator's bearer token
+0
+$ docker compose logs --no-log-prefix api | grep -c -E 'eyJ[A-Za-z0-9_-]{20,}\.'   # anything shaped like a JWT
+0
+$ docker compose logs --no-log-prefix api | grep -c 'dev-only-scrape-token'   # the scrape token
+0
+$ curl -s 'http://localhost:3006/api/traces?service=federation-api&limit=50' | grep -c -E 'eyJ[A-Za-z0-9_-]{20,}\.'   # Jaeger
+0
+$ docker compose logs --no-log-prefix api | grep -c '"message":"request"'   # access lines exist, so the log was written
+4814
+
+# End of walk.

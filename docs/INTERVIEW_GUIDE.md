@@ -349,3 +349,37 @@ Single-column indexes before composite ones; a raised rate limit for the measure
 3. How would you keep a page from regressing to two queries per row after you leave?
 4. Why did you raise the rate limit for the load run, and what does that do to the numbers' meaning?
 5. The page took forty seconds on slow 3G in your record. Is the product slow?
+
+## B7 — Security review
+
+### What it does
+
+A threat model written as six attack trees, one per attacker goal, with every leaf tied to the control in the code and the test that exercises it or to a recorded gap; RFC 6902 JSON Patch on applications through a dedicated route, where the document is parsed as a whole, every operation is authorised against the acting person's allow-list before any is applied, one refusal refuses the patch naming the path, a `test` operation guards against a stale view, and one audit entry carries the previous and new value of every field touched; reviewer notes the applicant never sees; the checks and metrics endpoints behind a scrape token by default; a test that no log line or span carries a token; both dependency audits re-run, classified by reachability, and an update policy written.
+
+### Why we built it this way
+
+A threat model as a table of fears is complete and useless; a tree per goal says what an attacker tries first and where the code stops them. Field-level authorization cannot live in the JSON:API update because its read-only markers cannot vary by actor, so the patch gets its own route and media type. Public surfaces are chosen on purpose: the probes stay open because a platform must probe before it holds secrets, the checks close because they describe the environment.
+
+### Alternatives considered
+
+A STRIDE table by asset; field rules inside the JSON:API update; JSON Merge Patch; a generic patch library applied to the model; leaving checks open; patching the advisories in this milestone (ADR-0014).
+
+### Failure modes
+
+A status change disguised as a field (refused: only allow-listed fields exist to the patch); a partially applied patch (refused: authorise all, then apply all in one transaction); a stale client overwriting a change (a `test` operation, 409); reviewer notes leaking to the applicant (rendered only when the actor may review); a token in a log line (asserted absent over success, 401 and provider paths); a checks endpoint that names the environment to anyone (token-gated).
+
+### Tradeoffs
+
+A second update path with its own error codes; a token every deployment must set; a threat model that must grow with every new entry point; advisories catalogued but not patched until B8's release step.
+
+### Code to locate immediately
+
+`docs/THREAT_MODEL.md` · `api/app/Federation/Support/JsonPatch.php` · `api/app/Federation/Actions/PatchApplicationFields.php` · `RegistrationApplicationController::fields` · `RendersDomainExceptions` · `RegistrationApplicationSchema` (`reviewerNotes`) · `ObservabilityController::scraperAuthorised` · `api/tests/Feature/Federation/Http/ApplicationFieldsPatchHttpTest.php` · `SecretsNeverLoggedTest.php` · `docs/baseline/security_audit_2026-09-03.txt`
+
+### Likely interviewer questions
+
+1. Walk me through your threat model: who are the actors, what do they want, and where do the controls live?
+2. How do you authorise a partial update field by field, and how do you keep a state change from sneaking in as a field?
+3. What in this system would you never log, and how do you know you do not?
+4. Your audit lists thirteen Composer advisories and eight npm ones, and you patched none. Defend that.
+5. Why are liveness and readiness open while checks and metrics are not?

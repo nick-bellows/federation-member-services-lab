@@ -6,8 +6,8 @@ What the federation module tells an operator without anyone reading code (ADR-00
 |---|---|---|
 | Logs | what happened, in which request | JSON lines on the api container's stderr (`docker compose logs api`) |
 | Traces | where the time went, across web, worker and provider | Jaeger at http://localhost:3006 |
-| Probes | may traffic go here | `GET /api/health/live`, `GET /api/health/ready`, `GET /api/health/checks` |
-| Metrics | how much, how old, how many | `GET /api/metrics` (Prometheus text format) |
+| Probes | may traffic go here | `GET /api/health/live`, `GET /api/health/ready` (open); `GET /api/health/checks` (scrape token) |
+| Metrics | how much, how old, how many | `GET /api/metrics` (Prometheus text format, scrape token) |
 
 Nothing here leaves the machine. Nothing here contains a token, a password or an e-mail address.
 
@@ -55,11 +55,11 @@ Find a trace by request id in Jaeger: service `federation-api`, tag `federation.
 
 - `GET /api/health/live` answers `200 {"status":"ok"}` without touching anything. A restart signal for an orchestrator.
 - `GET /api/health/ready` answers `200 ready` or `503 not_ready` with per-check detail. Required: the database answers; the outbox's oldest unrelayed fact is younger than `READINESS_OUTBOX_MAX_AGE_SECONDS` (default 300), which is how a dead worker shows up. Reported, never required: the Learning Center's `/health` within `READINESS_LEARNING_CENTER_TIMEOUT_MS` (default 300), because every page answers from stored snapshots without it (ADR-0009). A slow provider makes readiness say `degraded` for that check and stay `ready`.
-- `GET /api/health/checks` exposes upstream's spatie/health results, which `php artisan health:check` refreshes (scheduled in production, by hand here). Until it has run, the answer is `unknown`. Two of upstream's checks expect production (`EnvironmentCheck`, `DebugModeCheck`) and fail in development by design.
+- `GET /api/health/checks` exposes upstream's spatie/health results, which `php artisan health:check` refreshes (scheduled in production, by hand here). Until it has run, the answer is `unknown`. It requires the scrape token (below) whenever one is configured: it names failing dependencies, which is operator information, not public information (ADR-0014). Two of upstream's checks expect production (`EnvironmentCheck`, `DebugModeCheck`) and fail in development by design.
 
 ## Metrics
 
-`GET /api/metrics` computes every value from the tables on each scrape; no metrics server is needed for the numbers to be true. Set `METRICS_TOKEN` to require a bearer token; leave it empty only where the network restricts the endpoint.
+`GET /api/metrics` computes every value from the tables on each scrape; no metrics server is needed for the numbers to be true. `METRICS_TOKEN` is the bearer token a scraper presents to this endpoint and to `/api/health/checks`; the shipped `.env.example` sets one (`dev-only-scrape-token`, to be replaced per environment), so both are gated unless an operator empties the variable, which is only defensible where the network restricts them (ADR-0014). Liveness and readiness never require it: a platform has to probe before it holds secrets.
 
 | Metric | Meaning | Alert on |
 |---|---|---|
@@ -80,7 +80,8 @@ docker compose up -d jaeger                                          # traces UI
 docker compose exec -d -u verein api php artisan federation:work     # worker, as the PHP-FPM user (ADR-0010)
 docker compose exec -u verein api php artisan health:check           # upstream's checks into the result store
 curl -s http://localhost:3001/api/health/ready | jq .
-curl -s http://localhost:3001/api/metrics
+curl -s -H "Authorization: Bearer dev-only-scrape-token" http://localhost:3001/api/health/checks
+curl -s -H "Authorization: Bearer dev-only-scrape-token" http://localhost:3001/api/metrics
 ```
 
 The rehearsed incidents against these signals are in [`docs/RUNBOOK.md`](RUNBOOK.md) and `docs/baseline/operability_2026-09-03.txt`.

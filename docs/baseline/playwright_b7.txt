@@ -1,0 +1,66 @@
+
+Running 11 tests using 4 workers
+
+  ✓   3 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (2.2s)
+  ✘   5 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (17.8s)
+  ✓   1 [chromium] › tests\accessibility-review.spec.ts:81:9 › accessibility review of the slice › a member walks every page with the keyboard (21.2s)
+  ✓   6 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (355ms)
+  ✓   2 [chromium] › tests\screenshots.spec.ts:31:5 › capture member and reviewer screens (27.1s)
+  ✓   4 [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application (28.6s)
+  ✓   7 [chromium] › tests\accessibility-review.spec.ts:98:9 › accessibility review of the slice › a reviewer walks the queue and windows pages with the keyboard (12.7s)
+  ✓   8 [chromium] › tests\registration-review.spec.ts:104:9 › registration review slice › a reviewer works the queue and approves (22.9s)
+  ✓  10 [chromium] › tests\registration-review.spec.ts:138:9 › registration review slice › the applicant sees the decision and the history (9.3s)
+  ✓  11 [chromium] › tests\registration-review.spec.ts:159:9 › registration review slice › an organization administrator can open a registration window (8.3s)
+  ✓   9 [chromium] › tests\accessibility-review.spec.ts:110:9 › accessibility review of the slice › the new-application page is usable on a slow connection (46.6s)
+
+
+  1) [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /\/en\/member\/sign-in$/
+    Received string:  "http://localhost:3000/en/member"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 10000ms
+        23 × locator resolved to <html lang="en" class="__variable_39480f">…</html>
+           - unexpected value "http://localhost:3000/en/member"
+
+
+      64 |
+      65 |     await page.getByRole('button', { name: 'Sign out' }).click();
+    > 66 |     await expect(page).toHaveURL(/\/en\/member\/sign-in$/);
+         |                        ^
+      67 | });
+      68 |
+      69 | test('the API refuses an anonymous call to the identity endpoint', async ({ request }) => {
+        at D:\PortfolioProjects\federation-member-services-lab\e2e\tests\member-sign-in.spec.ts:66:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\member-sign-in-signing-in--ce9e5-e-identity-the-API-resolved-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\member-sign-in-signing-in--ce9e5-e-identity-the-API-resolved-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\member-sign-in-signing-in--ce9e5-e-identity-the-API-resolved-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\member-sign-in-signing-in--ce9e5-e-identity-the-API-resolved-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved 
+  10 passed (1.4m)
+
+=== Rerun of the failed spec (member-sign-in), same stack, 2026-09-04T01:26:36Z ===
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (1.4s)
+  ✓  2 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (7.0s)
+  ✓  3 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (492ms)
+
+  3 passed (9.6s)

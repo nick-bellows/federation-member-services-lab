@@ -333,6 +333,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/registration-applications/{registration_application}/-actions/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Apply an RFC 6902 JSON Patch to the application's fields. Every operation is authorised for the signed-in person before any is applied; one refused operation refuses the patch. Applicants may change /dateOfBirth, /phone and /applicantNotes while the application is a draft or needs information; reviewers may change /reviewerNotes. */
+        patch: operations["registration-applications.patchFields"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -400,12 +417,12 @@ export interface components {
                 readonly reviewedAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -486,12 +503,12 @@ export interface components {
                 readonly reviewedAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -574,12 +591,12 @@ export interface components {
                 readonly reviewedAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:16.000000Z
+                 * @example 2026-09-03T21:24:52.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -638,7 +655,7 @@ export interface components {
                 readonly code?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:14.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly createdAt?: string;
             };
@@ -736,12 +753,12 @@ export interface components {
              * @default registration-applications
              */
             type: string;
-            /** @example 3 */
+            /** @example 8 */
             id: string;
             attributes: {
                 /**
                  * role
-                 * @example referee
+                 * @example participant
                  */
                 role?: string;
                 /**
@@ -753,37 +770,43 @@ export interface components {
                 readonly statusReason?: string;
                 /**
                  * dateOfBirth
-                 * @example 1990-06-21T00:00:00.000000Z
+                 * @example 2001-03-09T00:00:00.000000Z
                  */
                 dateOfBirth?: string;
                 /** phone */
                 phone?: string;
                 /** applicantNotes */
                 applicantNotes?: string;
+                /** reviewerNotes */
+                readonly reviewerNotes?: string;
                 /** missingRequiredDocuments */
                 readonly missingRequiredDocuments?: unknown[];
+                /** history */
+                readonly history?: unknown[];
                 /**
                  * submittedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:11.000000Z
                  */
                 readonly submittedAt?: string;
                 /**
                  * decidedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly decidedAt?: string;
                 /** cancelledAt */
                 readonly cancelledAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:02.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly updatedAt?: string;
+                /** participation */
+                readonly participation?: Record<string, never>;
             };
             relationships?: {
                 /** registrationWindow */
@@ -791,12 +814,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         self?: string;
                     };
@@ -806,12 +829,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         self?: string;
                     };
@@ -821,12 +844,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         self?: string;
                     };
@@ -836,12 +859,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         self?: string;
                     };
@@ -851,12 +874,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         self?: string;
                     };
@@ -873,7 +896,7 @@ export interface components {
             attributes: {
                 /**
                  * role
-                 * @example referee
+                 * @example participant
                  */
                 role?: string;
                 /**
@@ -885,37 +908,43 @@ export interface components {
                 readonly statusReason?: string;
                 /**
                  * dateOfBirth
-                 * @example 1990-06-21T00:00:00.000000Z
+                 * @example 2001-03-09T00:00:00.000000Z
                  */
                 dateOfBirth?: string;
                 /** phone */
                 phone?: string;
                 /** applicantNotes */
                 applicantNotes?: string;
+                /** reviewerNotes */
+                readonly reviewerNotes?: string;
                 /** missingRequiredDocuments */
                 readonly missingRequiredDocuments?: unknown[];
+                /** history */
+                readonly history?: unknown[];
                 /**
                  * submittedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:11.000000Z
                  */
                 readonly submittedAt?: string;
                 /**
                  * decidedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly decidedAt?: string;
                 /** cancelledAt */
                 readonly cancelledAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:02.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly updatedAt?: string;
+                /** participation */
+                readonly participation?: Record<string, never>;
             };
             relationships?: {
                 /** registrationWindow */
@@ -923,12 +952,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         self?: string;
                     };
@@ -938,12 +967,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         self?: string;
                     };
@@ -953,12 +982,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         self?: string;
                     };
@@ -968,12 +997,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         self?: string;
                     };
@@ -983,12 +1012,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         self?: string;
                     };
@@ -1002,12 +1031,12 @@ export interface components {
              * @default registration-applications
              */
             type: string;
-            /** @example 3 */
+            /** @example 8 */
             id: string;
             attributes: {
                 /**
                  * role
-                 * @example referee
+                 * @example participant
                  */
                 role?: string;
                 /**
@@ -1019,37 +1048,43 @@ export interface components {
                 readonly statusReason?: string;
                 /**
                  * dateOfBirth
-                 * @example 1990-06-21T00:00:00.000000Z
+                 * @example 2001-03-09T00:00:00.000000Z
                  */
                 dateOfBirth?: string;
                 /** phone */
                 phone?: string;
                 /** applicantNotes */
                 applicantNotes?: string;
+                /** reviewerNotes */
+                readonly reviewerNotes?: string;
                 /** missingRequiredDocuments */
                 readonly missingRequiredDocuments?: unknown[];
+                /** history */
+                readonly history?: unknown[];
                 /**
                  * submittedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:11.000000Z
                  */
                 readonly submittedAt?: string;
                 /**
                  * decidedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly decidedAt?: string;
                 /** cancelledAt */
                 readonly cancelledAt?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:02.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:17.000000Z
+                 * @example 2026-09-04T00:32:30.000000Z
                  */
                 readonly updatedAt?: string;
+                /** participation */
+                readonly participation?: Record<string, never>;
             };
             relationships?: {
                 /** registrationWindow */
@@ -1057,12 +1092,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/registration-windows/3
+                         * @example http://localhost:3001/api/v1/federation/registration-windows/8
                          */
                         self?: string;
                     };
@@ -1072,12 +1107,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/member-organizations/3
+                         * @example http://localhost:3001/api/v1/federation/member-organizations/8
                          */
                         self?: string;
                     };
@@ -1087,12 +1122,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/seasons/3
+                         * @example http://localhost:3001/api/v1/federation/seasons/8
                          */
                         self?: string;
                     };
@@ -1102,12 +1137,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/applicants/3
+                         * @example http://localhost:3001/api/v1/federation/applicants/8
                          */
                         self?: string;
                     };
@@ -1117,12 +1152,12 @@ export interface components {
                     readonly links?: {
                         /**
                          * related
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         related?: string;
                         /**
                          * self
-                         * @example http://localhost:3001/api/v1/federation/documents/3
+                         * @example http://localhost:3001/api/v1/federation/documents/8
                          */
                         self?: string;
                     };
@@ -1141,12 +1176,12 @@ export interface components {
             attributes: {
                 /**
                  * opensAt
-                 * @example 2026-08-19T18:55:15.000000Z
+                 * @example 2026-08-20T21:24:50.000000Z
                  */
                 opensAt?: string;
                 /**
                  * closesAt
-                 * @example 2026-11-02T18:55:15.000000Z
+                 * @example 2026-11-03T21:24:50.000000Z
                  */
                 closesAt?: string;
                 /**
@@ -1162,12 +1197,12 @@ export interface components {
                 readonly isOpen?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -1229,12 +1264,12 @@ export interface components {
             attributes: {
                 /**
                  * opensAt
-                 * @example 2026-08-19T18:55:15.000000Z
+                 * @example 2026-08-20T21:24:50.000000Z
                  */
                 opensAt?: string;
                 /**
                  * closesAt
-                 * @example 2026-11-02T18:55:15.000000Z
+                 * @example 2026-11-03T21:24:50.000000Z
                  */
                 closesAt?: string;
                 /**
@@ -1250,12 +1285,12 @@ export interface components {
                 readonly isOpen?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -1319,12 +1354,12 @@ export interface components {
             attributes: {
                 /**
                  * opensAt
-                 * @example 2026-08-19T18:55:15.000000Z
+                 * @example 2026-08-20T21:24:50.000000Z
                  */
                 opensAt?: string;
                 /**
                  * closesAt
-                 * @example 2026-11-02T18:55:15.000000Z
+                 * @example 2026-11-03T21:24:50.000000Z
                  */
                 closesAt?: string;
                 /**
@@ -1340,12 +1375,12 @@ export interface components {
                 readonly isOpen?: string;
                 /**
                  * createdAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly createdAt?: string;
                 /**
                  * updatedAt
-                 * @example 2026-09-02T18:55:15.000000Z
+                 * @example 2026-09-03T21:24:50.000000Z
                  */
                 readonly updatedAt?: string;
             };
@@ -1502,7 +1537,7 @@ export interface operations {
     "federations.index": {
         parameters: {
             query?: {
-                sort?: ("id" | "-id")[];
+                sort?: ("id" | "-id" | "name" | "-name")[];
                 /** @description A list of ids to filter by. */
                 "filter[id]"?: string[];
             };
@@ -1571,7 +1606,7 @@ export interface operations {
     "seasons.index": {
         parameters: {
             query?: {
-                sort?: ("id" | "-id")[];
+                sort?: ("id" | "-id" | "label" | "-label")[];
                 /** @description A list of ids to filter by. */
                 "filter[id]"?: string[];
             };
@@ -1640,7 +1675,7 @@ export interface operations {
     "member-organizations.index": {
         parameters: {
             query?: {
-                sort?: ("id" | "-id")[];
+                sort?: ("id" | "-id" | "name" | "-name" | "code" | "-code")[];
                 /** @description A list of ids to filter by. */
                 "filter[id]"?: string[];
                 /** @description Filters the records */
@@ -2617,6 +2652,79 @@ export interface operations {
                 content?: never;
             };
             /** @description A reason is required, or the application is incomplete (meta lists what is missing). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "registration-applications.patchFields": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Correlation id echoed in the response and stored with the audit entry. */
+                "X-Request-Id"?: string;
+            };
+            path: {
+                registration_application: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json-patch+json": {
+                    /** @enum {string} */
+                    op: "add" | "replace" | "remove" | "test";
+                    /** @example /phone */
+                    path: string;
+                    /** @description Required for add, replace and test. */
+                    value?: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description Show registration-applications */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.api+json": {
+                        jsonapi: {
+                            /**
+                             * version
+                             * @example 1.0
+                             */
+                            version?: string;
+                        };
+                        data: components["schemas"]["resources.registration-applications.resource.fetch"];
+                    };
+                };
+            };
+            /** @description The signed-in person may not perform an operation on that path (code field_not_allowed, meta.path names it). Nothing was applied. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A test operation did not match the stored value (code patch_test_failed), or the applicant may no longer edit (code application_not_editable). Nothing was applied. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The body was not sent as application/json-patch+json. */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The document is not a valid JSON Patch, or a value fails validation (code invalid_patch). */
             422: {
                 headers: {
                     [name: string]: unknown;

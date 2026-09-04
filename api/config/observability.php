@@ -30,8 +30,10 @@ return [
     ],
 
     'metrics' => [
-        // Optional bearer token for /api/metrics; empty means the endpoint is open
-        // and must be restricted at the network layer.
+        // Bearer token for /api/metrics and /api/health/checks (ADR-0014). The
+        // shipped .env.example sets one; empty means both endpoints are open and
+        // must be restricted at the network layer. Liveness and readiness never
+        // require it.
         'token' => env('METRICS_TOKEN'),
         // Snapshots older than this count as stale in the metrics, as on the pages.
         'snapshot_stale_minutes' => (int) env('LEARNING_CENTER_SNAPSHOT_TTL_MINUTES', 720),

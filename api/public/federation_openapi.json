@@ -35,7 +35,9 @@
                             "items": {
                                 "enum": [
                                     "id",
-                                    "-id"
+                                    "-id",
+                                    "name",
+                                    "-name"
                                 ],
                                 "type": "string"
                             }
@@ -195,7 +197,9 @@
                             "items": {
                                 "enum": [
                                     "id",
-                                    "-id"
+                                    "-id",
+                                    "label",
+                                    "-label"
                                 ],
                                 "type": "string"
                             }
@@ -363,7 +367,11 @@
                             "items": {
                                 "enum": [
                                     "id",
-                                    "-id"
+                                    "-id",
+                                    "name",
+                                    "-name",
+                                    "code",
+                                    "-code"
                                 ],
                                 "type": "string"
                             }
@@ -970,19 +978,19 @@
                             "empty": {
                                 "value": []
                             },
-                            "3": {
+                            "8": {
                                 "value": [
-                                    "3"
+                                    "8"
                                 ]
                             },
-                            "4": {
+                            "7": {
                                 "value": [
-                                    "4"
+                                    "7"
                                 ]
                             },
-                            "5": {
+                            "6": {
                                 "value": [
-                                    "5"
+                                    "6"
                                 ]
                             }
                         }
@@ -1007,12 +1015,6 @@
                         "examples": {
                             "approved": {
                                 "value": "approved"
-                            },
-                            "rejected": {
-                                "value": "rejected"
-                            },
-                            "draft": {
-                                "value": "draft"
                             }
                         }
                     },
@@ -1027,12 +1029,6 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": 3
-                            },
-                            "1": {
-                                "value": 1
-                            },
                             "2": {
                                 "value": 2
                             }
@@ -1051,9 +1047,6 @@
                         "examples": {
                             "2": {
                                 "value": 2
-                            },
-                            "1": {
-                                "value": 1
                             }
                         }
                     }
@@ -1183,14 +1176,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     }
@@ -1253,14 +1246,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     }
@@ -1688,14 +1681,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -1800,14 +1793,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -1912,14 +1905,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -2024,14 +2017,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -2136,14 +2129,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -2248,14 +2241,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -2360,14 +2353,14 @@
                             "type": "string"
                         },
                         "examples": {
-                            "3": {
-                                "value": "3"
+                            "8": {
+                                "value": "8"
                             },
-                            "4": {
-                                "value": "4"
+                            "7": {
+                                "value": "7"
                             },
-                            "5": {
-                                "value": "5"
+                            "6": {
+                                "value": "6"
                             }
                         }
                     },
@@ -2451,6 +2444,127 @@
                     },
                     "422": {
                         "description": "A reason is required, or the application is incomplete (meta lists what is missing)."
+                    }
+                }
+            }
+        },
+        "/registration-applications/{registration_application}/-actions/fields": {
+            "patch": {
+                "summary": "Apply an RFC 6902 JSON Patch to the application's fields. Every operation is authorised for the signed-in person before any is applied; one refused operation refuses the patch. Applicants may change /dateOfBirth, /phone and /applicantNotes while the application is a draft or needs information; reviewers may change /reviewerNotes.",
+                "operationId": "registration-applications.patchFields",
+                "tags": [
+                    "registration-applications"
+                ],
+                "parameters": [
+                    {
+                        "name": "registration_application",
+                        "in": "path",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "8": {
+                                "value": "8"
+                            },
+                            "7": {
+                                "value": "7"
+                            },
+                            "6": {
+                                "value": "6"
+                            }
+                        }
+                    },
+                    {
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Correlation id echoed in the response and stored with the audit entry.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9._-]{8,64}$"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json-patch+json": {
+                            "schema": {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "op",
+                                        "path"
+                                    ],
+                                    "properties": {
+                                        "op": {
+                                            "type": "string",
+                                            "enum": [
+                                                "add",
+                                                "replace",
+                                                "remove",
+                                                "test"
+                                            ]
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "pattern": "^/[A-Za-z][A-Za-z0-9]*$",
+                                            "example": "/phone"
+                                        },
+                                        "value": {
+                                            "description": "Required for add, replace and test."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Show registration-applications",
+                        "content": {
+                            "application/vnd.api+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "jsonapi",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "jsonapi": {
+                                            "type": "object",
+                                            "properties": {
+                                                "version": {
+                                                    "title": "version",
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                }
+                                            }
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/resources.registration-applications.resource.fetch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The signed-in person may not perform an operation on that path (code field_not_allowed, meta.path names it). Nothing was applied."
+                    },
+                    "409": {
+                        "description": "A test operation did not match the stored value (code patch_test_failed), or the applicant may no longer edit (code application_not_editable). Nothing was applied."
+                    },
+                    "415": {
+                        "description": "The body was not sent as application/json-patch+json."
+                    },
+                    "422": {
+                        "description": "The document is not a valid JSON Patch, or a value fails validation (code invalid_patch)."
                     }
                 }
             }
@@ -2567,13 +2681,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             }
                         }
                     },
@@ -2687,13 +2801,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             }
                         }
                     },
@@ -2812,13 +2926,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:16.000000Z"
+                                "example": "2026-09-03T21:24:52.000000Z"
                             }
                         }
                     },
@@ -2910,7 +3024,7 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:14.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             }
                         }
                     },
@@ -3067,7 +3181,7 @@
                     },
                     "id": {
                         "type": "string",
-                        "example": "3"
+                        "example": "8"
                     },
                     "attributes": {
                         "type": "object",
@@ -3075,7 +3189,7 @@
                             "role": {
                                 "title": "role",
                                 "type": "string",
-                                "example": "referee"
+                                "example": "participant"
                             },
                             "status": {
                                 "title": "status",
@@ -3091,7 +3205,7 @@
                             "dateOfBirth": {
                                 "title": "dateOfBirth",
                                 "type": "string",
-                                "example": "1990-06-21T00:00:00.000000Z"
+                                "example": "2001-03-09T00:00:00.000000Z"
                             },
                             "phone": {
                                 "title": "phone",
@@ -3101,8 +3215,18 @@
                                 "title": "applicantNotes",
                                 "type": "string"
                             },
+                            "reviewerNotes": {
+                                "title": "reviewerNotes",
+                                "type": "string",
+                                "readOnly": true
+                            },
                             "missingRequiredDocuments": {
                                 "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "history": {
+                                "title": "history",
                                 "type": "array",
                                 "readOnly": true
                             },
@@ -3110,13 +3234,13 @@
                                 "title": "submittedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:11.000000Z"
                             },
                             "decidedAt": {
                                 "title": "decidedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
                             },
                             "cancelledAt": {
                                 "title": "cancelledAt",
@@ -3127,13 +3251,18 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:02.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
+                            },
+                            "participation": {
+                                "title": "participation",
+                                "type": "object",
+                                "readOnly": true
                             }
                         }
                     },
@@ -3150,12 +3279,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3172,12 +3301,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3194,12 +3323,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3216,12 +3345,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3238,12 +3367,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3273,7 +3402,7 @@
                             "role": {
                                 "title": "role",
                                 "type": "string",
-                                "example": "referee"
+                                "example": "participant"
                             },
                             "status": {
                                 "title": "status",
@@ -3289,7 +3418,7 @@
                             "dateOfBirth": {
                                 "title": "dateOfBirth",
                                 "type": "string",
-                                "example": "1990-06-21T00:00:00.000000Z"
+                                "example": "2001-03-09T00:00:00.000000Z"
                             },
                             "phone": {
                                 "title": "phone",
@@ -3299,8 +3428,18 @@
                                 "title": "applicantNotes",
                                 "type": "string"
                             },
+                            "reviewerNotes": {
+                                "title": "reviewerNotes",
+                                "type": "string",
+                                "readOnly": true
+                            },
                             "missingRequiredDocuments": {
                                 "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "history": {
+                                "title": "history",
                                 "type": "array",
                                 "readOnly": true
                             },
@@ -3308,13 +3447,13 @@
                                 "title": "submittedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:11.000000Z"
                             },
                             "decidedAt": {
                                 "title": "decidedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
                             },
                             "cancelledAt": {
                                 "title": "cancelledAt",
@@ -3325,13 +3464,18 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:02.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
+                            },
+                            "participation": {
+                                "title": "participation",
+                                "type": "object",
+                                "readOnly": true
                             }
                         }
                     },
@@ -3348,12 +3492,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3370,12 +3514,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3392,12 +3536,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3414,12 +3558,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3436,12 +3580,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3468,7 +3612,7 @@
                     },
                     "id": {
                         "type": "string",
-                        "example": "3"
+                        "example": "8"
                     },
                     "attributes": {
                         "type": "object",
@@ -3476,7 +3620,7 @@
                             "role": {
                                 "title": "role",
                                 "type": "string",
-                                "example": "referee"
+                                "example": "participant"
                             },
                             "status": {
                                 "title": "status",
@@ -3492,7 +3636,7 @@
                             "dateOfBirth": {
                                 "title": "dateOfBirth",
                                 "type": "string",
-                                "example": "1990-06-21T00:00:00.000000Z"
+                                "example": "2001-03-09T00:00:00.000000Z"
                             },
                             "phone": {
                                 "title": "phone",
@@ -3502,8 +3646,18 @@
                                 "title": "applicantNotes",
                                 "type": "string"
                             },
+                            "reviewerNotes": {
+                                "title": "reviewerNotes",
+                                "type": "string",
+                                "readOnly": true
+                            },
                             "missingRequiredDocuments": {
                                 "title": "missingRequiredDocuments",
+                                "type": "array",
+                                "readOnly": true
+                            },
+                            "history": {
+                                "title": "history",
                                 "type": "array",
                                 "readOnly": true
                             },
@@ -3511,13 +3665,13 @@
                                 "title": "submittedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:11.000000Z"
                             },
                             "decidedAt": {
                                 "title": "decidedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
                             },
                             "cancelledAt": {
                                 "title": "cancelledAt",
@@ -3528,13 +3682,18 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:02.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:17.000000Z"
+                                "example": "2026-09-04T00:32:30.000000Z"
+                            },
+                            "participation": {
+                                "title": "participation",
+                                "type": "object",
+                                "readOnly": true
                             }
                         }
                     },
@@ -3551,12 +3710,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/3"
+                                                "example": "http://localhost:3001/api/v1/federation/registration-windows/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3573,12 +3732,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/3"
+                                                "example": "http://localhost:3001/api/v1/federation/member-organizations/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3595,12 +3754,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/seasons/3"
+                                                "example": "http://localhost:3001/api/v1/federation/seasons/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3617,12 +3776,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/applicants/3"
+                                                "example": "http://localhost:3001/api/v1/federation/applicants/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3639,12 +3798,12 @@
                                             "related": {
                                                 "title": "related",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             },
                                             "self": {
                                                 "title": "self",
                                                 "type": "string",
-                                                "example": "http://localhost:3001/api/v1/federation/documents/3"
+                                                "example": "http://localhost:3001/api/v1/federation/documents/8"
                                             }
                                         },
                                         "readOnly": true
@@ -3679,12 +3838,12 @@
                             "opensAt": {
                                 "title": "opensAt",
                                 "type": "string",
-                                "example": "2026-08-19T18:55:15.000000Z"
+                                "example": "2026-08-20T21:24:50.000000Z"
                             },
                             "closesAt": {
                                 "title": "closesAt",
                                 "type": "string",
-                                "example": "2026-11-02T18:55:15.000000Z"
+                                "example": "2026-11-03T21:24:50.000000Z"
                             },
                             "roles": {
                                 "title": "roles",
@@ -3704,13 +3863,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             }
                         }
                     },
@@ -3806,12 +3965,12 @@
                             "opensAt": {
                                 "title": "opensAt",
                                 "type": "string",
-                                "example": "2026-08-19T18:55:15.000000Z"
+                                "example": "2026-08-20T21:24:50.000000Z"
                             },
                             "closesAt": {
                                 "title": "closesAt",
                                 "type": "string",
-                                "example": "2026-11-02T18:55:15.000000Z"
+                                "example": "2026-11-03T21:24:50.000000Z"
                             },
                             "roles": {
                                 "title": "roles",
@@ -3831,13 +3990,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             }
                         }
                     },
@@ -3938,12 +4097,12 @@
                             "opensAt": {
                                 "title": "opensAt",
                                 "type": "string",
-                                "example": "2026-08-19T18:55:15.000000Z"
+                                "example": "2026-08-20T21:24:50.000000Z"
                             },
                             "closesAt": {
                                 "title": "closesAt",
                                 "type": "string",
-                                "example": "2026-11-02T18:55:15.000000Z"
+                                "example": "2026-11-03T21:24:50.000000Z"
                             },
                             "roles": {
                                 "title": "roles",
@@ -3963,13 +4122,13 @@
                                 "title": "createdAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             },
                             "updatedAt": {
                                 "title": "updatedAt",
                                 "type": "string",
                                 "readOnly": true,
-                                "example": "2026-09-02T18:55:15.000000Z"
+                                "example": "2026-09-03T21:24:50.000000Z"
                             }
                         }
                     },
