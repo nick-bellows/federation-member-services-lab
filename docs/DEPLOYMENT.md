@@ -1,6 +1,6 @@
 # Deployment architecture
 
-Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document exists in any cloud account. What exists is the release rehearsal in Compose (`deploy/compose.release.yml`), which runs the release images this design would deploy, and the CI matrix, which proves the code on the engine this design chooses. Every service below is named with what it replaces from the Compose stack, so a reader can see that the design is the same system, not a different one.
+Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document exists in any cloud account. What exists is the release rehearsal in Compose (`deploy/compose.release.yml`), which runs the release images this design would deploy, and the CI matrix, which proves the code on the engine this design chooses. Since 2026-09-04 (owner's approval of provisioning, ADR-0015 addendum) a minimal proof of this design is written in Terraform under [`deploy/terraform/`](../deploy/terraform/README.md): validated, priced, and waiting for AWS credentials to be planned and applied. Every service below is named with what it replaces from the Compose stack, so a reader can see that the design is the same system, not a different one.
 
 ## Shape
 

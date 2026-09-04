@@ -472,3 +472,13 @@ _Pending; recorded in the internal review file._
 3. Things that need another person are listed, dated and left undone; doing them anyway would be the only way to fail this milestone.
 
 **Not done, on the owner.** Sending the upstream offer; creating the Auth0 tenant and taking the screenshots; enabling GitHub Pages for the case study or hosting a demo; provisioning anything from `docs/DEPLOYMENT.md`; running upstream's release workflows on the fork.
+
+## 2026-09-04 — After B9: the owner's answers
+
+**Instruction.** The upstream offer moves to the last item and stays unsent; proceed with the Auth0 tenant, provisioning, and a hosted case study.
+
+**Done without the owner.** `docs/index.md` and `docs/_config.yml` make `docs/` a GitHub Pages site (Liquid off so JSON examples survive; the baseline records excluded); Pages is enabled on the fork after the merge. `deploy/terraform/` holds the minimal proof of the deployment design: two public subnets without a NAT, four Fargate services and the one-off migration task on the release images, a single-AZ db.t4g.micro PostgreSQL, an HTTP load balancer with a path rule behind CloudFront on its default certificate, SSM parameters for the six secrets, the `scheduled_task_failed` metric filter and alarm; `terraform validate` passes (`docs/baseline/terraform_validate_2026-09-04.txt`); the README beside it prices the proof at about $2.50 a day while running and lists its gaps. ADR-0015 carries an addendum; the deployment document says what changed.
+
+**Waits for the owner.** AWS credentials on this machine (a profile under `~/.aws`, never in the repository) and the go to apply; the Auth0 tenant's domain, client id and client secret in the two gitignored environment files; then the walk and the screenshots.
+
+**Lesson.** Approval to spend is not the same as the means to spend: the code that would spend it can be written, validated and priced first, so the moment the credentials exist the action is one command and its record is one file.

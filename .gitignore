@@ -21,3 +21,10 @@ docker-compose.override.yml
 /public/storage
 # Release rehearsal environment (deploy/compose.release.yml); the example is tracked.
 /deploy/*.env
+
+# Terraform (deploy/terraform): state, providers and variable files with secrets stay local.
+/deploy/terraform/.terraform/
+/deploy/terraform/*.tfstate
+/deploy/terraform/*.tfstate.*
+/deploy/terraform/*.tfvars
+/deploy/terraform/*.tfplan

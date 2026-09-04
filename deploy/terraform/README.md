@@ -1,0 +1,75 @@
+# Minimal proof on AWS
+
+Status: **validated, not applied.** `terraform validate` passes (`docs/baseline/terraform_validate_2026-09-04.txt`). Planning and applying need AWS credentials the owner supplies; the first `plan` and `apply` outputs will be recorded under `docs/baseline/` and this line updated. The production shape is in [`docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md); this is the smallest honest version of it.
+
+## What it creates
+
+| Resource | Proof size | Why not the production shape |
+|---|---|---|
+| VPC, two public subnets, internet gateway | no NAT gateway | a NAT costs about as much as everything else combined; tasks get public IPs for outbound calls and accept nothing inbound except from the load balancer |
+| ECS Fargate services: api, web, worker, scheduler (1 task each, 0.25 vCPU / 0.5 GB) | smallest Fargate size | sizing is a measurement the proof produces |
+| One-off `migrate` task definition | run by hand per release | as the release checklist says |
+| RDS PostgreSQL 16, db.t4g.micro, 20 GB, single AZ, 1-day backups, no final snapshot | proof | Multi-AZ and retained snapshots for a real environment |
+| Application load balancer, HTTP, path rule `/api/*` | HTTP inside AWS only | CloudFront terminates TLS |
+| CloudFront on its default certificate, caching only `/_next/static/*` | no custom domain | a domain and an ACM certificate when one exists |
+| ECR repositories (immutable tags, scan on push), CloudWatch log group (14 days), a metric filter and alarm on `scheduled_task_failed` | as designed | |
+| SSM SecureString parameters for the six secrets | free | Secrets Manager for rotation later |
+
+Nothing here is the Learning Center: readiness reports it as degraded and a reviewer's refresh answers 503, which is the designed behaviour without a provider.
+
+## Cost, before you apply
+
+Estimated from the AWS price list for `us-east-1`, on-demand, September 2026, for the sizes above:
+
+| Item | Per hour | Per day |
+|---|---|---|
+| Fargate, 4 tasks at 0.25 vCPU / 0.5 GB | about $0.05 | about $1.20 |
+| RDS db.t4g.micro plus 20 GB gp3 | about $0.02 | about $0.50 |
+| Application load balancer (plus a small LCU charge) | about $0.023 | about $0.55 |
+| CloudFront, ECR, CloudWatch, SSM at proof traffic | near zero | under $0.20 |
+| **Total while running** | **about $0.10** | **about $2.50** |
+
+A one-day proof costs a few dollars; a month left running about $75. `terraform destroy` removes everything, including the database (no final snapshot). Prices change; check the calculator before applying.
+
+## Steps
+
+All commands run from the repository root through Docker, since neither Terraform nor the AWS CLI is installed here. `AWS_PROFILE` or the three `AWS_*` variables must be set in the environment the commands run in.
+
+```sh
+# 0. Credentials in ~/.aws (never in the repository); the region in variables.tf.
+# 1. Registries first, so images can be pushed.
+docker run --rm -v "$PWD/deploy/terraform:/tf" -v "$HOME/.aws:/root/.aws:ro" -w /tf hashicorp/terraform:1.9 init
+docker run --rm -v "$PWD/deploy/terraform:/tf" -v "$HOME/.aws:/root/.aws:ro" -w /tf hashicorp/terraform:1.9 apply -target=aws_ecr_repository.api -target=aws_ecr_repository.web
+
+# 2. Build and push the release images for linux/amd64, tagged with the git SHA.
+SHA=$(git rev-parse --short HEAD)
+aws ecr get-login-password | docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
+docker build --platform linux/amd64 -f docker/api/api.release.Dockerfile -t <ecr_api>:$SHA .
+docker build --platform linux/amd64 -f docker/web_application/web_application.Dockerfile -t <ecr_web>:$SHA .
+docker push <ecr_api>:$SHA && docker push <ecr_web>:$SHA
+
+# 3. Everything else, with the images and the Auth0 values (docs/AUTH0_WALKTHROUGH.md).
+#    terraform.tfvars is gitignored; the secret goes there, never in a commit.
+docker run --rm -v ... hashicorp/terraform:1.9 apply \
+  -var api_image=<ecr_api>:$SHA -var web_image=<ecr_web>:$SHA \
+  -var oidc_issuer=https://<tenant>.<region>.auth0.com/ -var auth0_client_id=... -var auth0_client_secret=...
+
+# 4. Add the auth0_callback_url output to the Auth0 application, then migrate once and seed.
+$(terraform output -raw run_migrate_command)
+# seed: run the same task definition with the command overridden to
+#   php artisan db:seed --class=NorthgateDemoSeeder --force
+
+# 5. Verify (docs/RELEASE.md lines 15 to 18): /api/health/ready 200 through CloudFront,
+#    a sign-in through Auth0, the outbox age below 60 s, no scheduled_task_failed.
+
+# 6. Tear down.
+docker run --rm -v ... hashicorp/terraform:1.9 destroy
+```
+
+## Known gaps in the proof, on purpose
+
+- Public subnets with public IPs on the tasks, no NAT, no VPC endpoints.
+- No WAF rate rule; upstream's per-user throttle is the only limit.
+- The scheduler and worker have no autoscaling; one task each.
+- No X-Ray or collector; traces are off (`OTEL_EXPORTER=none`).
+- The database password, `APP_KEY` and the tokens are generated by Terraform and stored in SSM; rotation is manual.
