@@ -1,0 +1,20 @@
+# gitleaks configuration (Phase C, C3): the default rule set, unchanged.
+# Known non-secrets are listed by fingerprint in .gitleaksignore, never by
+# path or pattern, so that a real secret in the same file is still found.
+# CI runs `gitleaks detect` over the whole history and fails the build on any
+# finding (.github/workflows/ci.yml, job secret-scan). Run it locally with
+#   docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.18.4 detect --source /repo --config /repo/.gitleaks.toml --redact
+title = "federation-member-services-lab"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Build output and dependency trees are never committed; listed so a local scan with --no-git stays quiet"
+paths = [
+  '''(^|[\\/])node_modules([\\/]|$)''',
+  '''(^|[\\/])vendor([\\/]|$)''',
+  '''(^|[\\/])\.next([\\/]|$)''',
+  '''(^|[\\/])test-results([\\/]|$)''',
+  '''(^|[\\/])playwright-report([\\/]|$)''',
+]

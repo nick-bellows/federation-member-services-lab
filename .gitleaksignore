@@ -1,0 +1,8 @@
+# Findings gitleaks may skip, one fingerprint per line (commit:path:rule:line).
+# Reviewed 2026-09-10 (Phase C, C3). Every entry names why it is not a secret.
+#
+# Upstream's "make open source" commit seeded a development Sanctum token for
+# the public apply form in UsersTableSeeder; the file no longer contains it
+# (removed upstream in c730f46) and the value never left development. It is
+# upstream's history, which the fork keeps unchanged (ADR-0001).
+0a6f7139a386a1f4fb441f5706103fabdb4520aa:api/database/seeders/UsersTableSeeder.php:generic-api-key:18

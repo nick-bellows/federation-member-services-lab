@@ -524,3 +524,15 @@ vendor/bin/pint --test <the fork's paths and the new migration>   # PASS, 144 fi
 1. A rule at a boundary names two things: the key and its owner, the answer and its question, the window and its hierarchy, the row and its lock. A check that names one of them is a check of the wrong thing, and tests of that one thing will keep passing.
 2. A test that normalises a mismatch is worse than none: it records the defect as the intended behaviour, and every later reader trusts it. Grep for the pattern once the first one is found; there were three.
 3. Simulate an interleaving deterministically (a listener at the transaction's start) rather than racing two connections. The property under test is the ordering, and ordering can be asserted on every engine on every run; the docblock says what the simulation does not prove.
+
+## 2026-09-10 — Phase C, C3: the secret-scan gate
+
+**Goal.** A CI job that fails the build on a secret anywhere in the history, with the one inherited finding excluded by fingerprint and with its reason, so that a reviewer can see both that the gate exists and what it was told to ignore.
+
+**Built.** `.gitleaks.toml` (the default rule set; build-output paths excluded for local `--no-git` runs), `.gitleaksignore` (one fingerprint: upstream's development Sanctum token in `UsersTableSeeder` at `0a6f713`, removed upstream in `c730f46`), and the `secret-scan` job in `.github/workflows/ci.yml` running gitleaks v8.18.4 in Docker over the full history with `--exit-code 2`. The version is pinned so that the fingerprint stays stable; a newer gitleaks would be adopted with its own run and, if needed, its own entries.
+
+**Evidence.** `docs/baseline/gitleaks_2026-09-10.txt`: 199 commits scanned; one finding without the ignore file, none with it; the job's first pull request is #16.
+
+**What went wrong.** The first attempt to record "without the ignore list" passed `--gitleaks-ignore-path /nonexistent`, and gitleaks reported no leaks anyway, which would have made the record claim a difference it did not show. The file was moved aside for the run instead, and the record now carries both runs as they happened.
+
+**Lesson.** A gate's record must show it failing on the thing it is for, not only passing; otherwise it is a green badge, not evidence. The same rule as the fail-then-pass regression tests.

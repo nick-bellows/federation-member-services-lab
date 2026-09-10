@@ -1,0 +1,25 @@
+# gitleaks over the full history, 2026-09-10 (Phase C, C3)
+# docker run --rm -v <repo>:/repo zricethezav/gitleaks:v8.18.4 detect --source /repo [--config /repo/.gitleaks.toml] --redact --exit-code 2
+
+## Without .gitleaksignore (the file moved aside for this run)
+Finding:     'token' => 'REDACTED'
+Secret:      REDACTED
+RuleID:      generic-api-key
+Entropy:     3.748232
+File:        api/database/seeders/UsersTableSeeder.php
+Line:        18
+Commit:      0a6f7139a386a1f4fb441f5706103fabdb4520aa
+Author:      (upstream maintainer; public commit metadata, not repeated here)
+Email:       (as above)
+Date:        2025-07-07T15:05:27Z
+Fingerprint: 0a6f7139a386a1f4fb441f5706103fabdb4520aa:api/database/seeders/UsersTableSeeder.php:generic-api-key:18
+INF 199 commits scanned.
+INF scan completed in 18s
+WRN leaks found: 1
+exit: 2
+
+## With .gitleaks.toml and .gitleaksignore (as the CI job runs it)
+INF 199 commits scanned.
+INF scan completed in 17.7s
+INF no leaks found
+exit: 0
