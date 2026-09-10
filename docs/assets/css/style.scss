@@ -27,6 +27,15 @@ footer a {
     color: #4a4a4a;
 }
 
+// The theme's "View the Project on GitHub" line renders the repository name
+// as an 11px <small> in #777 (4.5:1 fails at that size); the check after the
+// C4 merge still reported it (docs/baseline/pages_site_2026-09-10.txt).
+a small,
+a:hover small,
+a:focus small {
+    color: #4a4a4a;
+}
+
 video {
     max-width: 100%;
     height: auto;
