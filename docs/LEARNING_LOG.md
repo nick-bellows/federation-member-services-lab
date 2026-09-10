@@ -536,3 +536,38 @@ vendor/bin/pint --test <the fork's paths and the new migration>   # PASS, 144 fi
 **What went wrong.** The first attempt to record "without the ignore list" passed `--gitleaks-ignore-path /nonexistent`, and gitleaks reported no leaks anyway, which would have made the record claim a difference it did not show. The file was moved aside for the run instead, and the record now carries both runs as they happened.
 
 **Lesson.** A gate's record must show it failing on the thing it is for, not only passing; otherwise it is a green badge, not evidence. The same rule as the fail-then-pass regression tests.
+
+## 2026-09-10 — Phase C, C2: the release proof hardened
+
+**Goal.** Close the release-proof findings of the external reviews: the load-balancer rule that would have swallowed the identity callback, the unencrypted database, the API image that started as root; re-validate the Terraform and re-run the release rehearsal on the changed image.
+
+**Built.** `deploy/terraform/edge.tf`: a rule for `/api/auth/*` to the web target group at priority 5 ahead of `/api/*` at 10, with a `precondition` on the API rule that fails the plan if the order drifts; the API target group on 8080. `main.tf`: `storage_encrypted = true` on the database, the tasks' ingress on 8080. `ecs.tf`: port, health check and container port on 8080, every task on the API image as `1000:1000`. `versions.tf`: the remote-state note with the backend block a shared apply needs. `docker/api/api.release.Dockerfile`: the `user` directives removed, nginx's runtime directories owned by the application user, its logs symlinked to the container's streams, `EXPOSE 8080`, the health check on 8080, `USER verein` last; `docker/api/nginx.release.conf` listening on 8080; `deploy/compose.release.yml` mapping `3011:8080` and pointing the web image at `http://api:8080`. ADR-0015 carries an addendum; the deployment document, the release checklist, the Terraform README and threat-model leaf 6.4 say what changed.
+
+**Commands run.**
+
+```sh
+docker run --rm -v .../deploy/terraform:/tf -w /tf hashicorp/terraform:1.9 fmt -check && ... init -backend=false && ... validate   # docs/baseline/terraform_validate_2026-09-10.txt
+docker compose -p federation-release -f deploy/compose.release.yml build                               # about 35 minutes on this machine
+bash rehearsal_c2.sh                                                                                    # docs/baseline/release_rehearsal_2026-09-10.txt
+docker compose -p federation-release -f deploy/compose.release.yml down -v
+```
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Terraform | `docs/baseline/terraform_validate_2026-09-10.txt` | `fmt -check` clean, `validate` succeeds with the two rules, the precondition and the encrypted storage |
+| Rootless image | `docs/baseline/release_rehearsal_2026-09-10.txt` | `id` inside the container is `verein`; every process (25 nginx, 7 php-fpm) runs as `verein`; no `user` directive left in `nginx.conf`; the access log is `/dev/stdout` and an access line appears in `docker compose logs api`; the health check's own request on 8080 answers 200 |
+| Release checklist lines 5 to 12 | same | no environment file, no tests in the image; migrations as a one-off task (the C1 migration included); readiness 200 after 2 s; the schedule lists the federation tasks; checks and metrics 401 without the token and 200 with it; the web image answers |
+| Signed-in journeys | same, second attempt | sign-in 3 of 3 and registration review 4 of 4 against the release web image; the outbox processed count rose from 7 to 10 |
+
+**What went wrong, in order.**
+
+1. The first run of the journeys failed two tests and skipped three: the web container logged `connect ECONNREFUSED 172.23.0.6:80`. The API's port had moved to 8080 with the rootless image and the rehearsal's own web environment still named port 80 (`API_DOMAIN: http://api`). The record keeps the failed attempt, the diagnosis and the second run. The Terraform proof was already right, because there the web app reaches the API through the load balancer on 80 and the load balancer forwards to 8080.
+2. `docker images` takes one repository at a time; the rehearsal script asked for two and had to be corrected before it ran.
+
+**Three lessons.**
+
+1. A port is named in more places than the file that binds it: the image, the health check, the Compose mapping, the consumer's environment, the target group, the security group and the container port. Change it with a grep, then with a rehearsal.
+2. A precondition is a regression test for infrastructure code that costs nothing to run; the plan is its test run. `validate` alone does not evaluate it, which the exercise E27 in the internal record makes visible.
+3. Rootless is a set of small facts, each checkable with one command inside the running container; the record lists them so a reviewer can re-check without trusting the Dockerfile's comments.

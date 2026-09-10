@@ -91,8 +91,8 @@ resource "aws_security_group" "tasks" {
 
   ingress {
     description     = "API from the load balancer"
-    from_port       = 80
-    to_port         = 80
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -293,6 +293,7 @@ resource "aws_db_instance" "this" {
   instance_class          = var.db_instance_class
   allocated_storage       = var.db_allocated_storage_gb
   storage_type            = "gp3"
+  storage_encrypted       = true # the default AWS-managed KMS key; a proof still holds synthetic personal data (C2)
   db_name                 = "verein"
   username                = "verein"
   password                = random_password.db.result

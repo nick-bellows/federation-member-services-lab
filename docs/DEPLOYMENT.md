@@ -8,7 +8,7 @@ Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document ex
                        ┌──────────────────────────────────────────────┐
   people ───► CloudFront ──► ALB ──┬─► ECS Fargate: web (Next.js, standalone image)
                                    │
-                                   └─► ECS Fargate: api (nginx + PHP-FPM, release image)
+                                   └─► ECS Fargate: api (nginx + PHP-FPM as the application user, port 8080, release image)
                                                    │         │
                                      ECS Fargate: worker    ECS Fargate: scheduler
                                      (federation:work)      (schedule:work)
@@ -27,7 +27,7 @@ Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document ex
 | Component | Replaces in Compose | Design |
 |---|---|---|
 | CloudFront | nothing (the browser hits the containers) | One distribution, two origins: the web service and the API service. TLS from ACM. Caches only static assets under `/_next/static`; everything else passes through. WAF rate rule for anonymous traffic (threat model 4.5). |
-| Application load balancer | the published ports 3000 and 3001 | Two target groups. Health check on `/api/health/ready` for the API (503 drains an instance whose outbox is backing up, which is the intent of readiness, ADR-0012) and on `/en/member/sign-in` for the web app. Only CloudFront's prefix list may reach it. |
+| Application load balancer | the published ports 3000 and 3001 | Two target groups. Path rules in order: `/api/auth/*` to the web app first (NextAuth's callback lives there), then `/api/*` to the API; the Terraform proof asserts that order with a precondition (C2). Health check on `/api/health/ready` for the API (503 drains an instance whose outbox is backing up, which is the intent of readiness, ADR-0012) and on `/en/member/sign-in` for the web app. Only CloudFront's prefix list may reach it. |
 | ECS Fargate, `api` | the `api` container | The release image, 2 tasks minimum, CPU and memory sized after a load run on the real engine (the k6 numbers in `docs/PERFORMANCE.md` are from a laptop). Environment from Secrets Manager and SSM. `RUN_MIGRATIONS` unset. |
 | ECS Fargate, `worker` | `docker compose exec -d -u verein api php artisan federation:work` | Same image, command `php artisan federation:work`, 1 task; scale on `federation_outbox_unpublished`. Restart on exit. |
 | ECS Fargate, `scheduler` | nothing (run by hand until B8) | Same image, command `php artisan schedule:work`, exactly 1 task (the schedule uses `withoutOverlapping`, which also guards a second task by accident). |
@@ -55,6 +55,7 @@ Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document ex
 | Proven by `deploy/compose.release.yml` | Not proven until an environment exists |
 |---|---|
 | The release images build from a clean context and start with no bind mount | Task sizing, autoscaling thresholds |
+| The API image runs as the application user on port 8080 (C2; `id` inside the container and the rehearsal record) | The load balancer's rule order in front of a real identity provider (the precondition guards it; the walk proves it) |
 | The API answers liveness and readiness from the release image | ALB health-check timing under real latency |
 | A migration runs once as a task, not on every start | IAM boundaries, secret rotation |
 | The worker and the scheduler run as separate containers on the same image | CloudFront caching behaviour for the App Router |

@@ -94,8 +94,8 @@ locals {
     api = {
       command     = null
       migrations  = "0"
-      port        = 80
-      healthcheck = ["CMD-SHELL", "curl -fsS http://127.0.0.1/api/health/live || exit 1"]
+      port        = 8080 # nginx as the application user (C2)
+      healthcheck = ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/api/health/live || exit 1"]
     }
     worker = {
       command     = ["php", "artisan", "federation:work"]
@@ -139,7 +139,7 @@ resource "aws_ecs_task_definition" "php" {
       image        = var.api_image
       essential    = true
       command      = each.value.command
-      user         = each.key == "api" ? null : "1000:1000"
+      user         = "1000:1000" # the image's USER since C2; stated here so no task ever runs as root by accident
       environment  = concat(local.api_environment, [{ name = "RUN_MIGRATIONS", value = each.value.migrations }])
       secrets      = local.api_secrets
       portMappings = each.value.port == null ? [] : [{ containerPort = each.value.port, protocol = "tcp" }]
@@ -201,7 +201,7 @@ resource "aws_ecs_service" "api" {
   load_balancer {
     target_group_arn = aws_lb_target_group.api.arn
     container_name   = "api"
-    container_port   = 80
+    container_port   = 8080
   }
 
   depends_on = [aws_lb_listener.http]
