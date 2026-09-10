@@ -482,3 +482,45 @@ _Pending; recorded in the internal review file._
 **Waits for the owner.** AWS credentials on this machine (a profile under `~/.aws`, never in the repository) and the go to apply; the Auth0 tenant's domain, client id and client secret in the two gitignored environment files; then the walk and the screenshots.
 
 **Lesson.** Approval to spend is not the same as the means to spend: the code that would spend it can be written, validated and priced first, so the moment the credentials exist the action is one command and its record is one file.
+
+## 2026-09-10 — Phase C, C1: the four reviewed defects
+
+**Goal.** Fix the four defects the external reviews of 2026-09-04 found and 237 passing tests never caught, each with a regression test that fails before and passes after; take the inherited workflow fix and one flaky upstream test with them; record the boundary rules as ADR-0016.
+
+**Found on arrival.** The CI run for the Phase C planning merge (pull request #14, documentation only) was red on the MariaDB job: upstream's `MemberTest::test_consent_boolean_mutates_timestamp_column` compares a stored `now()` with a second `now()` read after the request, and on the runner the second had ticked between the two. One flaky test in a documentation-only run is exactly the "green on every run" sentence C4 has to stop writing; the test is fixed here and goes into the upstream offer as item 6.
+
+**Commands run (tooling container, `api/`).**
+
+```sh
+php artisan test --filter 'StartApplicationTest|RegistrationApplicationsHttpTest|CredentialFactsTest|CredentialSnapshotsTest|ParticipationHttpTest|RegistrationWindowsHttpTest|ConcurrentAuthorizationTest|MemberTest'
+  # before the fixes: 11 failed, 49 passed -> docs/baseline/c1_tests_before.txt
+php artisan test --filter '...|ParticipationResolverTest|ApplicationFieldsPatchHttpTest|ApplicationDocumentsHttpTest|SchemaIdentifierLengthTest'
+  # after the fixes: 85 passed -> docs/baseline/c1_tests_after.txt
+php artisan test                      # the whole suite on SQLite -> docs/baseline/phpunit_after_c1_backend.txt
+vendor/bin/pint --test <the fork's paths and the new migration>   # PASS, 144 files
+```
+
+**Built.** `StartApplication` looks a key up for the applicant who presented it and refuses the same key with another window or role (`IdempotencyKeyReusedException`, 409 `idempotency_key_reused`); the controller fills details only on a freshly created application; the unique constraint moves to `(applicant_user_id, idempotency_key)` (migration `2026_09_10_100000`). `CredentialFacts::fromArray` takes the subject that was asked for and refuses an answer about anyone else; the HTTP client and the participation resolver pass it; the tests that had mapped alex's URL to sam's fixture now build alex's answer with sam's eligibility. `RegistrationWindowController` checks the season's federation against the organization's (409 `season_not_in_federation`). `PatchApplicationFields`, `AttachDocumentMetadata` and `ReviewDocument` lock the application before they decide anything. `publish.yml` reads the branch name from `env:`. Ten regression tests, three of them in the new `ConcurrentAuthorizationTest`, which moves the application on at the moment the action's transaction begins and asserts the refusal.
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Regression tests before the fixes | `docs/baseline/c1_tests_before.txt` | 11 failed, 49 passed: the ten new tests and the consent test |
+| The same after the fixes | `docs/baseline/c1_tests_after.txt` | 85 passed (the touched classes plus the resolver, patch, document and identifier-length tests) |
+| Whole suite | `docs/baseline/phpunit_after_c1_backend.txt` | 247 passed on SQLite; the three engines run in CI on the pull request |
+| Style | this session | Pint PASS on 144 fork files including the migration |
+
+**What went wrong, in order.**
+
+1. The first fix for the consent test froze the clock. The schema serialises the consent as `isPast()` of the stored instant, and with a frozen clock nothing is past, so the response said `false` and the test failed differently. The test now brackets the request between two instants and asserts the stored value lies between them.
+2. The two tests that make two applicants share a key passed and then failed at teardown: `DatabaseMigrations` rolls back after each test, and the new migration's `down` restores the global unique constraint that two rows now violate. The rollback is right to fail; the tests remove the second row before it, and the migration's `down` says why it can fail.
+3. `ParticipationResolver` reads the stored payload through the same value object, so binding the subject there broke the resolver's unit test, whose hand-built snapshots carried no subject. They carry one now; that is the check doing its job on a row that would otherwise read as nobody's.
+4. The whole suite then found one more test that had normalised the mismatch, in the reconciliation command's test; it builds the person's own answer now. Three tests had encoded the defect as intended behaviour, not one.
+5. Writing the tests through a shell heredoc on this machine collapsed doubled backslashes in PHP namespaces; the edits were redone through scripts written as files.
+
+**Three lessons.**
+
+1. A rule at a boundary names two things: the key and its owner, the answer and its question, the window and its hierarchy, the row and its lock. A check that names one of them is a check of the wrong thing, and tests of that one thing will keep passing.
+2. A test that normalises a mismatch is worse than none: it records the defect as the intended behaviour, and every later reader trusts it. Grep for the pattern once the first one is found; there were three.
+3. Simulate an interleaving deterministically (a listener at the transaction's start) rather than racing two connections. The property under test is the ordering, and ordering can be asserted on every engine on every run; the docblock says what the simulation does not prove.

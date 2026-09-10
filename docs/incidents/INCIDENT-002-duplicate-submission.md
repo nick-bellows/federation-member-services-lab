@@ -28,6 +28,7 @@ Submission was a plain state write with no identity for the *attempt*, and uniqu
 | Layer | Mechanism | Where |
 |---|---|---|
 | Attempt identity | The page mints one idempotency key per attempt and reuses it for retries; the API stores it with the transition and answers the same state for the same key without a new audit row | `ApplicantControls.tsx`, `TransitionApplication::execute`, `transition_idempotency_key` |
+| Attempt identity on the start | A start's key belongs to the applicant who presented it: the same applicant, key, window and role answers the stored application untouched; the same key with other parameters is 409 `idempotency_key_reused`; another person's key is their own. Found by the external reviews of 2026-09-04 (the key was looked up globally and a replay re-filled the details); fixed in C1 (ADR-0016) | `StartApplication::execute`, migration `2026_09_10_100000`, `StartApplicationTest`, `RegistrationApplicationsHttpTest` |
 | State machine | A second submit of an already submitted application with a *new* key is an illegal transition, 409 `illegal_transition` | `ApplicationTransitions` |
 | One live application | `StartApplication` checks for a live application first (domain exception, 409 `duplicate_application`) | `StartApplication` |
 | Concurrency backstop | `active_key`, a nullable unique column set while the application is live, rejects the loser of a race at the database; the violation is translated to the same exception | migration `…create_registration_applications_table.php`, `StartApplication` |

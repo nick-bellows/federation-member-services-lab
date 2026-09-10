@@ -22,7 +22,7 @@ Accept: application/json
 |---|---|---|
 | `contract` | string | Always `learning-center.credentials.v1`. The consumer rejects any other value. |
 | `member.id` | uuid | The provider's member id, for support and reconciliation. Never used as a key by the consumer. |
-| `member.subject` | string | The subject that was asked for. |
+| `member.subject` | string | The subject that was asked for. The consumer compares it with the subject it asked about and refuses the answer as a contract mismatch when they differ (ADR-0016); an answer about another person is never stored. |
 | `member.roles` | string[] | The provider's roles for the person (`learner`, `instructor`, `admin`, `coach`, `referee`). |
 | `as_of` | RFC 3339 instant | When the provider evaluated the answer. The consumer stores it next to its own fetch time. |
 | `eligibility.status` | enum | `eligible`, `suspended`, `ineligible_lapsed`, exactly the provider's public eligibility vocabulary. The consumer branches on this field only. |
