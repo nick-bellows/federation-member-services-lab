@@ -55,14 +55,15 @@ services:
       database:
         condition: service_healthy
     ports:
-      - "3011:80"
+      - "3011:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks: [release]
     restart: unless-stopped
 
-  # The worker and the scheduler run as the application user; only the API
-  # container starts as root, for nginx and PHP-FPM to bind and drop privileges.
+  # Every container on the API image runs as the application user (the image's
+  # USER since C2; nginx listens on 8080). The worker and the scheduler say it
+  # explicitly as well, so a task definition never runs them as root by accident.
   worker:
     image: federation-api:release
     env_file: release.env
@@ -101,7 +102,7 @@ services:
     environment:
       WEB_APPLICATION_URL: http://localhost:3010
       WEBSITE_URL: http://localhost:3010
-      API_DOMAIN: http://api
+      API_DOMAIN: http://api:8080 # the API image listens on 8080 since C2 (rootless nginx)
       API_PATH: /api/v1
       API_BEARER_TOKEN: ""
       NEXTAUTH_URL: http://localhost:3010

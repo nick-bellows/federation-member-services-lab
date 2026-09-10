@@ -485,3 +485,36 @@ A refused patch, attachment or review now opens and rolls back a transaction; `C
 3. How do you test "the check must happen after the lock" without a real race?
 4. The Learning Center answered with the wrong person's facts. Whose fault is that, and why does the consumer check it anyway?
 5. You found a flaky upstream test and a workflow-injection risk on the way. Why fix them here rather than only report them?
+
+## Phase C — Closing: the release proof and the secret-scan gate (C2, C3)
+
+### What it does
+
+C2 hardens the Terraform proof and the release image after the same reviews: a load-balancer rule sends `/api/auth/*` (NextAuth's callback) to the web app ahead of the `/api/*` rule, with a precondition that fails the plan if the order drifts; the database storage is encrypted at rest; the API release image starts as the application user with nginx on 8080 and PHP-FPM on the loopback, its logs on the container's streams, and the Compose rehearsal and the Terraform port mappings follow; `versions.tf` says what remote state a shared apply needs. `terraform validate` and the release rehearsal are re-run and re-recorded. C3 adds a `secret-scan` job that runs gitleaks over the full history and fails the build, with the one inherited development token listed by fingerprint and with its reason; the record shows the scan failing without the ignore list and passing with it.
+
+### Why we built it this way
+
+A path rule is an ordered list, and the narrower rule must come first; a precondition turns that ordering into a plan-time test. Rootless is a set of small facts (port, directories, no user switching, logs on the streams, `USER` last), each of which the rehearsal can check with one command. A gate is evidence only when it has been seen to fail, so the record carries both runs. The ignore list names a fingerprint rather than a path so that a real secret in the same file is still found, and the scanner version is pinned so the fingerprint stays stable.
+
+### Alternatives considered
+
+Two load balancers or two CloudFront origins instead of path rules (more cost, the same ordering question at the edge); keeping the root-then-drop start (upstream's shape; works, but a reviewer's first question); a path allowlist for the scanner (a hole); scanning the working tree only (misses history).
+
+### Failure modes
+
+A non-root nginx that cannot write its pid file; a health check still on port 80 marking the container unhealthy forever; the `docker images` command taking one repository at a time in the rehearsal script; a first "without the ignore list" scan that passed because the flag meant to disable the ignore file did not, caught by re-running with the file moved aside.
+
+### Tradeoffs
+
+A pinned scanner version that must be bumped deliberately; a rehearsal that takes a quarter of an hour of image builds per change to the image; the proof's encryption with the AWS-managed key rather than a customer-managed one.
+
+### Code to locate immediately
+
+`deploy/terraform/edge.tf` (the two rules and the precondition) · `deploy/terraform/main.tf` (`storage_encrypted`, the 8080 ingress) · `docker/api/api.release.Dockerfile` (the rootless block and `USER`) · `docker/api/nginx.release.conf` · `deploy/compose.release.yml` (`3011:8080`) · `.github/workflows/ci.yml` (`secret-scan`) · `.gitleaksignore` · `docs/baseline/release_rehearsal_2026-09-10.txt`, `terraform_validate_2026-09-10.txt`, `gitleaks_2026-09-10.txt`
+
+### Likely interviewer questions
+
+1. Your proof's load balancer would have broken sign-in. How did that get past validation, and what catches it now?
+2. What does it take to run nginx as a non-root user, and how do you prove the container really is?
+3. Why pin the secret scanner's version?
+4. What would you have to change in this proof before two people could apply it?

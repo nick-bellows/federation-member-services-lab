@@ -12,7 +12,7 @@ resource "aws_lb" "this" {
 
 resource "aws_lb_target_group" "api" {
   name        = "${local.name}-api"
-  port        = 80
+  port        = 8080 # the release image runs nginx as the application user (C2)
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.this.id
@@ -55,9 +55,35 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+# Rule order matters: the identity callback lives under /api/auth/* and
+# belongs to the web app (NextAuth), while everything else under /api/* is
+# Laravel. The narrower rule must win, so it carries the lower priority
+# number; the precondition on the API rule turns a drift into a plan error
+# rather than a sign-in that dies at the callback (C2, from the reviews).
+locals {
+  auth_rule_priority = 5
+  api_rule_priority  = 10
+}
+
+resource "aws_lb_listener_rule" "auth" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = local.auth_rule_priority
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/auth/*"]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "api" {
   listener_arn = aws_lb_listener.http.arn
-  priority     = 10
+  priority     = local.api_rule_priority
 
   action {
     type             = "forward"
@@ -67,6 +93,13 @@ resource "aws_lb_listener_rule" "api" {
   condition {
     path_pattern {
       values = ["/api/*"]
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = local.auth_rule_priority < local.api_rule_priority
+      error_message = "The identity callback rule (/api/auth/* to the web app) must have a lower priority number than the API rule (/api/*), or NextAuth's callback is swallowed by Laravel."
     }
   }
 }

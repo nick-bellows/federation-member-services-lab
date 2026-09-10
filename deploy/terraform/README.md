@@ -1,16 +1,16 @@
 # Minimal proof on AWS
 
-Status: **validated, not applied.** `terraform validate` passes (`docs/baseline/terraform_validate_2026-09-04.txt`). Planning and applying need AWS credentials the owner supplies; the first `plan` and `apply` outputs will be recorded under `docs/baseline/` and this line updated. The production shape is in [`docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md); this is the smallest honest version of it.
+Status: **validated, not applied.** `terraform validate` passes (`docs/baseline/terraform_validate_2026-09-04.txt`; re-run after the C2 changes, `terraform_validate_2026-09-10.txt`). Planning and applying need AWS credentials the owner supplies; the first `plan` and `apply` outputs will be recorded under `docs/baseline/` and this line updated. The production shape is in [`docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md); this is the smallest honest version of it.
 
 ## What it creates
 
 | Resource | Proof size | Why not the production shape |
 |---|---|---|
 | VPC, two public subnets, internet gateway | no NAT gateway | a NAT costs about as much as everything else combined; tasks get public IPs for outbound calls and accept nothing inbound except from the load balancer |
-| ECS Fargate services: api, web, worker, scheduler (1 task each, 0.25 vCPU / 0.5 GB) | smallest Fargate size | sizing is a measurement the proof produces |
+| ECS Fargate services: api, web, worker, scheduler (1 task each, 0.25 vCPU / 0.5 GB); every task on the API image runs as the application user, the API on port 8080 | smallest Fargate size | sizing is a measurement the proof produces |
 | One-off `migrate` task definition | run by hand per release | as the release checklist says |
-| RDS PostgreSQL 16, db.t4g.micro, 20 GB, single AZ, 1-day backups, no final snapshot | proof | Multi-AZ and retained snapshots for a real environment |
-| Application load balancer, HTTP, path rule `/api/*` | HTTP inside AWS only | CloudFront terminates TLS |
+| RDS PostgreSQL 16, db.t4g.micro, 20 GB encrypted at rest, single AZ, 1-day backups, no final snapshot | proof | Multi-AZ, retained snapshots and a customer-managed key for a real environment |
+| Application load balancer, HTTP, path rules `/api/auth/*` to the web app (priority 5, the identity callback) then `/api/*` to the API (priority 10), with a precondition that keeps that order | HTTP inside AWS only | CloudFront terminates TLS |
 | CloudFront on its default certificate, caching only `/_next/static/*` | no custom domain | a domain and an ACM certificate when one exists |
 | ECR repositories (immutable tags, scan on push), CloudWatch log group (14 days), a metric filter and alarm on `scheduled_task_failed` | as designed | |
 | SSM SecureString parameters for the six secrets | free | Secrets Manager for rotation later |
@@ -37,6 +37,9 @@ All commands run from the repository root through Docker, since neither Terrafor
 
 ```sh
 # 0. Credentials in ~/.aws (never in the repository); the region in variables.tf.
+#    State: local for a one-person proof (terraform.tfstate holds the generated
+#    secrets and is gitignored). For anything two people or two machines touch,
+#    configure the S3 backend in versions.tf before the first apply.
 # 1. Registries first, so images can be pushed.
 docker run --rm -v "$PWD/deploy/terraform:/tf" -v "$HOME/.aws:/root/.aws:ro" -w /tf hashicorp/terraform:1.9 init
 docker run --rm -v "$PWD/deploy/terraform:/tf" -v "$HOME/.aws:/root/.aws:ro" -w /tf hashicorp/terraform:1.9 apply -target=aws_ecr_repository.api -target=aws_ecr_repository.web

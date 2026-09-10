@@ -21,7 +21,7 @@ Every line has an owner (the person releasing) and evidence (a link or a file). 
 ### Build
 
 5. `docker build -f docker/api/api.release.Dockerfile -t federation-api:<sha> .` and the web image likewise; both from a clean checkout of the merge commit (the ignore lists exclude `.env*`, `vendor`, `node_modules`, `.next`).
-6. `docker run --rm federation-api:<sha> sh -c 'test ! -e /var/www/html/.env && php artisan about --only=environment'`: no environment file inside the image, configuration from the environment only.
+6. `docker run --rm federation-api:<sha> sh -c 'test ! -e /var/www/html/.env && php artisan about --only=environment'`: no environment file inside the image, configuration from the environment only; `docker run --rm federation-api:<sha> id` prints the application user, not root (C2).
 7. Push both images to the registry under the SHA tag. Retain the previous release's tag.
 
 ### Rehearse (Compose, every release)

@@ -8,7 +8,9 @@
 #   - the build toolchain lives in a separate stage and is not shipped;
 #   - the entrypoint caches configuration and waits for the configured
 #     database, and migrates only when RUN_MIGRATIONS=1 (a one-off task);
-#   - a HEALTHCHECK asks liveness.
+#   - a HEALTHCHECK asks liveness;
+#   - the container starts as the application user (C2): nginx listens on
+#     8080 and PHP-FPM on the loopback, so nothing needs root to bind.
 #
 # Build from the repository root:
 #   docker build -f docker/api/api.release.Dockerfile -t federation-api:<git sha> .
@@ -50,13 +52,20 @@ RUN apk add --no-cache bash curl nginx icu-libs libzip libpng libjpeg-turbo free
     && pecl install imagick && docker-php-ext-enable imagick \
     && apk del .build-deps
 
-RUN sed -ri -e "s!user nginx!user ${USER_NAME}!g" /etc/nginx/nginx.conf \
-    && sed -ri -e "s!user = www-data!user = ${USER_NAME}!g" /usr/local/etc/php-fpm.d/www.conf \
-    && sed -ri -e "s!group = www-data!group = ${GROUP_NAME}!g" /usr/local/etc/php-fpm.d/www.conf \
+# Rootless (C2): a non-root master cannot switch users, so the `user`
+# directives are removed rather than pointed at the user; nginx's runtime
+# directories become the user's, and its logs go to the container's streams
+# like PHP-FPM's.
+RUN sed -ri -e "/^user[[:space:]]+nginx;/d" /etc/nginx/nginx.conf \
+    && sed -ri -e "/^user = www-data/d" -e "/^group = www-data/d" /usr/local/etc/php-fpm.d/www.conf \
     && printf '\ncatch_workers_output = yes\ndecorate_workers_output = no\n' >> /usr/local/etc/php-fpm.d/www.conf \
-    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && mkdir -p /run/nginx /var/lib/nginx/tmp /var/log/nginx \
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && chown -R ${USER_NAME}:${GROUP_NAME} /run/nginx /var/lib/nginx /var/log/nginx
 
-COPY docker/api/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/api/nginx.release.conf /etc/nginx/http.d/default.conf
 COPY docker/api/php.ini "$PHP_INI_DIR/conf.d/zzz-custom-php.ini"
 COPY docker/api/php-fpm-www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
 
@@ -79,10 +88,12 @@ RUN composer dump-autoload --optimize --classmap-authoritative --no-dev --no-int
     && chown -R ${USER_NAME}:${GROUP_NAME} /var/www/html \
     && chmod +x /var/www/docker/release-entrypoint.sh /var/www/docker/startup.sh
 
-EXPOSE 80
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-    CMD curl -fsS http://127.0.0.1/api/health/live || exit 1
+    CMD curl -fsS http://127.0.0.1:8080/api/health/live || exit 1
+
+USER ${USER_NAME}
 
 ENTRYPOINT ["bash", "/var/www/docker/release-entrypoint.sh"]
 CMD ["bash", "/var/www/docker/startup.sh"]

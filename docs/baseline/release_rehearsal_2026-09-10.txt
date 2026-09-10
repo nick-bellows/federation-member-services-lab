@@ -1,0 +1,238 @@
+# Release rehearsal, 2026-09-10 (C2: the API release image runs as the application user with nginx on 8080; docs/RELEASE.md lines 5 to 12)
+# Release images with no bind mount, beside the development stack. Tokens are never printed.
+
+## Images (built by docker compose -p federation-release -f deploy/compose.release.yml build)
+federation-api:release 483MB (created About a minute ago)
+federation-web:release 287MB (created 24 minutes ago)
+
+## Line 6: no environment file inside the API image; the container starts as the application user (C2)
+
+$ docker run --rm federation-api:release sh -c 'test ! -e /var/www/html/.env && echo no-env-file; test ! -d /var/www/html/tests && echo no-tests; id; ls -ld /run/nginx /var/lib/nginx /var/log/nginx; readlink /var/log/nginx/access.log /var/log/nginx/error.log; grep -c "^user" /etc/nginx/nginx.conf || true'
+no-env-file
+no-tests
+uid=1000(verein) gid=1000(verein) groups=1000(verein),1000(verein)
+drwxr-xr-x    1 verein   verein        4096 Sep  4 08:16 /run/nginx
+drwxr-x---    1 verein   verein        4096 Sep  4 08:16 /var/lib/nginx
+drwxr-xr-x    1 verein   verein        4096 Sep 10 21:54 /var/log/nginx
+BusyBox v1.37.0 (2025-12-16 14:19:28 UTC) multi-call binary.
+
+Usage: readlink [-fnv] FILE
+
+Display the value of a symlink
+
+	-n	Don't add newline
+	-f	Canonicalize by following all symlinks
+	-v	Verbose
+user directives left in nginx.conf: 0
+listen 8080 lines: 1
+
+$ docker run --rm --entrypoint sh federation-web:release -c 'id; test ! -e /app/.env.local && echo no-env-local'
+uid=1001(nextjs) gid=65533(nogroup) groups=65533(nogroup),65533(nogroup)
+no-env-local
+
+## Line 9: the one-off migration task (fresh database volume)
+
+$ docker compose -p federation-release -f deploy/compose.release.yml --profile release run --rm migrate
+  2026_02_16_100000_alter_receipts_table_change_amount_to_unsigned ... [1] Ran  
+  2026_02_23_101501_insert_membership_types_permissions_into_permissions_table  [1] Ran  
+  2026_03_04_140930_alter_memberships_table_change_on_delete_behaviour  [1] Ran  
+  2026_03_09_120000_alter_membership_types_table_add_division_count_limits  [1] Ran  
+  2026_04_13_120000_alter_members_table_add_status_column ............ [1] Ran  
+  2026_04_13_120500_insert_members_permissions_into_permissions_table  [1] Ran  
+  2026_04_16_120500_insert_payment_periods_permission_into_permissions_table  [1] Ran  
+  2026_09_02_100000_create_federations_table ......................... [1] Ran  
+  2026_09_02_100001_create_seasons_table ............................. [1] Ran  
+  2026_09_02_100002_create_member_organizations_table ................ [1] Ran  
+  2026_09_02_100003_alter_clubs_table_add_member_organization_id_column  [1] Ran  
+  2026_09_02_100004_create_administrator_pivot_tables ................ [1] Ran  
+  2026_09_02_100005_alter_members_table_add_user_id_column ........... [1] Ran  
+  2026_09_02_100006_create_registration_applications_table ........... [1] Ran  
+  2026_09_02_100007_create_audit_entries_table ....................... [1] Ran  
+  2026_09_02_110000_alter_users_table_add_oidc_identity_columns ...... [1] Ran  
+  2026_09_02_120000_create_registration_windows_table ................ [1] Ran  
+  2026_09_02_120001_alter_registration_applications_table_add_details_columns  [1] Ran  
+  2026_09_02_120002_create_application_documents_table ............... [1] Ran  
+  2026_09_03_100000_create_credential_snapshots_table ................ [1] Ran  
+  2026_09_03_110000_create_federation_outbox_tables .................. [1] Ran  
+  2026_09_03_120000_add_traceparent_to_outbox_events_table ........... [1] Ran  
+  2026_09_03_130000_add_club_id_indexes_to_upstream_tables ........... [1] Ran  
+  2026_09_03_140000_add_reviewer_notes_to_registration_applications_table  [1] Ran  
+  2026_09_10_100000_scope_idempotency_key_to_applicant ............... [1] Ran  
+
+## Line 10: start everything; wait for readiness on the mapped port 3011 -> 8080
+
+$ docker compose -p federation-release -f deploy/compose.release.yml up -d
+ Container federation-release-oidc-1 Created 
+ Container federation-release-web-1 Created 
+ Container federation-release-learning-center-1 Started 
+ Container federation-release-oidc-1 Started 
+ Container federation-release-scheduler-1 Started 
+ Container federation-release-api-1 Started 
+ Container federation-release-worker-1 Started 
+ Container federation-release-web-1 Started 
+readiness after 2 s: HTTP 200
+
+$ curl -s http://localhost:3011/api/health/live
+{"status":"ok","time":"2026-09-10T22:26:06+00:00"}
+
+$ curl -s http://localhost:3011/api/health/ready
+{"status":"ready","checks":{"database":{"status":"ok","required":true},"outbox":{"status":"ok","required":true,"detail":"oldest unpublished 0s, parked 0"},"learning_center":{"status":"ok","required":false}},"time":"2026-09-10T22:26:06+00:00"}
+
+$ docker compose -p federation-release -f deploy/compose.release.yml ps
+SERVICE           STATUS
+api               Up 6 seconds (health: starting)
+database          Up 3 minutes (healthy)
+learning-center   Up 8 seconds
+oidc              Up 8 seconds
+scheduler         Up 6 seconds
+web               Up 1 second
+worker            Up 7 seconds
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api id
+uid=1000(verein) gid=1000(verein) groups=1000(verein)
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api sh -c 'ps -o user,comm | sort | uniq -c'   # every process in the API container and its user
+      1 USER     COMMAND
+      1 verein   bash
+     25 verein   nginx
+      7 verein   php-fpm
+      1 verein   ps
+      1 verein   sh
+      1 verein   sort
+      1 verein   uniq
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api sh -c 'curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/api/health/live'   # the HEALTHCHECK's own request
+200
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan schedule:list
+  0    0 * * *  php artisan sanctum:prune-expired --hours=24  Next Due: 1 hour from now
+  *    * * * *  php artisan health:queue-check-heartbeat  Next Due: 52 seconds from now
+  *    * * * *  php artisan health:schedule-check-heartbeat  Next Due: 52 seconds from now
+  0    * * * *  php artisan federation:reconcile-credentials  Next Due: 33 minutes from now
+  */15 * * * *  php artisan federation:outbox-status  Next Due: 3 minutes from now
+  */15 * * * *  php artisan health:check ........ Next Due: 3 minutes from now
+  0    3 * * *  App\Jobs\CleanupMedia ............. Next Due: 4 hours from now
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan about --only=environment
+  Environment ................................................................  
+  Laravel Version .................................................... 13.30.1  
+  PHP Version ......................................................... 8.3.33  
+  Environment ..................................................... production  
+  Debug Mode ............................................................. OFF  
+  URL ......................................................... localhost:3011  
+
+## Line 12: checks and metrics require the scrape token
+
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3011/api/health/checks
+401
+
+$ curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3011/api/health/checks
+200
+
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3011/api/metrics
+401
+
+$ curl -s -H 'Authorization: Bearer $METRICS_TOKEN' http://localhost:3011/api/metrics | head -3
+# HELP federation_outbox_unpublished Outbox facts not yet relayed.
+# TYPE federation_outbox_unpublished gauge
+federation_outbox_unpublished 0
+
+## The web image answers
+
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:3010/en/member/sign-in
+200
+
+## nginx access line from the container's stdout (C2: logs on the streams, not in a file)
+
+$ docker compose -p federation-release -f deploy/compose.release.yml logs --no-log-prefix --tail 200 api | grep -E 'GET /api/health' | tail -2
+172.23.0.1 - - [10/Sep/2026:22:26:08 +0000] "GET /api/health/checks HTTP/1.1" 401 36 "-" "curl/8.17.0" "-"
+172.23.0.1 - - [10/Sep/2026:22:26:08 +0000] "GET /api/health/checks HTTP/1.1" 200 123 "-" "curl/8.17.0" "-"
+
+## Line 11: seed the synthetic demo data, then the signed-in journeys against the release web image
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan migrate:fresh --seed --seeder=NorthgateDemoSeeder --force
+  Database\Seeders\FakeTaxAccountSeeder .............................. RUNNING  
+  Database\Seeders\FakeTaxAccountSeeder .......................... 844 ms DONE  
+  Database\Seeders\FakeReceiptSeeder ................................. RUNNING  
+  Database\Seeders\FakeReceiptSeeder .......................... 18,271 ms DONE  
+  Database\Seeders\FakeDatabaseSeeder ........................ 129,906 ms DONE  
+  Database\Seeders\NorthgateDemoSeeder ....................... 134,193 ms DONE  
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=6 failed_jobs=0 failed_events=0 processed=1
+
+$ cd e2e && WEB_URL=http://localhost:3010 npx playwright test tests/member-sign-in.spec.ts tests/registration-review.spec.ts --reporter=list
+    > 71 |         await page.getByLabel('Organization and season').selectOption((await naslOption.getAttribute('value')) ?? '');
+         |                                                                                         ^
+      72 |         await page.getByRole('radio', { name: 'Participant' }).check();
+      73 |         await page.getByLabel('Date of birth').fill('2001-03-09');
+      74 |         await page.getByRole('button', { name: 'Start' }).click();
+        at D:\PortfolioProjects\federation-member-services-lab\e2e\tests\registration-review.spec.ts:71:89
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\registration-review-regist-955c9--and-submits-an-application-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+    Error Context: test-results\registration-review-regist-955c9--and-submits-an-application-chromium\error-context.md
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\registration-review-regist-955c9--and-submits-an-application-chromium\trace.zip
+    Usage:
+        npx playwright show-trace test-results\registration-review-regist-955c9--and-submits-an-application-chromium\trace.zip
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+  2 failed
+    [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved 
+    [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application 
+  3 did not run
+  2 passed (1.0m)
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=7
+
+$ docker compose -p federation-release -f deploy/compose.release.yml logs --no-log-prefix worker | grep -c '"consumer"'   # consumer log lines from the worker container
+0
+
+$ docker compose -p federation-release -f deploy/compose.release.yml ps
+SERVICE           STATUS
+api               Up 5 minutes (healthy)
+database          Up 8 minutes (healthy)
+learning-center   Up 5 minutes
+oidc              Up 5 minutes
+scheduler         Up 5 minutes
+web               Up 5 minutes
+worker            Up 5 minutes
+
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T worker id
+uid=1000(verein) gid=1000(verein) groups=1000(verein)
+
+
+## Line 11, second attempt: the release web image pointed at the API's new port (compose API_DOMAIN http://api → http://api:8080), 2026-09-10T22:32:19Z
+# First attempt: 2 passed, 2 failed, 3 did not run. The web container logged 'connect ECONNREFUSED 172.23.0.6:80': the API's port moved with the rootless image and the rehearsal's own web environment still named port 80. Fixed in deploy/compose.release.yml; the Terraform proof reaches the API through the load balancer on 80 and was already right.
+$ docker compose -p federation-release -f deploy/compose.release.yml up -d web   # recreated with the corrected environment
+ Container federation-release-web-1 Recreate 
+ Container federation-release-web-1 Recreated 
+ Container federation-release-web-1 Started 
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=7
+$ cd e2e && WEB_URL=http://localhost:3010 npx playwright test tests/member-sign-in.spec.ts tests/registration-review.spec.ts --reporter=list
+Running 7 tests using 2 workers
+  ✓  1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (602ms)
+  ✓  3 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (1.0s)
+  ✓  4 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (713ms)
+  ✓  2 [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application (3.0s)
+  ✓  5 [chromium] › tests\registration-review.spec.ts:104:9 › registration review slice › a reviewer works the queue and approves (3.3s)
+  ✓  6 [chromium] › tests\registration-review.spec.ts:138:9 › registration review slice › the applicant sees the decision and the history (1.2s)
+  ✓  7 [chromium] › tests\registration-review.spec.ts:159:9 › registration review slice › an organization administrator can open a registration window (1.1s)
+  7 passed (9.4s)
+$ docker compose -p federation-release -f deploy/compose.release.yml exec -T api php artisan federation:outbox-status
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=10
+$ docker compose -p federation-release -f deploy/compose.release.yml logs --no-log-prefix worker | grep -c 'outbox'   # worker log lines mentioning the outbox
+200
+$ docker compose -p federation-release -f deploy/compose.release.yml ps
+SERVICE           STATUS
+api               Up 6 minutes (healthy)
+database          Up 9 minutes (healthy)
+learning-center   Up 6 minutes
+oidc              Up 6 minutes
+scheduler         Up 6 minutes
+web               Up 18 seconds
+worker            Up 6 minutes
+
+# End of rehearsal, 2026-09-10T22:32:51Z. Torn down with its volume: docker compose -p federation-release -f deploy/compose.release.yml down -v

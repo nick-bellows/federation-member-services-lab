@@ -4,8 +4,18 @@
 # once the owner supplies AWS credentials (docs/baseline/ records the runs).
 # Nothing here runs without `terraform apply`, which is the owner's action.
 #
-# State is local by default (terraform.tfstate, gitignored). A remote backend
-# is a one-line change here once an account exists.
+# State is local for the proof (terraform.tfstate, gitignored: it holds the
+# generated database password and tokens). Before any apply that a second
+# person or machine must be able to continue, configure a remote backend
+# first and never commit the state (C2):
+#
+#   backend "s3" {
+#     bucket         = "<an existing, versioned, encrypted bucket>"
+#     key            = "federation-member-services-lab/proof.tfstate"
+#     region         = "us-east-1"
+#     dynamodb_table = "<a lock table with a LockID string key>"
+#     encrypt        = true
+#   }
 
 terraform {
   required_version = ">= 1.6"
