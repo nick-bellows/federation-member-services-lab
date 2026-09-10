@@ -571,3 +571,31 @@ docker compose -p federation-release -f deploy/compose.release.yml down -v
 1. A port is named in more places than the file that binds it: the image, the health check, the Compose mapping, the consumer's environment, the target group, the security group and the container port. Change it with a grep, then with a rehearsal.
 2. A precondition is a regression test for infrastructure code that costs nothing to run; the plan is its test run. `validate` alone does not evaluate it, which the exercise E27 in the internal record makes visible.
 3. Rootless is a set of small facts, each checkable with one command inside the running container; the record lists them so a reviewer can re-check without trusting the Dockerfile's comments.
+
+## 2026-09-10 — Phase C, C4: the evidence and the reviewer's path
+
+**Goal.** Make every number a reviewer meets in the first two minutes the current one, linked to the run that produced it; make the documentation site carry the evidence it cites; recapture the two screenshots the reviews called out; reduce the future-work file to what is still open.
+
+**Built.** README: 247 tests, the browser count as CI runs it (9 run, 4 skipped by design: the screenshots, the demo recording, a slow-connection timing check, the Pages site check), sixteen decision records, the nine CI jobs, the CI history as it happened (the first two runs of #1, a stalled runner on 2026-09-03, the red MariaDB job of the #14 merge on 2026-09-05), the cold-clone date, a link to the documentation site and the sentence "the application is not deployed; the documentation site is", a row for Phase C. `docs/CASE_STUDY.md`: the same numbers, a row for M11 and one for the closing phase, a row for the four reviewed defects and one for the secret scan, and every evidence name a link pinned to the C2 commit `10351a5` so the link stays true after later commits. `docs/index.md`: the demo embedded with a poster frame taken from the recording (`ffmpeg -ss 6`), a link to the evidence folder; `docs/_config.yml` no longer excludes the baseline folder, and `docs/baseline/index.md` (generated from the listing, 64 files in six groups) is its landing page. `docs/assets/css/style.scss` overrides the theme for the two axe findings on the live site: the footer link at 11px failed contrast, and every link in running text was told apart by colour alone; links are darker and underlined, the body and footer text darker. `e2e/tests/pages-site.spec.ts` runs axe and a link check over the landing page, the case study and the threat model when `PAGES_URL` is set. `e2e/tests/screenshots.spec.ts` waits for the content each capture is meant to show and submits one application from a fresh identity before the reviewer screens; the identity page and the reviewer queue are recaptured populated. `docs/future-work.md` rewritten: everything done since M0 removed, duplicates merged, the remainder grouped (owner items, domain and API, database, operations and delivery, development stack).
+
+**Commands run.**
+
+```sh
+cd e2e && PAGES_URL=https://nick-bellows.github.io/federation-member-services-lab npx playwright test tests/pages-site.spec.ts   # before the fix: color-contrast on the footer link, link-in-text-block on every text link
+ffprobe docs/assets/demo.webm; ffmpeg -ss 6 -i docs/assets/demo.webm -frames:v 1 docs/assets/demo-poster.png
+cd e2e && npx playwright test tests/screenshots.spec.ts   # against the development stack, seeded; 1 passed
+```
+
+**Evidence.** The README's numbers against `docs/baseline/phpunit_after_c1_backend.txt` (247), `release_rehearsal_2026-09-10.txt` (7 of 7 journeys on the second attempt) and the CI run of #15 (9 passed, 3 skipped before the Pages spec was added); the recaptured screenshots in `docs/assets/`; the Pages check re-run against the live site after this merge, recorded with C5.
+
+**What went wrong, in order.**
+
+1. The landing page had said the baseline folder was served while `_config.yml` excluded it and every `.txt`; a folder of text files also has no index page on Pages, so the link would have answered 404 even once served. The exclusion is gone and an index page is generated from the listing.
+2. The first Pages check named the two axe failures precisely, which the earlier session had recorded only as "footer contrast and link colour"; a spec that can be re-run is worth more than a note.
+3. The screenshot spec had taken the identity page before its server component had rendered and the reviewer queue after every earlier run had approved its only application; both captures were true pictures of the wrong moment.
+
+**Three lessons.**
+
+1. A number in a README has a half-life of one milestone; pin it to a commit or accept that it lies by the next merge.
+2. A documentation site is a deployment: it has a build, an accessibility surface and dead links, and it needs the same check the application gets.
+3. "Reduce to what is still open" is a deletion task; the history belongs in the log, not in the list.

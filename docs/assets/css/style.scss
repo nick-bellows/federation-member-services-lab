@@ -1,0 +1,34 @@
+---
+---
+
+@import "jekyll-theme-minimal";
+
+// The theme's link colour (#267CB9, 4.4:1 on white) and its 11px footer link
+// fail WCAG AA contrast, and links in running text are told apart from the
+// text by colour alone (axe: link-in-text-block). Darker links, underlined;
+// darker body and footer text (C4, e2e/tests/pages-site.spec.ts).
+body {
+    color: #555;
+}
+
+a {
+    color: #1f5f8b;
+    text-decoration: underline;
+}
+
+a:hover,
+a:focus {
+    color: #0b3d66;
+}
+
+footer,
+footer small,
+footer a {
+    color: #4a4a4a;
+}
+
+video {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #e5e5e5;
+}
