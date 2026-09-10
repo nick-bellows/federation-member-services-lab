@@ -6,11 +6,13 @@ use App\Federation\Actions\StartApplication;
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
 use App\Federation\Exceptions\DuplicateApplicationException;
+use App\Federation\Exceptions\IdempotencyKeyReusedException;
 use App\Federation\Exceptions\RoleNotOfferedException;
 use App\Federation\Exceptions\WindowClosedException;
 use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Models\Season;
+use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 class StartApplicationTest extends FederationTestCase
@@ -61,6 +63,38 @@ class StartApplicationTest extends FederationTestCase
         $second = $this->startApplication(idempotencyKey: 'client-key-1');
 
         $this->assertTrue($first->is($second));
+        $this->assertSame(1, RegistrationApplication::count());
+    }
+
+    public function test_an_idempotency_key_belongs_to_the_applicant_who_presented_it(): void
+    {
+        $first = $this->startApplication(idempotencyKey: 'client-key-1', complete: false);
+
+        // Another person presenting the same key gets their own application, never someone else's.
+        $other = User::factory()->create();
+        $second = app(StartApplication::class)->execute($other, $this->window, ApplicationRole::PARTICIPANT, 'client-key-1');
+
+        $this->assertFalse($first->is($second));
+        $this->assertSame((int) $other->getKey(), (int) $second->applicant_user_id);
+        $this->assertSame(2, RegistrationApplication::count());
+
+        // The rollback at teardown restores the pre-C1 global constraint, which two rows sharing a key would violate.
+        $second->delete();
+    }
+
+    public function test_a_reused_key_with_other_parameters_is_refused_not_replayed(): void
+    {
+        $this->startApplication(idempotencyKey: 'client-key-1', complete: false);
+
+        $this->assertThrows(
+            fn () => app(StartApplication::class)->execute($this->applicant, $this->window, ApplicationRole::COACH, 'client-key-1'),
+            IdempotencyKeyReusedException::class,
+        );
+        $this->assertThrows(
+            fn () => app(StartApplication::class)->execute($this->applicant, $this->otherWindow, ApplicationRole::PARTICIPANT, 'client-key-1'),
+            IdempotencyKeyReusedException::class,
+        );
+
         $this->assertSame(1, RegistrationApplication::count());
     }
 

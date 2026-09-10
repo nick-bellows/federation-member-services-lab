@@ -20,7 +20,7 @@ class ParticipationHttpTest extends FederationHttpTestCase
 
     private const TOKEN_ENDPOINT = 'http://oidc.test/default/token';
 
-    /** @var array<string, string> subject => fixture file */
+    /** @var array<string, string|array<string, mixed>> subject => fixture file, or the answer itself */
     private array $subjects = ['mock|alex' => 'alex-eligible.json'];
 
     private bool $providerDown = false;
@@ -41,9 +41,9 @@ class ParticipationHttpTest extends FederationHttpTestCase
                 if ($this->providerDown) {
                     throw new ConnectionException('cURL error 28: Operation timed out');
                 }
-                foreach ($this->subjects as $subject => $file) {
+                foreach ($this->subjects as $subject => $answer) {
                     if ($request->url() === self::PROVIDER.'/v1/members/'.rawurlencode($subject).'/credentials') {
-                        return Http::response(CredentialFactsTest::fixture($file));
+                        return Http::response(is_array($answer) ? $answer : CredentialFactsTest::fixture($answer));
                     }
                 }
 
@@ -84,7 +84,7 @@ class ParticipationHttpTest extends FederationHttpTestCase
     public function test_a_reviewer_can_refresh_and_sees_the_new_answer(): void
     {
         $id = $this->approvedApplication();
-        $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+        $this->subjects = ['mock|alex' => CredentialFactsTest::answerFor('mock|alex', 'sam-suspended.json')];
 
         $this->request($this->organizationAdmin, 'POST', self::BASE."/registration-applications/{$id}/-actions/refresh-credentials")
             ->assertOk()
@@ -92,6 +92,21 @@ class ParticipationHttpTest extends FederationHttpTestCase
             ->assertJsonPath('data.attributes.participation.reasons', ['hold_active']);
 
         $this->assertSame('suspended', CredentialSnapshot::query()->sole()->eligibility_status);
+    }
+
+    public function test_a_refresh_answered_about_another_person_is_a_502_and_the_snapshot_stays(): void
+    {
+        $id = $this->approvedApplication();
+        $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+
+        $this->request($this->organizationAdmin, 'POST', self::BASE."/registration-applications/{$id}/-actions/refresh-credentials")
+            ->assertStatus(502)
+            ->assertJsonPath('errors.0.code', 'learning_center_error');
+
+        $this->assertSame('eligible', CredentialSnapshot::query()->where('user_id', $this->applicant->getKey())->sole()->eligibility_status);
+        $this->request($this->organizationAdmin, 'GET', self::BASE."/registration-applications/{$id}")
+            ->assertOk()
+            ->assertJsonPath('data.attributes.participation.status', 'may_participate');
     }
 
     public function test_only_a_reviewer_of_that_organization_may_refresh(): void

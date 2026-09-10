@@ -3,7 +3,9 @@
 namespace Tests\Feature\Federation\Http;
 
 use App\Federation\Models\AuditEntry;
+use App\Federation\Models\Federation;
 use App\Federation\Models\RegistrationWindow;
+use App\Federation\Models\Season;
 
 class RegistrationWindowsHttpTest extends FederationHttpTestCase
 {
@@ -52,6 +54,24 @@ class RegistrationWindowsHttpTest extends FederationHttpTestCase
     {
         $this->request($this->federationAdmin, 'POST', self::BASE.'/registration-windows', $this->windowDocument((string) $this->otherOrganization->getKey()))
             ->assertStatus(201);
+    }
+
+    public function test_a_window_cannot_be_opened_on_another_federations_season(): void
+    {
+        $otherFederation = Federation::factory()->create(['name' => 'Southgate Soccer Federation', 'code' => 'SSF']);
+        $foreignSeason = Season::factory()->create(['federation_id' => $otherFederation->getKey()]);
+        $document = $this->windowDocument((string) $this->organization->getKey());
+        $document['data']['relationships']['season']['data']['id'] = (string) $foreignSeason->getKey();
+
+        // Neither the organization's administrator nor the federation's may cross the hierarchy.
+        foreach ([$this->organizationAdmin, $this->federationAdmin] as $administrator) {
+            $this->request($administrator, 'POST', self::BASE.'/registration-windows', $document)
+                ->assertStatus(409)
+                ->assertJsonPath('errors.0.code', 'season_not_in_federation');
+        }
+
+        $this->assertSame(0, RegistrationWindow::query()->where('season_id', $foreignSeason->getKey())->count());
+        $this->assertSame(0, AuditEntry::query()->where('action', 'window.opened')->count());
     }
 
     public function test_windows_are_listed_and_filtered_by_openness(): void

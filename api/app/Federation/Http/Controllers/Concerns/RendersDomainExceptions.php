@@ -9,11 +9,13 @@ use App\Federation\Exceptions\DocumentNotAllowedException;
 use App\Federation\Exceptions\DuplicateApplicationException;
 use App\Federation\Exceptions\FederationDomainException;
 use App\Federation\Exceptions\FieldNotAllowedException;
+use App\Federation\Exceptions\IdempotencyKeyReusedException;
 use App\Federation\Exceptions\IllegalTransitionException;
 use App\Federation\Exceptions\InvalidPatchException;
 use App\Federation\Exceptions\PatchTestFailedException;
 use App\Federation\Exceptions\ReasonRequiredException;
 use App\Federation\Exceptions\RoleNotOfferedException;
+use App\Federation\Exceptions\SeasonNotInFederationException;
 use App\Federation\Exceptions\TransitionNotAllowedForActorException;
 use App\Federation\Exceptions\WindowClosedException;
 use LaravelJsonApi\Core\Document\Error;
@@ -50,6 +52,8 @@ trait RendersDomainExceptions
             $exception instanceof WindowClosedException => [409, 'window_closed'],
             $exception instanceof RoleNotOfferedException => [409, 'role_not_offered'],
             $exception instanceof ApplicationNotEditableException => [409, 'application_not_editable'],
+            $exception instanceof IdempotencyKeyReusedException => [409, 'idempotency_key_reused'],
+            $exception instanceof SeasonNotInFederationException => [409, 'season_not_in_federation'],
             $exception instanceof ReasonRequiredException => [422, 'reason_required'],
             $exception instanceof ApplicationIncompleteException => [422, 'application_incomplete'],
             $exception instanceof DocumentNotAllowedException => [422, 'document_not_allowed'],

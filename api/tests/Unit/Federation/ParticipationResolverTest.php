@@ -134,6 +134,7 @@ class ParticipationResolverTest extends TestCase
         $payload = CredentialFactsTest::fixture($fixture);
 
         return (new CredentialSnapshot)->forceFill([
+            'subject' => $payload['member']['subject'],
             'contract' => self::CONTRACT,
             'eligibility_status' => $payload['eligibility']['status'],
             'payload' => $payload,

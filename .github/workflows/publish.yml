@@ -20,11 +20,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # The branch name is untrusted input: it reaches the shell through an
+      # environment variable, never through template interpolation into the
+      # script (GitHub's script-injection guidance); the version derived from
+      # it is read as a shell variable below for the same reason.
       - name: Extract version from branch name
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          BRANCH="${{ github.event.pull_request.head.ref }}"
-          VERSION="${BRANCH#release/}"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          VERSION="${HEAD_REF#release/}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Create tag and GitHub release
         env:
@@ -32,9 +37,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
-          git push origin tag "${{ env.VERSION }}"
+          git tag -a "$VERSION" -m "Release version $VERSION"
+          git push origin tag "$VERSION"
 
-          gh release create "${{ env.VERSION }}" \
-            --title "Release ${{ env.VERSION }}" \
+          gh release create "$VERSION" \
+            --title "Release $VERSION" \
             --notes "$(awk '/## \[/{flag=1;next}/## \[/{flag=0}flag' CHANGELOG.md)"

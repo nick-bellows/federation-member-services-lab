@@ -2,8 +2,11 @@
 
 namespace App\Federation\Http\Controllers;
 
+use App\Federation\Exceptions\SeasonNotInFederationException;
+use App\Federation\Http\Controllers\Concerns\RendersDomainExceptions;
 use App\Federation\Models\MemberOrganization;
 use App\Federation\Models\RegistrationWindow;
+use App\Federation\Models\Season;
 use App\Federation\Support\AuditRecorder;
 use App\Http\Controllers\Controller;
 use LaravelJsonApi\Core\Document\Error;
@@ -19,12 +22,14 @@ class RegistrationWindowController extends Controller
 {
     use FetchMany;
     use FetchOne;
+    use RendersDomainExceptions;
     use Store;
     use Update;
 
     /**
      * The policy allows "create" for any administrator; whether they
-     * administer *this* organization is decided here, with the payload.
+     * administer *this* organization, and whether the season belongs to the
+     * organization's federation, is decided here, with the payload.
      */
     public function creating(ResourceRequest $request): DataResponse
     {
@@ -41,9 +46,17 @@ class RegistrationWindowController extends Controller
             ]));
         }
 
+        $season = Season::query()->findOrFail($data['season']['id']);
+
+        // The hierarchy holds at creation (ADR-0016): a window's season must
+        // belong to the organization's federation, whoever opens it.
+        if ((int) $season->federation_id !== (int) $organization->federation_id) {
+            throw $this->toJsonApiException(new SeasonNotInFederationException);
+        }
+
         $window = RegistrationWindow::query()->create([
             'member_organization_id' => $organization->getKey(),
-            'season_id' => $data['season']['id'],
+            'season_id' => $season->getKey(),
             'opens_at' => $data['opensAt'],
             'closes_at' => $data['closesAt'],
             'roles' => $data['roles'],

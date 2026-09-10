@@ -20,7 +20,7 @@ class ReconcileCredentialsCommandTest extends FederationTestCase
 {
     private const PROVIDER = 'http://learning-center.test';
 
-    /** @var array<string, string> */
+    /** @var array<string, string|array<string, mixed>> subject => fixture file, or the answer itself */
     private array $subjects = [];
 
     private bool $providerDown = false;
@@ -44,9 +44,9 @@ class ReconcileCredentialsCommandTest extends FederationTestCase
                 if ($this->providerDown) {
                     throw new ConnectionException('cURL error 28: Operation timed out');
                 }
-                foreach ($this->subjects as $subject => $file) {
+                foreach ($this->subjects as $subject => $answer) {
                     if ($request->url() === self::PROVIDER.'/v1/members/'.rawurlencode($subject).'/credentials') {
-                        return Http::response(CredentialFactsTest::fixture($file));
+                        return Http::response(is_array($answer) ? $answer : CredentialFactsTest::fixture($answer));
                     }
                 }
 
@@ -79,7 +79,7 @@ class ReconcileCredentialsCommandTest extends FederationTestCase
         $this->approve();
         $this->artisan('federation:reconcile-credentials')->assertSuccessful();
 
-        $this->subjects = ['mock|alex' => 'riley-lapsed.json'];
+        $this->subjects = ['mock|alex' => CredentialFactsTest::answerFor('mock|alex', 'riley-lapsed.json')];
         $this->travel(2)->hours();
 
         $this->artisan('federation:reconcile-credentials')

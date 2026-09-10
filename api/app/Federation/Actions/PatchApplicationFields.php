@@ -52,25 +52,27 @@ final class PatchApplicationFields
      */
     public function execute(RegistrationApplication $application, array $operations, User $actor, ?string $requestId = null): RegistrationApplication
     {
-        [$allowed, $applicantLocked] = $this->allowedFields($application, $actor);
-
-        // Authorise every operation before applying any: a patch is all or nothing.
-        foreach ($operations as $operation) {
-            if (array_key_exists($operation['field'], $allowed)) {
-                continue;
-            }
-
-            // The applicant's own field, but the application has left their hands:
-            // that is the existing 409, not a permission problem.
-            if ($applicantLocked && array_key_exists($operation['field'], self::APPLICANT_FIELDS)) {
-                throw new ApplicationNotEditableException;
-            }
-
-            throw new FieldNotAllowedException($operation['path'], $operation['op']);
-        }
-
-        return DB::transaction(function () use ($application, $operations, $actor, $allowed, $requestId): RegistrationApplication {
+        return DB::transaction(function () use ($application, $operations, $actor, $requestId): RegistrationApplication {
+            // Lock first, authorise on what was locked (ADR-0016): the row the
+            // request loaded may have moved on since it was read.
             $application = RegistrationApplication::query()->lockForUpdate()->findOrFail($application->getKey());
+            [$allowed, $applicantLocked] = $this->allowedFields($application, $actor);
+
+            // Authorise every operation before applying any: a patch is all or nothing.
+            foreach ($operations as $operation) {
+                if (array_key_exists($operation['field'], $allowed)) {
+                    continue;
+                }
+
+                // The applicant's own field, but the application has left their hands:
+                // that is the existing 409, not a permission problem.
+                if ($applicantLocked && array_key_exists($operation['field'], self::APPLICANT_FIELDS)) {
+                    throw new ApplicationNotEditableException;
+                }
+
+                throw new FieldNotAllowedException($operation['path'], $operation['op']);
+            }
+
             $previous = [];
             $new = [];
 

@@ -41,7 +41,10 @@ final class ParticipationResolver
             return new ParticipationStatus($approved ? Participation::UNKNOWN : Participation::BLOCKED, $reasons, null, $snapshot->fetched_at, $stale);
         }
 
-        $facts = CredentialFacts::fromArray($snapshot->payload, $this->contract);
+        // A stored snapshot was bound to its subject when it was fetched; the
+        // same check here keeps a hand-edited or migrated row from reading as
+        // someone else's facts.
+        $facts = CredentialFacts::fromArray($snapshot->payload, $this->contract, (string) $snapshot->subject);
 
         if ($facts->eligibilityStatus === CredentialFacts::STATUS_SUSPENDED) {
             $reasons[] = ParticipationStatus::REASON_HOLD;

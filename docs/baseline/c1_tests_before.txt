@@ -1,0 +1,478 @@
+# C1 regression tests BEFORE the fixes (2026-09-10, SQLite in memory, tooling container)
+# php artisan test --filter 'StartApplicationTest|RegistrationApplicationsHttpTest|CredentialFactsTest|CredentialSnapshotsTest|ParticipationHttpTest|RegistrationWindowsHttpTest|ConcurrentAuthorizationTest|MemberTest'
+# The ten new tests and upstream's consent test fail; the consent test here failed because a frozen clock was the first attempt at the fix (see LEARNING_LOG).
+
+   FAIL  Tests\Unit\Federation\CredentialFactsTest
+  ✓ every fixture parses and reports what the provider decided with dat… 0.21s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ another contract version is refused                                  0.02s  
+  ✓ an unknown status is refused
+  ✓ a missing field is refused
+  ⨯ an answer about another subject is refused                           0.01s  
+
+   FAIL  Tests\Feature\Federation\ConcurrentAuthorizationTest
+  ⨯ a patch is refused when the application leaves the applicants hands… 3.43s  
+  ⨯ document metadata is refused when the application is submitted befo… 0.70s  
+  ⨯ a document review is refused when the application is decided before… 0.83s  
+
+   FAIL  Tests\Feature\Federation\CredentialSnapshotsTest
+  ✓ a refresh stores the answer and audits the first record              0.79s  
+  ✓ a changed eligibility is audited with both states                    0.66s  
+  ✓ an unchanged answer writes no audit entry                            0.67s  
+  ⨯ an answer about another person is a contract error and nothing is s… 0.63s  
+  ✓ a member the provider does not know is recorded as not found         0.64s  
+  ✓ a user without a linked identity is not asked about                  0.65s  
+  ✓ a slow or absent provider leaves the previous snapshot untouched     0.66s  
+  ✓ a server error is unavailable not a new snapshot                     0.70s  
+  ✓ the service token is fetched once and reused                         0.65s  
+
+   FAIL  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ✓ an approval asks the provider once and the application shows partic… 1.60s  
+  ✓ an approval succeeds when the provider is away and participation is… 4.28s  
+  ✓ a reviewer can refresh and sees the new answer                       0.76s  
+  ⨯ a refresh answered about another person is a 502 and the snapshot s… 0.75s  
+  ✓ only a reviewer of that organization may refresh                     0.82s  
+  ✓ a refresh while the provider is away is a 503 with a stable code     0.74s  
+  ✓ the queue reads snapshots without calling the provider               0.80s  
+  ✓ an unapproved application reports findings but is not participating  0.71s  
+
+   FAIL  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ✓ an applicant starts a draft inside an open window                    0.68s  
+  ✓ the response lists what is still missing before submission           0.67s  
+  ✓ submitting an incomplete application is a 422 with the missing piec… 0.73s  
+  ✓ a complete application submits and a retry with the same key is ide… 0.73s  
+  ⨯ a replayed start answers the stored application and never rewrites…  0.72s  
+  ✓ applicants only see their own applications                           0.79s  
+  ✓ a reviewer sees the queue for their organization only                0.78s  
+  ✓ the review path over http with reasons and actor rules               0.81s  
+  ✓ the applicant can edit details while editable and not afterwards     0.75s  
+  ✓ a closed window and a duplicate are conflicts                        0.67s  
+
+   FAIL  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ✓ an organization administrator opens a window for their organization  0.79s  
+  ✓ an applicant cannot open a window                                    0.67s  
+  ✓ an administrator cannot open a window for another organization       0.66s  
+  ✓ a federation administrator can open a window for any organization    0.68s  
+  ⨯ a window cannot be opened on another federations season              0.68s  
+  ✓ windows are listed and filtered by openness                          0.66s  
+  ✓ validation rejects a window that closes before it opens              0.71s  
+
+   FAIL  Tests\Feature\Federation\StartApplicationTest
+  ✓ a new application starts as a draft with an audit entry              0.62s  
+  ✓ a second live application for the same person organization season a… 0.61s  
+  ✓ a different role in the same season is a separate application        0.62s  
+  ✓ a new application is allowed after a cancellation                    0.63s  
+  ✓ the same idempotency key returns the existing application            0.62s  
+  ⨯ an idempotency key belongs to the applicant who presented it         0.63s  
+  ⨯ a reused key with other parameters is refused not replayed           0.62s  
+  ✓ the database rejects a duplicate that bypasses the action            0.62s  
+  ✓ a closed window refuses new applications                             0.62s  
+  ✓ a window only accepts the roles it offers                            0.62s  
+  ✓ the application inherits organization and season from the window     0.62s  
+
+   FAIL  Tests\Feature\MemberTest
+  ✓ club can create new member                                           1.03s  
+  ✓ cannot create member for other club                                  0.63s  
+  ⨯ consent boolean mutates timestamp column                             0.64s  
+  ✓ cannot create member when membership has no capacity                 0.63s  
+  ✓ cannot update member to membership with no capacity                  0.62s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\Federation\CredentialFactsTest > an answer about anoth…   
+  Failed asserting that exception of type "App\Federation\LearningCenter\Exceptions\ContractMismatchException" is thrown.
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\ConcurrentAuthorizationTest > a patch is…   
+  Failed asserting that exception of type "App\Federation\Exceptions\ApplicationNotEditableException" was thrown.
+Failed asserting that false is true.
+
+  at tests/Feature/Federation/ConcurrentAuthorizationTest.php:39
+     35▕     {
+     36▕         $application = $this->startApplication();
+     37▕         $this->whenTheNextTransactionBegins(fn () => $this->moveOn($application, ApplicationStatus::SUBMITTED));
+     38▕ 
+  ➜  39▕         $this->assertThrows(
+     40▕             fn () => app(PatchApplicationFields::class)->execute(
+     41▕                 $application,
+     42▕                 [['op' => 'replace', 'path' => '/phone', 'field' => 'phone', 'value' => '+1 555 0100']],
+     43▕                 $this->applicant,
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\ConcurrentAuthorizationTest > document m…   
+  Failed asserting that exception of type "App\Federation\Exceptions\ApplicationNotEditableException" was thrown.
+Failed asserting that false is true.
+
+  at tests/Feature/Federation/ConcurrentAuthorizationTest.php:57
+     53▕     {
+     54▕         $application = $this->startApplication(complete: false);
+     55▕         $this->whenTheNextTransactionBegins(fn () => $this->moveOn($application, ApplicationStatus::SUBMITTED));
+     56▕ 
+  ➜  57▕         $this->assertThrows(
+     58▕             fn () => app(AttachDocumentMetadata::class)->execute(
+     59▕                 $application,
+     60▕                 $this->applicant,
+     61▕                 DocumentType::PROOF_OF_AGE,
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\ConcurrentAuthorizationTest > a document…   
+  Failed asserting that exception of type "App\Federation\Exceptions\IllegalTransitionException" was thrown.
+Failed asserting that false is true.
+
+  at tests/Feature/Federation/ConcurrentAuthorizationTest.php:80
+     76▕         $application = $this->applicationUnderReview();
+     77▕         $document = $application->documents()->firstOrFail();
+     78▕         $this->whenTheNextTransactionBegins(fn () => $this->moveOn($application, ApplicationStatus::APPROVED));
+     79▕ 
+  ➜  80▕         $this->assertThrows(
+     81▕             fn () => app(ReviewDocument::class)->execute($document, $this->organizationAdmin, DocumentReviewStatus::ACCEPTED),
+     82▕             IllegalTransitionException::class,
+     83▕         );
+     84▕
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\CredentialSnapshotsTest > an answer abou…   
+  Failed asserting that exception of type "App\Federation\LearningCenter\Exceptions\ContractMismatchException" was thrown.
+Failed asserting that false is true.
+
+  at tests/Feature/Federation/CredentialSnapshotsTest.php:129
+    125▕     {
+    126▕         // The provider answers alex's URL with sam's facts.
+    127▕         $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+    128▕ 
+  ➜ 129▕         $this->assertThrows(
+    130▕             fn () => app(CredentialSnapshots::class)->refresh($this->applicant),
+    131▕             ContractMismatchException::class,
+    132▕         );
+    133▕
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\ParticipationHttpTest > a refresh a…   
+  Expected response status code [502] but received 200.
+Failed asserting that 200 is identical to 502.
+
+  at tests/Feature/Federation/Http/ParticipationHttpTest.php:103
+     99▕         $id = $this->approvedApplication();
+    100▕         $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+    101▕ 
+    102▕         $this->request($this->organizationAdmin, 'POST', self::BASE."/registration-applications/{$id}/-actions/refresh-credentials")
+  ➜ 103▕             ->assertStatus(502)
+    104▕             ->assertJsonPath('errors.0.code', 'learning_center_error');
+    105▕ 
+    106▕         $this->assertSame('eligible', CredentialSnapshot::query()->where('user_id', $this->applicant->getKey())->sole()->eligibility_status);
+    107▕         $this->request($this->organizationAdmin, 'GET', self::BASE."/registration-applications/{$id}")
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest >…    
+  Failed asserting that two strings are identical.
+  -'1998-04-12'
+  +'2001-01-01'
+  
+
+  at tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php:92
+     88▕         // The retry carries a different detail: the stored application answers, untouched.
+     89▕         $start($this->applicant, '2001-01-01')
+     90▕             ->assertStatus(200)
+     91▕             ->assertJsonPath('data.id', $id)
+  ➜  92▕             ->assertJsonPath('data.attributes.dateOfBirth', '1998-04-12');
+     93▕         $this->assertSame('1998-04-12', RegistrationApplication::query()->findOrFail($id)->date_of_birth->format('Y-m-d'));
+     94▕ 
+     95▕         // The same key for another role is a reused key, not a replay.
+     96▕         $start($this->applicant, '1998-04-12', 'coach')
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest > a win…   
+  Expected response status code [409] but received 201.
+Failed asserting that 201 is identical to 409.
+
+  at tests/Feature/Federation/Http/RegistrationWindowsHttpTest.php:69
+     65▕ 
+     66▕         // Neither the organization's administrator nor the federation's may cross the hierarchy.
+     67▕         foreach ([$this->organizationAdmin, $this->federationAdmin] as $administrator) {
+     68▕             $this->request($administrator, 'POST', self::BASE.'/registration-windows', $document)
+  ➜  69▕                 ->assertStatus(409)
+     70▕                 ->assertJsonPath('errors.0.code', 'season_not_in_federation');
+     71▕         }
+     72▕ 
+     73▕         $this->assertSame(0, RegistrationWindow::query()->where('season_id', $foreignSeason->getKey())->count());
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\StartApplicationTest > an idempotency ke…   
+  Failed asserting that true is false.
+
+  at tests/Feature/Federation/StartApplicationTest.php:77
+     73▕         // Another person presenting the same key gets their own application, never someone else's.
+     74▕         $other = User::factory()->create();
+     75▕         $second = app(StartApplication::class)->execute($other, $this->window, ApplicationRole::PARTICIPANT, 'client-key-1');
+     76▕ 
+  ➜  77▕         $this->assertFalse($first->is($second));
+     78▕         $this->assertSame((int) $other->getKey(), (int) $second->applicant_user_id);
+     79▕         $this->assertSame(2, RegistrationApplication::count());
+     80▕     }
+     81▕
+
+  1   tests/Feature/Federation/StartApplicationTest.php:77
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\StartApplicationTest > a reused key with…   
+  Failed asserting that exception of type "App\Federation\Exceptions\IdempotencyKeyReusedException" was thrown.
+Failed asserting that false is true.
+
+  at tests/Feature/Federation/StartApplicationTest.php:86
+     82▕     public function test_a_reused_key_with_other_parameters_is_refused_not_replayed(): void
+     83▕     {
+     84▕         $this->startApplication(idempotencyKey: 'client-key-1', complete: false);
+     85▕ 
+  ➜  86▕         $this->assertThrows(
+     87▕             fn () => app(StartApplication::class)->execute($this->applicant, $this->window, ApplicationRole::COACH, 'client-key-1'),
+     88▕             IdempotencyKeyReusedException::class,
+     89▕         );
+     90▕         $this->assertThrows(
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\MemberTest > consent boolean mutates timestamp colu…   
+  Failed asserting that the member at [/data] matches the subset:
+{
+    "attributes": {
+        "address": "482 Tillman Throughway Apt. 230",
+        "birthday": "1976-05-15T00:00:00.000000Z",
+        "city": "Ferrystad",
+        "country": "Micronesia",
+        "email": "vincenza13@example.net",
+        "firstName": "Bell",
+        "gender": null,
+        "hasConsentedMediaPublication": true,
+        "lastName": "Parisian",
+        "zipCode": "29897-1775"
+    },
+    "relationships": {
+        "club": {
+            "data": {
+                "id": "1",
+                "type": "clubs"
+            }
+        },
+        "membership": {
+            "data": {
+                "id": "1",
+                "type": "memberships"
+            }
+        }
+    },
+    "type": "members"
+}
+
+within JSON API document:
+{
+    "data": {
+        "attributes": {
+            "address": "482 Tillman Throughway Apt. 230",
+            "birthday": "1976-05-15T00:00:00.000000Z",
+            "city": "Ferrystad",
+            "country": "Micronesia",
+            "createdAt": "2026-09-10T21:25:55.000000Z",
+            "email": "vincenza13@example.net",
+            "firstName": "Bell",
+            "fullName": "Bell Parisian",
+            "gender": null,
+            "hasConsentedMediaPublication": false,
+            "lastName": "Parisian",
+            "membershipTypeId": null,
+            "phoneNumber": null,
+            "preferredLocale": "en",
+            "status": null,
+            "updatedAt": "2026-09-10T21:25:55.000000Z",
+            "zipCode": "29897-1775"
+        },
+        "id": "1",
+        "links": {
+            "self": "http://api.verein.localhost/api/v1/members/1"
+        },
+        "relationships": {
+            "club": {
+                "data": {
+                    "id": "1",
+                    "type": "clubs"
+                },
+                "links": {
+                    "related": "http://api.verein.localhost/api/v1/members/1/club",
+                    "self": "http://api.verein.localhost/api/v1/members/1/relationships/club"
+                }
+            },
+            "divisions": {
+                "links": {
+                    "related": "http://api.verein.localhost/api/v1/members/1/divisions",
+                    "self": "http://api.verein.localhost/api/v1/members/1/relationships/divisions"
+                }
+            },
+            "media": {
+                "links": {
+                    "related": "http://api.verein.localhost/api/v1/members/1/media",
+                    "self": "http://api.verein.localhost/api/v1/members/1/relationships/media"
+                }
+            },
+            "membership": {
+                "data": {
+                    "id": "1",
+                    "type": "memberships"
+                },
+                "links": {
+                    "related": "http://api.verein.localhost/api/v1/members/1/membership",
+                    "self": "http://api.verein.localhost/api/v1/members/1/relationships/membership"
+                }
+            }
+        },
+        "type": "members"
+    },
+    "included": [
+        {
+            "attributes": {
+                "address": "2785 Harvey Well Suite 788",
+                "allowVoluntaryContribution": true,
+                "applyTitle": null,
+                "applyUrl": "https://app.vereinfacht.digital/de/bartoletti-harris-and-carter/apply",
+                "city": "East Deonteberg",
+                "constitutionUrl": "http://www.ullrich.org/",
+                "contributionStatementUrl": "http://ziemann.info/rem-maiores-autem-reprehenderit-molestiae",
+                "country": "Zambia",
+                "createdAt": "2026-09-10T21:25:55.000000Z",
+                "email": "chadd.daugherty@example.net",
+                "extendedTitle": "Williamson and Sons Group",
+                "hasConsentedMediaPublicationDefaultValue": true,
+                "hasConsentedMediaPublicationIsRequired": false,
+                "logoUrl": "https://placehold.co/600x400/CD1982/FFFFFF/?text=Logo",
+                "membershipStartCycleType": "monthly",
+                "preferredLocale": "en",
+                "primaryColor": "#cd1982",
+                "privacyStatementUrl": "http://www.gislason.biz/est-libero-iusto-maiores-et-maiores-ut-odit.html",
+                "slug": "bartoletti-harris-and-carter",
+                "title": "Bartoletti, Harris and Carter",
+                "updatedAt": "2026-09-10T21:25:55.000000Z",
+                "websiteUrl": "http://gibson.net/nihil-dignissimos-tempore-et-et-ea",
+                "zipCode": "03039-6416"
+            },
+            "id": "1",
+            "links": {
+                "self": "http://api.verein.localhost/api/v1/clubs/1"
+            },
+            "relationships": {
+                "divisions": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/clubs/1/divisions",
+                        "self": "http://api.verein.localhost/api/v1/clubs/1/relationships/divisions"
+                    }
+                },
+                "financeAccounts": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/clubs/1/finance-accounts",
+                        "self": "http://api.verein.localhost/api/v1/clubs/1/relationships/finance-accounts"
+                    }
+                },
+                "membershipTypes": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/clubs/1/membership-types",
+                        "self": "http://api.verein.localhost/api/v1/clubs/1/relationships/membership-types"
+                    }
+                },
+                "paymentPeriods": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/clubs/1/payment-periods",
+                        "self": "http://api.verein.localhost/api/v1/clubs/1/relationships/payment-periods"
+                    }
+                },
+                "taxAccountChart": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/clubs/1/tax-account-chart",
+                        "self": "http://api.verein.localhost/api/v1/clubs/1/relationships/tax-account-chart"
+                    }
+                }
+            },
+            "type": "clubs"
+        },
+        {
+            "attributes": {
+                "bankAccountHolder": "Marlen Beatty",
+                "bankIban": "DK3982812061191986",
+                "createdAt": "2026-09-10T21:25:55.000000Z",
+                "endedAt": null,
+                "membersCount": 1,
+                "monthlyFee": 10,
+                "notes": null,
+                "startedAt": "2017-01-03T13:22:37.000000Z",
+                "status": "cancelled",
+                "updatedAt": "2026-09-10T21:25:55.000000Z",
+                "voluntaryContribution": 0
+            },
+            "id": "1",
+            "links": {
+                "self": "http://api.verein.localhost/api/v1/memberships/1"
+            },
+            "relationships": {
+                "club": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/memberships/1/club",
+                        "self": "http://api.verein.localhost/api/v1/memberships/1/relationships/club"
+                    }
+                },
+                "members": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/memberships/1/members",
+                        "self": "http://api.verein.localhost/api/v1/memberships/1/relationships/members"
+                    }
+                },
+                "membershipType": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/memberships/1/membership-type",
+                        "self": "http://api.verein.localhost/api/v1/memberships/1/relationships/membership-type"
+                    }
+                },
+                "owner": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/memberships/1/owner",
+                        "self": "http://api.verein.localhost/api/v1/memberships/1/relationships/owner"
+                    }
+                },
+                "paymentPeriod": {
+                    "links": {
+                        "related": "http://api.verein.localhost/api/v1/memberships/1/payment-period",
+                        "self": "http://api.verein.localhost/api/v1/memberships/1/relationships/payment-period"
+                    }
+                }
+            },
+            "type": "memberships"
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "links": {
+        "self": "http://api.verein.localhost/api/v1/members/1"
+    }
+}.
+           "firstName": "Bell",
+           "fullName": "Bell Parisian",
+           "gender": null,
+  -        "hasConsentedMediaPublication": true,
+  +        "hasConsentedMediaPublication": false,
+           "lastName": "Parisian",
+           "membershipTypeId": null,
+           "phoneNumber": null,
+  
+
+  at vendor/cloudcreativity/json-api-testing/src/Constraints/SubsetInDocument.php:73
+     69▕             return $result;
+     70▕         }
+     71▕ 
+     72▕         if (!$result) {
+  ➜  73▕             $this->fail(
+     74▕                 $other,
+     75▕                 $description,
+     76▕                 $this->failure($actual)
+     77▕             );
+
+      +6 vendor frames 
+  7   tests/Feature/MemberTest.php:217
+
+
+  Tests:    11 failed, 49 passed (312 assertions)
+  Duration: 45.27s
+
