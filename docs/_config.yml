@@ -1,13 +1,12 @@
 # GitHub Pages for the docs/ folder (B9 approvals, step 4). Jekyll renders the
-# Markdown here as pages; the baseline records and the contract fixtures are
-# served as files. Liquid is off so that JSON examples with braces survive.
+# Markdown here as pages; the baseline records (text files) and the contract
+# fixtures are served as files (C4: the baseline folder was excluded before,
+# while the landing page said it was served). Liquid is off so that JSON
+# examples with braces survive.
 title: Federation Member Services Lab
 description: An open-source club-management platform extended into a fictional federation's member-services system, milestone by milestone, with the evidence.
 theme: jekyll-theme-minimal
 markdown: kramdown
-exclude:
-  - baseline/
-  - "*.txt"
 defaults:
   - scope:
       path: ""

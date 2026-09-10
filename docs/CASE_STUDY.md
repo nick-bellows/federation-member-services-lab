@@ -1,6 +1,6 @@
 # Case study: modernizing an inherited system into a federation's member-services platform
 
-A fictional federation, the Northgate Soccer Federation, needed a member-services platform: organizations, seasons, registration windows, applications with documents and review, identity through OpenID Connect, credential facts from a separate learning system, and the operability a federation expects. Rather than start from nothing, this project forked a real open-source club-management system, [vereinfacht](https://github.com/vereinfacht/vereinfacht) (Laravel 13, Next.js 14, MIT), learned it, and extended it in eleven bounded milestones. Every number below links to a retained run; every "works" links to a test or a CI job. The system is validated in CI on three database engines and rehearsed from release images in Compose; it is not deployed.
+A fictional federation, the Northgate Soccer Federation, needed a member-services platform: organizations, seasons, registration windows, applications with documents and review, identity through OpenID Connect, credential facts from a separate learning system, and the operability a federation expects. Rather than start from nothing, this project forked a real open-source club-management system, [vereinfacht](https://github.com/vereinfacht/vereinfacht) (Laravel 13, Next.js 14, MIT), learned it, and extended it in eleven bounded milestones and a closing phase driven by two external reviews. Every number below links to a retained run pinned to a commit; every "works" links to a test or a CI job. The system is validated in CI on three database engines and rehearsed from release images in Compose; the application is not deployed, this documentation site is.
 
 The federation is invented. Nothing here uses a real federation's marks, data or architecture.
 
@@ -32,6 +32,8 @@ None of these is unusual. They are what an inherited system looks like, and the 
 | M9 Accessibility and performance | A manual WCAG 2.1 AA review with a keyboard walk; five indexes and an eager-loaded listing, measured before and after | [`docs/ACCESSIBILITY.md`](ACCESSIBILITY.md), [`docs/PERFORMANCE.md`](PERFORMANCE.md), [ADR-0013](adr/0013-accessibility-and-performance-evidence.md) |
 | B7 Security | A threat model as attack trees; JSON Patch with field-level authorization; operator surfaces behind a token; a test that no token is ever logged | [`docs/THREAT_MODEL.md`](THREAT_MODEL.md), [ADR-0014](adr/0014-security-review.md) |
 | M10 Release | Release images, a one-off migration task, the worker and scheduler as services, a rehearsal with no bind mount, a designed-not-provisioned deployment, a release checklist and rollback plan | [`docs/DEPLOYMENT.md`](DEPLOYMENT.md), [`docs/RELEASE.md`](RELEASE.md), [ADR-0015](adr/0015-release-engineering.md) |
+| M11 Case study | This document, the recorded demo, the accessibility improvements deferred since M9, the upstream offer drafted, the Auth0 walkthrough written for a tenant that does not exist yet; then a Terraform proof of the deployment design (validated, not applied) and this documentation site | [`docs/UPSTREAM_OFFER.md`](UPSTREAM_OFFER.md), [`deploy/terraform/README.md`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/deploy/terraform/README.md) |
+| C1 to C3 Closing | Two independent reviews of the M11 state, verified finding by finding: four defects the 237 green tests had never caught (a key without its owner, an answer without its question, a window without its hierarchy, a check before its lock), each fixed with a test that fails before and passes after; the proof's load-balancer rule that would have swallowed the sign-in callback, fixed and asserted; the database encrypted; the API image rootless; a secret scan over the full history that fails the build | [ADR-0016](adr/0016-boundary-rules-from-the-external-reviews.md), [`c1_tests_before.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/c1_tests_before.txt), [`c1_tests_after.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/c1_tests_after.txt), [`release_rehearsal_2026-09-10.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/release_rehearsal_2026-09-10.txt), [`gitleaks_2026-09-10.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/gitleaks_2026-09-10.txt) |
 
 ## Three decisions worth explaining
 
@@ -45,20 +47,23 @@ None of these is unusual. They are what an inherited system looks like, and the 
 
 | Measurement | Before | After | Where | Caveat |
 |---|---|---|---|---|
-| Rows examined by the memberships listing's member query | 32,020 (full scan) | 1,510 (index lookup) | `docs/baseline/perf_explain_before.txt`, `perf_explain_after.txt` | synthetic seed of 30,000 members |
-| Queries per page of twenty memberships | 89 | 11 | `perf_query_count_before.txt`, `perf_query_count_after.txt` | guarded by a test |
-| Listing p95, ten virtual users for thirty seconds | 663 ms | 333 ms | `perf_before.json`, `perf_after_eager.json` | a laptop, the rate limit raised for the window |
-| Backend tests | 91 (upstream) | 237 | `docs/baseline/phpunit*.txt` | SQLite locally; three engines in CI |
-| Composer advisories | 13 in 3 upstream packages | 0 | `security_audit_2026-09-03.txt`, `security_audit_after_b8_2026-09-04.txt` | within-major fixes only |
-| npm advisories, frontend | 8 | 4 | same | the four remaining need a major (`next`, `sharp`, `swiper`, `postcss`) and are listed in `future-work.md` |
+| Rows examined by the memberships listing's member query | 32,020 (full scan) | 1,510 (index lookup) | [`perf_explain_before.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_explain_before.txt), [`perf_explain_after.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_explain_after.txt) | synthetic seed of 30,000 members |
+| Queries per page of twenty memberships | 89 | 11 | [`perf_query_count_before.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_query_count_before.txt), [`perf_query_count_after.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_query_count_after.txt) | guarded by a test |
+| Listing p95, ten virtual users for thirty seconds | 663 ms | 333 ms | [`perf_before.json`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_before.json), [`perf_after_eager.json`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/perf_after_eager.json) | a laptop, the rate limit raised for the window |
+| Backend tests | 91 (upstream) | 247 | [`phpunit.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/phpunit.txt) (upstream), [`phpunit_after_c1_backend.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/phpunit_after_c1_backend.txt) | SQLite locally; the same suite on MariaDB and PostgreSQL in CI |
+| Defects found by two external reviews that those tests had missed | 4 | 0 open | [`c1_tests_before.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/c1_tests_before.txt) (the regression tests failing), [`c1_tests_after.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/c1_tests_after.txt) (passing) | the reviews read the code, not the test names |
+| Composer advisories | 13 in 3 upstream packages | 0 | [`security_audit_2026-09-03.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/security_audit_2026-09-03.txt), [`security_audit_after_b8_2026-09-04.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/security_audit_after_b8_2026-09-04.txt) | within-major fixes only |
+| npm advisories, frontend | 8 | 4 | same | the four remaining need a major (`next`, `sharp`, `swiper`, `postcss`) and are listed in [`future-work.md`](future-work.md) |
+| Secrets in the history | 1 finding (upstream's development token, since removed) | 0 outside the reviewed ignore list | [`gitleaks_2026-09-10.txt`](https://github.com/nick-bellows/federation-member-services-lab/blob/10351a5c38fd591c57b86954a218dd937f801820/docs/baseline/gitleaks_2026-09-10.txt) | the scan fails the build in CI since C3 |
 
 ## What was not done
 
-- Nothing is deployed. The architecture is designed and priced at nothing; provisioning needs the owner's approval and money.
+- The application is not deployed. The architecture is designed and a minimal Terraform proof of it is validated and priced (about $2.50 a day), not applied; it waits for the owner's AWS credentials. This documentation site is deployed.
+- Two hundred and thirty-seven green tests hid four defects that two external reviews found by reading the code; the fixes and their fail-then-pass tests are in ADR-0016, and the fact is recorded here rather than smoothed over.
 - No penetration test, no fuzzing; the threat model is read from the code and the tests.
 - No screen reader was run by ear; the accessibility review is a keyboard walk and a per-criterion record.
 - The Auth0 tenant walkthrough is planned; CI and development use a self-hosted mock provider.
-- Nothing has been offered upstream yet; one offer is drafted ([`docs/UPSTREAM_OFFER.md`](UPSTREAM_OFFER.md)) and waits for the owner's word.
+- Nothing has been offered upstream yet; one offer of six items is drafted ([`docs/UPSTREAM_OFFER.md`](UPSTREAM_OFFER.md)) and waits for the owner's word, as the last act of the project.
 - Four dependency majors are unapplied, on purpose, with their advisories recorded.
 
 ## How to read the repository in five minutes
@@ -67,7 +72,7 @@ None of these is unusual. They are what an inherited system looks like, and the 
 2. One ADR, say [ADR-0010](adr/0010-transactional-outbox-and-consumers.md), for how decisions are recorded.
 3. One incident, say [INCIDENT-003](incidents/INCIDENT-003-worker-fails-after-approval.md), for how failure is rehearsed.
 4. One test file, say `api/tests/Feature/Federation/Http/ApplicationFieldsPatchHttpTest.php`, for how behaviour is pinned.
-5. The [threat model](THREAT_MODEL.md) legend, for how "partly" and "upstream" are used instead of "done".
+5. The [threat model](THREAT_MODEL.md) legend, for how "partly" and "upstream" are used instead of "done"; and [ADR-0016](adr/0016-boundary-rules-from-the-external-reviews.md), for what an outside reader found that the tests had not.
 
 ## How this was built
 
