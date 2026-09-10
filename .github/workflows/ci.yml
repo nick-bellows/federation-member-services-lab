@@ -8,8 +8,10 @@
 #
 # Jobs: backend tests on SQLite (upstream's test configuration), on MariaDB
 # (the runtime engine) and on PostgreSQL 16 (the compatibility matrix's strict engine), Pint as a report,
-# frontend type-check, lint and production build, an env() misuse guard, and an
-# upstream-versus-fork manifest published to the job summary.
+# frontend type-check, lint and production build, an env() misuse guard, the
+# browser journeys against the compose stack, a dependency audit (report only),
+# an upstream-versus-fork manifest published to the job summary, and a secret
+# scan over the full history that fails the build (C3).
 
 name: CI
 
@@ -333,3 +335,19 @@ jobs:
             echo
             git log --oneline FETCH_HEAD..HEAD | sed 's/^/- /'
           } | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # Secret scan over the whole history (Phase C, C3). Fails the build on any
+  # finding; known non-secrets are listed by fingerprint in .gitleaksignore
+  # with the reason, and the rule set is the default one (.gitleaks.toml).
+  secret-scan:
+    name: Secret scan (gitleaks over the full history, enforced)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks detect
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.18.4 \
+            detect --source /repo --config /repo/.gitleaks.toml --redact --exit-code 2 --verbose
+          echo "gitleaks v8.18.4: no findings outside .gitleaksignore" | tee -a "$GITHUB_STEP_SUMMARY"
