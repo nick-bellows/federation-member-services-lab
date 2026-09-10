@@ -599,3 +599,37 @@ cd e2e && npx playwright test tests/screenshots.spec.ts   # against the developm
 1. A number in a README has a half-life of one milestone; pin it to a commit or accept that it lies by the next merge.
 2. A documentation site is a deployment: it has a build, an accessibility surface and dead links, and it needs the same check the application gets.
 3. "Reduce to what is still open" is a deletion task; the history belongs in the log, not in the list.
+
+## 2026-09-10 — Phase C, C5: the final verification
+
+**Goal.** Repeat, on the closing state, the three proofs a stranger can repeat: the whole suite, the release rehearsal, and a cold clone of the README's run instructions from the public fork; check the documentation site as deployed; bring the roadmap, the learning log, the interview guide and the internal record to the closing state.
+
+**Commands run.**
+
+```sh
+docker compose exec tooling bash -lc 'cd api && php artisan test'                      # docs/baseline/phpunit_after_c_backend.txt
+cd e2e && PAGES_URL=https://nick-bellows.github.io/federation-member-services-lab npx playwright test tests/pages-site.spec.ts   # docs/baseline/pages_site_2026-09-10.txt, twice
+bash coldclone_c5.sh                                                                     # docs/baseline/cold_clone_2026-09-10.txt (the script's steps are the README's, in the record)
+```
+
+**Evidence.**
+
+| What | Where | Result |
+|---|---|---|
+| Whole suite on the closing tree | `docs/baseline/phpunit_after_c_backend.txt` | 247 passed (1,148 assertions) on SQLite; MariaDB and PostgreSQL in CI on every merge of the phase |
+| Release rehearsal | `docs/baseline/release_rehearsal_2026-09-10.txt` (C2) | the closing images; the journeys 7 of 7 on the second attempt |
+| Cold clone | `docs/baseline/cold_clone_2026-09-10.txt` | from the public fork's `main` (`f1f3397`) into a scratch directory, a separate Compose project with fresh volumes: clone 6 s, `compose up --build` 79 s with cached images, composer 33 s, the entrypoint's own migration 160 s, `migrate:fresh` with the demo seeder 365 s, assets and web installs 23 s, sign-in page 200, ten journeys passed in 113 s (sign-in 3, registration review 4, accessibility review 3), the outbox processed 11 facts; 882 s in all, then torn down with its volumes and the working stack restored |
+| Documentation site | `docs/baseline/pages_site_2026-09-10.txt` | after the C4 merge: the two findings of the live site gone, one residual (`a small` at 11px in the theme's header); after #19: 0 violations on the landing page, the case study and the threat model, 42 same-site links resolve |
+
+**What went wrong, in order.**
+
+1. The site check after C4 still failed on one element the first check had folded into "footer contrast": the theme renders the repository name in the header as an 11px `<small>` in `#777`. One rule more, its own pull request, the check re-run after it deployed. A finding named by selector is worth more than one named by area.
+2. The cold-clone script's readiness probe ran while the API container was still restarting after the web install, so that one line in the record is empty; the sign-in page, the ten journeys and the outbox status are the evidence, and the record says so instead of being re-run to look tidier.
+
+**Three lessons.**
+
+1. The closing verification is the same three proofs as the first public gate, repeated; if they cannot be repeated in an afternoon, the project has drifted from its evidence.
+2. A record that shows a gap with its explanation beats a record re-run until it is clean.
+3. Done is a state of the evidence, not of the code: every claim a stranger meets has a file behind it, every open item names who can close it.
+
+**Not done, on the owner (ROADMAP O1 to O6).** The Auth0 tenant and its walk; the AWS proof and its cost; whether the fork carries releases; the owner's read and the review of the internal record; the pin; the upstream offer, last.

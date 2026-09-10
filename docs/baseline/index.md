@@ -4,7 +4,7 @@ title: Retained evidence
 
 # Retained evidence
 
-Every number in the documentation comes from one of these files, each written by the run that produced it and committed unchanged (ANSI colour stripped). The file names carry the milestone or the date; the learning log says which command wrote which file. Generated on 2026-09-10 (C4) from the folder listing.
+Every number in the documentation comes from one of these files, each written by the run that produced it and committed unchanged (ANSI colour stripped). The file names carry the milestone or the date; the learning log says which command wrote which file. Generated on 2026-09-10 from the folder listing.
 
 
 ## Test suites
@@ -19,6 +19,7 @@ Every number in the documentation comes from one of these files, each written by
 - [`phpunit_after_b7_backend.txt`](phpunit_after_b7_backend.txt) (21 KB)
 - [`phpunit_after_b8_backend.txt`](phpunit_after_b8_backend.txt) (21 KB)
 - [`phpunit_after_c1_backend.txt`](phpunit_after_c1_backend.txt) (22 KB)
+- [`phpunit_after_c_backend.txt`](phpunit_after_c_backend.txt) (22 KB)
 - [`phpunit_after_env_fix.txt`](phpunit_after_env_fix.txt) (8 KB)
 - [`phpunit_after_m2.txt`](phpunit_after_m2.txt) (11 KB)
 - [`phpunit_after_m3.txt`](phpunit_after_m3.txt) (13 KB)
@@ -29,6 +30,7 @@ Every number in the documentation comes from one of these files, each written by
 
 - [`a11y_review_2026-09-03.txt`](a11y_review_2026-09-03.txt) (2 KB)
 - [`a11y_review_2026-09-04.txt`](a11y_review_2026-09-04.txt) (2 KB)
+- [`pages_site_2026-09-10.txt`](pages_site_2026-09-10.txt) (3 KB)
 - [`playwright_b2.txt`](playwright_b2.txt) (1 KB)
 - [`playwright_b3.txt`](playwright_b3.txt) (1 KB)
 - [`playwright_b5.txt`](playwright_b5.txt) (1 KB)
@@ -41,6 +43,7 @@ Every number in the documentation comes from one of these files, each written by
 
 - [`c1_tests_after.txt`](c1_tests_after.txt) (7 KB)
 - [`c1_tests_before.txt`](c1_tests_before.txt) (25 KB)
+- [`cold_clone_2026-09-10.txt`](cold_clone_2026-09-10.txt) (3 KB)
 - [`gitleaks_2026-09-10.txt`](gitleaks_2026-09-10.txt) (973 bytes)
 - [`release_rehearsal_2026-09-10.txt`](release_rehearsal_2026-09-10.txt) (15 KB)
 - [`terraform_validate_2026-09-10.txt`](terraform_validate_2026-09-10.txt) (927 bytes)

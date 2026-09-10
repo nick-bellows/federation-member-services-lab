@@ -1,0 +1,50 @@
+# Cold-clone verification of README run instructions, 2026-09-10T22:53:58Z (C5)
+# Fresh clone of https://github.com/nick-bellows/federation-member-services-lab (main) into /d/PortfolioProjects/_coldclone, Compose project 'fmsl-coldclone', fresh volumes.
+# The working stack is stopped for the duration (same ports) and restored in phase 4.
+[17:53:58] phase 1: stop the working stack
+[17:54:17] working stack stopped
+[17:54:23] git clone: 6s, head=f1f3397 (Merge pull request #18 from nick-bellows/c4/evidence-pass)
+[17:54:24] upstream fetched; commits ahead: 70
+ Container fmsl-coldclone-database-1 Started 
+ Container fmsl-coldclone-tooling-1 Started 
+ Container fmsl-coldclone-api-1 Started 
+ Container fmsl-coldclone-api-docs-1 Started 
+[17:55:43] compose up --build: 79s (images cached from the working stack; a fresh machine builds longer)
+[17:55:43] phase 2: inside the tooling container, the README's commands
+Use the `composer fund` command to find out more!
+env-ready
+[17:56:17] composer install + env: 33s
+[17:56:17] waiting for the api entrypoint's own migration (README instruction: until 'Starting the app')
+[17:58:57] api entrypoint migration wait: 160s
+  Database\Seeders\NorthgateDemoSeeder ............................... RUNNING  
+  Database\Seeders\NorthgateDemoSeeder ....................... 240,518 ms DONE  
+seed_exit=0
+[18:05:02] migrate:fresh + seed: 365s
+refreshed=1 changed=0 unavailable=0 skipped=0 (cutoff 2026-09-10T11:05:04+00:00)
+[18:05:04] phase 3: assets, web install, next dev, api restart, worker, verification
+npm notice
+✓ built in 1.41s
+added 665 packages in 17s
+[18:05:27] assets + npm installs: 23s
+[18:05:56] sign-in page: http=200
+[18:05:56] api readiness: 
+[18:05:56] browser journeys against the clone (e2e from the clone, browsers already installed on this machine)
+added 8 packages in 2s
+  ✓   1 [chromium] › tests\member-sign-in.spec.ts:35:5 › an anonymous visitor is sent to the sign-in page (2.2s)
+  ✓   4 [chromium] › tests\member-sign-in.spec.ts:45:5 › signing in through the OIDC provider shows the identity the API resolved (19.2s)
+  ✓   5 [chromium] › tests\member-sign-in.spec.ts:69:5 › the API refuses an anonymous call to the identity endpoint (252ms)
+  ✓   3 [chromium] › tests\registration-review.spec.ts:65:9 › registration review slice › an applicant starts, completes and submits an application (39.6s)
+  ✓   2 [chromium] › tests\accessibility-review.spec.ts:116:9 › accessibility review of the slice › a member walks every page with the keyboard (42.8s)
+  ✓   7 [chromium] › tests\accessibility-review.spec.ts:172:9 › accessibility review of the slice › a reviewer walks the queue and windows pages with the keyboard (18.1s)
+  ✓   6 [chromium] › tests\registration-review.spec.ts:104:9 › registration review slice › a reviewer works the queue and approves (26.4s)
+  ✓   9 [chromium] › tests\registration-review.spec.ts:138:9 › registration review slice › the applicant sees the decision and the history (7.9s)
+  ✓  10 [chromium] › tests\registration-review.spec.ts:159:9 › registration review slice › an organization administrator can open a registration window (7.6s)
+  ✓   8 [chromium] › tests\accessibility-review.spec.ts:203:9 › accessibility review of the slice › the new-application page is usable on a slow connection (47.5s)
+  10 passed (1.8m)
+[18:07:49] playwright: 113s
+unpublished=0 oldest=- queued_jobs=0 failed_jobs=0 failed_events=0 processed=11
+[18:07:50] phase 4: tear the clone down, restore the working stack
+removed: 12
+[18:08:25] working stack started
+[18:08:40] done in 882s
+# Note: the 'api readiness' line printed empty because the API container was still restarting when the probe ran (the README says to restart it once after the web install); the sign-in page, the ten journeys and the outbox status above are the readiness evidence.
