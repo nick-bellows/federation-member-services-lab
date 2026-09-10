@@ -1,0 +1,49 @@
+# Documentation site check after the C4 merge (f1f3397), 2026-09-10T22:53:48Z: e2e/tests/pages-site.spec.ts against https://nick-bellows.github.io/federation-member-services-lab
+# Before C4 (98bc84b) the same spec reported color-contrast on the footer link and link-in-text-block on every link in running text, on all three pages; see docs/LEARNING_LOG.md (C4).
+
+$ cd e2e && PAGES_URL=https://nick-bellows.github.io/federation-member-services-lab npx playwright test tests/pages-site.spec.ts --reporter=list
+Running 1 test using 1 worker
+landing page: 1 axe violation(s), 11 same-site link(s) checked
+case study: 1 axe violation(s), 30 same-site link(s) checked
+threat model: 1 axe violation(s), 1 same-site link(s) checked
+  ✘  1 [chromium] › tests\pages-site.spec.ts:22:5 › the documentation site answers, is accessible and its links resolve (7.2s)
+  1) [chromium] › tests\pages-site.spec.ts:22:5 › the documentation site answers, is accessible and its links resolve 
+    Error: /: axe color-contrast (serious) at a > small
+    /CASE_STUDY: axe color-contrast (serious) at a > small
+    /THREAT_MODEL: axe color-contrast (serious) at a > small
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 1
+    + Received  + 5
+    - Array []
+    + Array [
+    +   "/: axe color-contrast (serious) at a > small",
+    +   "/CASE_STUDY: axe color-contrast (serious) at a > small",
+    +   "/THREAT_MODEL: axe color-contrast (serious) at a > small",
+    + ]
+      47 |     }
+      48 |
+    > 49 |     expect(findings, findings.join('\n')).toEqual([]);
+         |                                           ^
+      50 | });
+      51 |
+        at D:\PortfolioProjects\federation-member-services-lab\e2e\tests\pages-site.spec.ts:49:43
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\pages-site-the-documentati-9035c-sible-and-its-links-resolve-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+    Error Context: test-results\pages-site-the-documentati-9035c-sible-and-its-links-resolve-chromium\error-context.md
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\pages-site-the-documentati-9035c-sible-and-its-links-resolve-chromium\trace.zip
+    Usage:
+        npx playwright show-trace test-results\pages-site-the-documentati-9035c-sible-and-its-links-resolve-chromium\trace.zip
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+  1 failed
+    [chromium] › tests\pages-site.spec.ts:22:5 › the documentation site answers, is accessible and its links resolve 
+
+## After the merge of #19 (bffdecd), 2026-09-10T23:04:30Z: the header's 11px repository-name link darkened (docs/assets/css/style.scss)
+$ cd e2e && PAGES_URL=https://nick-bellows.github.io/federation-member-services-lab npx playwright test tests/pages-site.spec.ts --reporter=list
+Running 1 test using 1 worker
+landing page: 0 axe violation(s), 11 same-site link(s) checked
+case study: 0 axe violation(s), 30 same-site link(s) checked
+threat model: 0 axe violation(s), 1 same-site link(s) checked
+  ✓  1 [chromium] › tests\pages-site.spec.ts:22:5 › the documentation site answers, is accessible and its links resolve (7.3s)
+  1 passed (7.9s)

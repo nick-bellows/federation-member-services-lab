@@ -518,3 +518,36 @@ A pinned scanner version that must be bumped deliberately; a rehearsal that take
 2. What does it take to run nginx as a non-root user, and how do you prove the container really is?
 3. Why pin the secret scanner's version?
 4. What would you have to change in this proof before two people could apply it?
+
+## Phase C — Closing: the evidence pass and the final verification (C4, C5)
+
+### What it does
+
+C4 makes every number a reviewer meets current and linked to its record, pinned to a commit: the README (247 tests, the browser count as CI runs it, sixteen decision records, nine CI jobs, the CI history as it happened including the red merge of 2026-09-05, the Pages link), the case study (the same, plus rows for the closing phase and the reviewed defects), the documentation site (the baseline folder served with a generated index, the demo embedded with a poster frame, the theme's two accessibility failures fixed and checked by a spec that runs against the live site), the screenshots recaptured populated, and the future-work file reduced to what is still open. C5 repeats the proofs on the closing commit: the whole suite, the release rehearsal from C2, a cold clone of the README's run instructions from the public fork with the journeys against it, the Pages check after the merge, and the roadmap, the learning log and the interview guide brought to the closing state.
+
+### Why we built it this way
+
+A number in a README has a half-life of one milestone; pinning the link to a commit makes the sentence checkable after the next merge. The CI history is told with its four failures because a reviewer who finds a hidden red run stops reading. A documentation site is a deployment with a build, an accessibility surface and dead links, so it gets the same kind of check the application gets. A screenshot is a claim, so each capture waits for the state it shows and the reviewer's queue is populated through the product's own path. The final verification repeats only what a stranger can repeat.
+
+### Alternatives considered
+
+Links to `main` (drift silently); a CI check that greps the README for counts (would have caught the test count; left as a follow-up because the counts now live in the records); hand-edited screenshots (a picture of nothing); leaving the future-work file as a history (the log already is one).
+
+### Failure modes
+
+A folder link that answered 404 for two separate reasons (excluded in the config, and no index page); a first "without the ignore list" scan that passed because the flag did not do what it seemed to (C3); a rehearsal whose own web environment still named the old port (C2); a screenshot of a loading state and one of an empty queue.
+
+### Tradeoffs
+
+Pinned links that must be re-pinned when a record is corrected; a Pages check that cannot run in a pull request's CI and is run by hand after the merge; a cold clone that stops the working stack for a quarter of an hour.
+
+### Code to locate immediately
+
+`README.md` (the milestone table and the Tests section) · `docs/CASE_STUDY.md` (the numbers table) · `docs/index.md`, `docs/_config.yml`, `docs/baseline/index.md`, `docs/assets/css/style.scss` · `e2e/tests/pages-site.spec.ts` · `e2e/tests/screenshots.spec.ts` · `docs/future-work.md` · `docs/baseline/phpunit_after_c_backend.txt`, `cold_clone_2026-09-10.txt`, `pages_site_2026-09-10.txt`
+
+### Likely interviewer questions
+
+1. How do you keep a README truthful over the life of a project?
+2. What does "done" mean for this project, and what is deliberately left undone?
+3. Your documentation site failed its own accessibility check. What was wrong and how is it checked now?
+4. What would a stranger have to repeat to trust this repository, and how long would it take them?
