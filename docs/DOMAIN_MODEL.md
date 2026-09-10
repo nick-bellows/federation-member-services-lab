@@ -118,12 +118,14 @@ Whether a person may participate is **not** a column. It is computed on read (`P
 
 | Entity | Meaning | Rules |
 |---|---|---|
-| **Registration window** (`registration_windows`) | An organization administrator opens registration for one season and a set of roles, with `opens_at` and `closes_at`. One window per organization and season. | Applications can only be started inside an open window and only for roles it offers (`StartApplication`). Created over the API by an administrator of that organization or its federation; audited as `window.opened`. |
+| **Registration window** (`registration_windows`) | An organization administrator opens registration for one season and a set of roles, with `opens_at` and `closes_at`. One window per organization and season. | Applications can only be started inside an open window and only for roles it offers (`StartApplication`). Created over the API by an administrator of that organization or its federation, for a season of that federation only (409 `season_not_in_federation`, ADR-0016); audited as `window.opened`. |
 | **Application details** | `date_of_birth`, `phone`, `applicant_notes` on the application. | Editable by the applicant while the application is `DRAFT` or `NEEDS_INFORMATION`; every change is audited as `application.details_updated`. Role and window are fixed once started. |
 | **Application document** (`application_documents`) | Metadata about one document: type, file name, MIME type, size, SHA-256 checksum, review status, reviewer note. No bytes are stored (ADR-0008). | One per type per application (unique). Attached by the applicant while editable; replacing resets the review to `pending`. Reviewed (`accepted` / `rejected` with a note) by a reviewer while the application is `UNDER_REVIEW`. |
 | **Required documents** | `DocumentType::requiredFor(role)`: participant needs proof of age and photo; coach adds coaching licence and background-check consent; referee adds referee certificate and background-check consent. | Submission is refused with a 422 listing what is missing until every required type has metadata and a date of birth is present. |
 
-Over HTTP the same rules appear as stable error codes: `window_closed`, `role_not_offered`, `duplicate_application`, `application_incomplete` (with `meta.missingDocuments`), `application_not_editable`, `illegal_transition`, `transition_not_allowed_for_actor`, `reason_required`, `document_not_allowed`.
+Over HTTP the same rules appear as stable error codes: `window_closed`, `role_not_offered`, `duplicate_application`, `idempotency_key_reused`, `season_not_in_federation`, `application_incomplete` (with `meta.missingDocuments`), `application_not_editable`, `illegal_transition`, `transition_not_allowed_for_actor`, `reason_required`, `document_not_allowed`.
+
+An idempotency key on a start belongs to the applicant who presented it (ADR-0016): the same applicant, key, window and role is a replay that answers the stored application and never rewrites its details; the same key with another window or role is refused; another person's key is another person's. The three writes outside a transition (a field patch, a document's metadata, a document review) lock the application before they decide who may act and whether the state still allows it.
 
 ## Deliberately not modelled
 

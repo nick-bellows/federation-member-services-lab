@@ -30,7 +30,7 @@ class CredentialFactsTest extends TestCase
     #[DataProvider('fixtures')]
     public function test_every_fixture_parses_and_reports_what_the_provider_decided(string $file, string $subject, string $status, array $roleValidity, bool $hold): void
     {
-        $facts = CredentialFacts::fromArray(self::fixture($file), self::CONTRACT);
+        $facts = CredentialFacts::fromArray(self::fixture($file), self::CONTRACT, $subject);
 
         $this->assertSame(self::CONTRACT, $facts->contract);
         $this->assertSame($subject, $facts->subject);
@@ -49,7 +49,7 @@ class CredentialFactsTest extends TestCase
         $data['contract'] = 'learning-center.credentials.v2';
 
         $this->expectException(ContractMismatchException::class);
-        CredentialFacts::fromArray($data, self::CONTRACT);
+        CredentialFacts::fromArray($data, self::CONTRACT, 'mock|alex');
     }
 
     public function test_an_unknown_status_is_refused(): void
@@ -58,7 +58,7 @@ class CredentialFactsTest extends TestCase
         $data['eligibility']['status'] = 'probably_fine';
 
         $this->expectException(ContractMismatchException::class);
-        CredentialFacts::fromArray($data, self::CONTRACT);
+        CredentialFacts::fromArray($data, self::CONTRACT, 'mock|alex');
     }
 
     public function test_a_missing_field_is_refused(): void
@@ -67,7 +67,30 @@ class CredentialFactsTest extends TestCase
         unset($data['role_credentials']);
 
         $this->expectException(ContractMismatchException::class);
-        CredentialFacts::fromArray($data, self::CONTRACT);
+        CredentialFacts::fromArray($data, self::CONTRACT, 'mock|alex');
+    }
+
+    public function test_an_answer_about_another_subject_is_refused(): void
+    {
+        // The provider's answer is bound to the subject that was asked for; a
+        // response about someone else (a routing or caching fault upstream)
+        // must never be stored as this person's facts.
+        $this->expectException(ContractMismatchException::class);
+        CredentialFacts::fromArray(self::fixture('sam-suspended.json'), self::CONTRACT, 'mock|alex');
+    }
+
+    /**
+     * The provider's answer for $subject, shaped like another fixture: the
+     * same person, now with that fixture's eligibility.
+     *
+     * @return array<string, mixed>
+     */
+    public static function answerFor(string $subject, string $shapedLike): array
+    {
+        $data = self::fixture($shapedLike);
+        $data['member']['subject'] = $subject;
+
+        return $data;
     }
 
     /**

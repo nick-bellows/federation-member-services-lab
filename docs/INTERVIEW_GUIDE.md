@@ -451,3 +451,37 @@ A video file in the repository instead of a hosted demo; a case study in Markdow
 3. What did you offer upstream, and what happened?
 4. Your demo is a video. How do I know it shows the code in the repository?
 5. Which claim in the case study is weakest, and why did you keep it?
+
+## Phase C — Closing: the reviewed defects (C1)
+
+### What it does
+
+Fixes the four defects two external reviews found in `a68f88f` and the suite had never caught: an idempotency key looked up without its owner (another person's key answered with their application; a replay re-filled the details), a Learning Center answer stored without checking whose it was (three tests had normalised the mismatch), a registration window whose season could belong to another federation (the exception existed and was thrown nowhere), and three writes that checked who may act on the row the request had loaded and only then locked it. Each fix has a regression test that fails before and passes after (`docs/baseline/c1_tests_before.txt`, `c1_tests_after.txt`); the rules are ADR-0016; the threat model's leaves say what changed. Two inherited items travel with it: upstream's release workflow interpolated the branch name into a script, and one upstream test compared two `now()` reads and flaked on the MariaDB job.
+
+### Why we built it this way
+
+All four defects have one shape, a rule stated at a boundary and checked against the wrong object, so the fix is the same shape four times: name both things the rule is about, and check on the one that can change. The key gets its owner (a composite unique constraint, a 409 for reuse with other parameters, a replay that never rewrites). The answer gets its question (the value object refuses another subject; the stored snapshot is bound again on read). The window gets its hierarchy (409 `season_not_in_federation`). The row gets its lock first and the checks after. The regression test for the last one simulates the interleaving at the moment the transaction begins, because a two-connection race would be timing-dependent and impossible on SQLite in memory.
+
+### Alternatives considered
+
+Keeping the global unique constraint and answering 409 on collision (tells one person another's key exists); a request fingerprint as the replay test (refuses the retry the applicant would have to repeat); checking the subject in the HTTP client only (the stored payload stays unbound); a 422 validation rule for the season (a domain invariant, not a document shape); `If-Match` instead of lock-then-authorise (changes the API for every client; the lock was already there).
+
+### Failure modes
+
+A frozen clock that made the serialised consent `isPast()` false; a migration rollback at test teardown that restores the old constraint two rows now violate (it should fail; the tests clean up first); a resolver unit test whose hand-built snapshots had no subject once the subject was checked on read; a third normalising test found only by the whole suite.
+
+### Tradeoffs
+
+A refused patch, attachment or review now opens and rolls back a transaction; `CredentialFacts::fromArray` gains a required parameter every caller must supply; the composite constraint's `down` cannot run while two applicants share a key.
+
+### Code to locate immediately
+
+`api/app/Federation/Actions/StartApplication.php` · `api/database/migrations/2026_09_10_100000_scope_idempotency_key_to_applicant.php` · `api/app/Federation/LearningCenter/CredentialFacts.php` (the subject check) · `api/app/Federation/Http/Controllers/RegistrationWindowController.php` · `PatchApplicationFields`, `AttachDocumentMetadata`, `ReviewDocument` (lock first) · `api/tests/Feature/Federation/ConcurrentAuthorizationTest.php` · `docs/adr/0016-boundary-rules-from-the-external-reviews.md`
+
+### Likely interviewer questions
+
+1. Two hundred and thirty-seven tests passed and these four defects were in the code. What does that say about the tests, and what did you change about how you write them?
+2. Walk me through the idempotency-key fix. Why a composite unique constraint rather than a code check, and what happens when two requests with the same key race?
+3. How do you test "the check must happen after the lock" without a real race?
+4. The Learning Center answered with the wrong person's facts. Whose fault is that, and why does the consumer check it anyway?
+5. You found a flaky upstream test and a workflow-injection risk on the way. Why fix them here rather than only report them?

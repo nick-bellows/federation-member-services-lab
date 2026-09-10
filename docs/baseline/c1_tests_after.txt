@@ -1,0 +1,115 @@
+# C1 regression tests AFTER the fixes (2026-09-10, SQLite in memory, tooling container)
+# php artisan test --filter 'StartApplicationTest|RegistrationApplicationsHttpTest|CredentialFactsTest|CredentialSnapshotsTest|ParticipationHttpTest|RegistrationWindowsHttpTest|ConcurrentAuthorizationTest|MemberTest|ParticipationResolverTest|ApplicationFieldsPatchHttpTest|ApplicationDocumentsHttpTest|SchemaIdentifierLengthTest'
+
+   PASS  Tests\Unit\Federation\CredentialFactsTest
+  ✓ every fixture parses and reports what the provider decided with dat… 0.04s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ another contract version is refused                                  0.02s  
+  ✓ an unknown status is refused
+  ✓ a missing field is refused
+  ✓ an answer about another subject is refused
+
+   PASS  Tests\Unit\Federation\ParticipationResolverTest
+  ✓ an approved participant with an eligible snapshot may participate    2.41s  
+  ✓ an approved coach needs a valid coach credential                     0.68s  
+  ✓ a hold blocks regardless of credentials                              0.73s  
+  ✓ a lapsed credential blocks with both reasons                         0.68s  
+  ✓ an unapproved application reports findings but never participates    0.68s  
+  ✓ no snapshot is unknown for an approved application                   0.68s  
+  ✓ a not found snapshot is unknown with its age                         0.72s  
+  ✓ a snapshot older than the limit is marked stale and still answers    0.73s  
+  ✓ the serialised shape is stable                                       0.71s  
+
+   PASS  Tests\Unit\Federation\SchemaIdentifierLengthTest
+  ✓ every table index and foreign key name fits mysql limits             0.77s  
+
+   PASS  Tests\Feature\Federation\ConcurrentAuthorizationTest
+  ✓ a patch is refused when the application leaves the applicants hands… 0.83s  
+  ✓ document metadata is refused when the application is submitted befo… 0.70s  
+  ✓ a document review is refused when the application is decided before… 0.75s  
+
+   PASS  Tests\Feature\Federation\CredentialSnapshotsTest
+  ✓ a refresh stores the answer and audits the first record              0.75s  
+  ✓ a changed eligibility is audited with both states                    0.71s  
+  ✓ an unchanged answer writes no audit entry                            0.72s  
+  ✓ an answer about another person is a contract error and nothing is s… 0.86s  
+  ✓ a member the provider does not know is recorded as not found         0.72s  
+  ✓ a user without a linked identity is not asked about                  0.72s  
+  ✓ a slow or absent provider leaves the previous snapshot untouched     0.71s  
+  ✓ a server error is unavailable not a new snapshot                     0.67s  
+  ✓ the service token is fetched once and reused                         0.72s  
+
+   PASS  Tests\Feature\Federation\Http\ApplicationDocumentsHttpTest
+  ✓ the applicant attaches metadata and replacing resets the review      1.00s  
+  ✓ only the applicant attaches and only while editable                  0.81s  
+  ✓ format size and checksum are validated                               0.77s  
+  ✓ a reviewer accepts or rejects documents under review                 0.85s  
+
+   PASS  Tests\Feature\Federation\Http\ApplicationFieldsPatchHttpTest
+  ✓ the applicant patches their own details on a draft and the change i… 0.80s  
+  ✓ one forbidden operation refuses the whole patch                      0.80s  
+  ✓ a reviewer writes reviewer notes that the applicant never sees       0.86s  
+  ✓ a reviewer may not touch the applicants fields                       0.79s  
+  ✓ an administrator of another organization cannot reach the applicati… 0.90s  
+  ✓ the applicant can no longer patch details once submitted             0.75s  
+  ✓ a test operation guards against a stale view                         0.85s  
+  ✓ remove clears a field and values are validated                       0.76s  
+  ✓ the wrong media type is refused before anything is read              0.73s  
+  ✓ a malformed document is refused as a whole                           0.78s  
+  ✓ the resource update cannot write reviewer notes                      0.80s  
+
+   PASS  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ✓ an approval asks the provider once and the application shows partic… 0.96s  
+  ✓ an approval succeeds when the provider is away and participation is… 4.07s  
+  ✓ a reviewer can refresh and sees the new answer                       0.77s  
+  ✓ a refresh answered about another person is a 502 and the snapshot s… 0.81s  
+  ✓ only a reviewer of that organization may refresh                     0.89s  
+  ✓ a refresh while the provider is away is a 503 with a stable code     0.82s  
+  ✓ the queue reads snapshots without calling the provider               0.77s  
+  ✓ an unapproved application reports findings but is not participating  0.69s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ✓ an applicant starts a draft inside an open window                    0.71s  
+  ✓ the response lists what is still missing before submission           0.75s  
+  ✓ submitting an incomplete application is a 422 with the missing piec… 0.69s  
+  ✓ a complete application submits and a retry with the same key is ide… 0.73s  
+  ✓ a replayed start answers the stored application and never rewrites…  0.76s  
+  ✓ applicants only see their own applications                           0.86s  
+  ✓ a reviewer sees the queue for their organization only                0.97s  
+  ✓ the review path over http with reasons and actor rules               0.82s  
+  ✓ the applicant can edit details while editable and not afterwards     0.86s  
+  ✓ a closed window and a duplicate are conflicts                        0.80s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ✓ an organization administrator opens a window for their organization  0.76s  
+  ✓ an applicant cannot open a window                                    0.78s  
+  ✓ an administrator cannot open a window for another organization       0.77s  
+  ✓ a federation administrator can open a window for any organization    0.77s  
+  ✓ a window cannot be opened on another federations season              0.75s  
+  ✓ windows are listed and filtered by openness                          0.77s  
+  ✓ validation rejects a window that closes before it opens              0.79s  
+
+   PASS  Tests\Feature\Federation\StartApplicationTest
+  ✓ a new application starts as a draft with an audit entry              0.77s  
+  ✓ a second live application for the same person organization season a… 0.75s  
+  ✓ a different role in the same season is a separate application        0.70s  
+  ✓ a new application is allowed after a cancellation                    0.68s  
+  ✓ the same idempotency key returns the existing application            0.71s  
+  ✓ an idempotency key belongs to the applicant who presented it         0.68s  
+  ✓ a reused key with other parameters is refused not replayed           0.69s  
+  ✓ the database rejects a duplicate that bypasses the action            0.70s  
+  ✓ a closed window refuses new applications                             0.67s  
+  ✓ a window only accepts the roles it offers                            0.64s  
+  ✓ the application inherits organization and season from the window     0.64s  
+
+   PASS  Tests\Feature\MemberTest
+  ✓ club can create new member                                           0.86s  
+  ✓ cannot create member for other club                                  0.80s  
+  ✓ consent boolean mutates timestamp column                             0.68s  
+  ✓ cannot create member when membership has no capacity                 0.64s  
+  ✓ cannot update member to membership with no capacity                  0.71s  
+
+  Tests:    85 passed (484 assertions)
+  Duration: 64.82s
+

@@ -41,8 +41,9 @@ final class CredentialFacts
 
     /**
      * @param  array<string, mixed>  $data
+     * @param  string  $expectedSubject  the subject that was asked for; an answer about anyone else is refused
      */
-    public static function fromArray(array $data, string $expectedContract): self
+    public static function fromArray(array $data, string $expectedContract, string $expectedSubject): self
     {
         if (($data['contract'] ?? null) !== $expectedContract) {
             throw new ContractMismatchException(sprintf(
@@ -56,6 +57,18 @@ final class CredentialFacts
             if (! array_key_exists($key, $data)) {
                 throw new ContractMismatchException("Missing field {$key}");
             }
+        }
+
+        // The answer is bound to the request (ADR-0016): facts about another
+        // person, however well-formed, are a fault on the provider's side and
+        // must never become this person's snapshot.
+        $subject = (string) ($data['member']['subject'] ?? '');
+        if ($subject !== $expectedSubject) {
+            throw new ContractMismatchException(sprintf(
+                'Expected facts about subject %s, received %s',
+                $expectedSubject,
+                var_export($subject, true),
+            ));
         }
 
         $status = $data['eligibility']['status'] ?? null;

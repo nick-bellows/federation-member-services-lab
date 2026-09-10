@@ -56,10 +56,11 @@ class RegistrationApplicationController extends Controller
             AssignRequestId::current($request),
         ));
 
-        // Details may be supplied together with the start.
+        // Details may be supplied together with the start. A replay under the
+        // same key answers the stored application and never rewrites it.
         $details = array_intersect_key($data, array_flip(['dateOfBirth', 'phone', 'applicantNotes']));
 
-        if ($details !== []) {
+        if ($details !== [] && $application->wasRecentlyCreated) {
             $application->fill([
                 'date_of_birth' => $details['dateOfBirth'] ?? null,
                 'phone' => $details['phone'] ?? null,

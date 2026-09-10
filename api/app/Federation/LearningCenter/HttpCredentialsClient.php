@@ -53,7 +53,7 @@ final class HttpCredentialsClient implements CredentialsClient
                 ->get($url);
             $span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $response->status());
 
-            return $this->interpret($response);
+            return $this->interpret($response, $subject);
         } catch (ConnectionException $e) {
             $span->recordException($e)->setStatus(StatusCode::STATUS_ERROR);
             throw new LearningCenterUnavailableException('Learning Center unreachable or too slow: '.$e->getMessage(), previous: $e);
@@ -66,10 +66,10 @@ final class HttpCredentialsClient implements CredentialsClient
         }
     }
 
-    private function interpret(Response $response): CredentialFacts
+    private function interpret(Response $response, string $subject): CredentialFacts
     {
         return match (true) {
-            $response->successful() => CredentialFacts::fromArray((array) $response->json(), $this->contract),
+            $response->successful() => CredentialFacts::fromArray((array) $response->json(), $this->contract, $subject),
             $response->status() === 404 => throw new LearningCenterMemberNotFoundException('No Learning Center member for the subject'),
             in_array($response->status(), [401, 403], true) => throw new LearningCenterUnauthorizedException('Learning Center rejected the service token with '.$response->status()),
             $response->serverError() => throw new LearningCenterUnavailableException('Learning Center answered '.$response->status()),

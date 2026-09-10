@@ -1,0 +1,306 @@
+# Backend suite after C1 (2026-09-10, SQLite in memory, tooling container): php artisan test
+# 247 passed (1148 assertions), 197 s. The three engines run in CI on the pull request.
+   PASS  Tests\Unit\DivisionTest
+  ✓ division can have many membership types                              2.69s  
+  ✓ division membership type can have monthly fee                        0.78s  
+   PASS  Tests\Unit\Federation\ApplicationTransitionsTest
+  ✓ the transition table matches the documented rules                    0.02s  
+  ✓ every pair not in the table is illegal
+  ✓ terminal statuses have no outgoing transitions
+  ✓ applicants move their own application and reviewers decide
+  ✓ only information requests and rejections require a reason
+  ✓ asking for the rule of an illegal pair is a programming error
+   PASS  Tests\Unit\Federation\CredentialFactsTest
+  ✓ every fixture parses and reports what the provider decided with dat… 0.03s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ every fixture parses and reports what the provider decided with dat… 0.01s  
+  ✓ another contract version is refused                                  0.02s  
+  ✓ an unknown status is refused                                         0.01s  
+  ✓ a missing field is refused
+  ✓ an answer about another subject is refused                           0.01s  
+   PASS  Tests\Unit\Federation\ParticipationResolverTest
+  ✓ an approved participant with an eligible snapshot may participate    0.75s  
+  ✓ an approved coach needs a valid coach credential                     0.71s  
+  ✓ a hold blocks regardless of credentials                              0.72s  
+  ✓ a lapsed credential blocks with both reasons                         0.72s  
+  ✓ an unapproved application reports findings but never participates    0.69s  
+  ✓ no snapshot is unknown for an approved application                   0.69s  
+  ✓ a not found snapshot is unknown with its age                         0.76s  
+  ✓ a snapshot older than the limit is marked stale and still answers    0.70s  
+  ✓ the serialised shape is stable                                       0.72s  
+   PASS  Tests\Unit\Federation\SchemaIdentifierLengthTest
+  ✓ every table index and foreign key name fits mysql limits             0.72s  
+   PASS  Tests\Unit\FinanceAccountTest
+  ✓ a finance account can be created                                     0.76s  
+  ✓ a finance account has many statements                                0.76s  
+  ✓ current balance is calculated correctly                              0.82s  
+   PASS  Tests\Unit\MembershipTest
+  ✓ membership monthly fee includes membership type fee                  0.87s  
+  ✓ membership monthly fee excludes membership type admission fee        0.86s  
+  ✓ membership monthly fee includes voluntary contribution               0.76s  
+  ✓ membership monthly fee includes selected divisions                   0.73s  
+   PASS  Tests\Unit\MembershipTypeTest
+  ✓ membership type can have many divisions                              0.68s  
+   PASS  Tests\Unit\TestEnvironmentIsolationTest
+  ✓ the test process never reads the containers config cache             0.69s  
+  ✓ the test database is the one the testing environment names           0.65s  
+   PASS  Tests\Unit\WebApplicationUrlConfigTest
+  ✓ club apply url uses the configured web application url               0.69s  
+  ✓ welcome mail login url and support address come from config          0.69s  
+  ✓ password reset link uses the configured web application url          0.69s  
+  ✓ health ping checks target the configured web application url         0.71s  
+   PASS  Tests\Feature\ClubAdmin\ClubTest
+  ✓ admin user can get own club                                          0.95s  
+  ✓ admin user cannot get other clubs                                    0.76s  
+  ✓ admin user can edit own club                                         0.76s  
+  ✓ admin user cannot edit other club                                    0.69s  
+  ✓ admin user cannot edit any field of own club                         0.73s  
+   PASS  Tests\Feature\ClubAdmin\DivisionTest
+  ✓ admin user can edit divisions                                        0.79s  
+  ✓ admin user cannot edit other clubs divisions                         0.70s  
+   PASS  Tests\Feature\ClubAdmin\FinanceContactTest
+  ✓ admin user cannot edit external finance contacts                     0.80s  
+   PASS  Tests\Feature\ClubAdmin\MembershipTest
+  ✓ admin user can edit memberships                                      0.79s  
+  ✓ admin user cannot edit other clubs memberships                       0.72s  
+   PASS  Tests\Feature\ClubAdmin\MembershipTypeTest
+  ✓ admin user can edit membership types                                 0.73s  
+  ✓ admin user cannot edit other clubs membership types                  0.80s  
+  ✓ admin user can set only minimum number of divisions                  0.72s  
+  ✓ admin user can set only maximum number of divisions                  0.70s  
+   PASS  Tests\Feature\ClubPermissionsTest
+  ✓ club admins default club is set in session by middleware             0.69s  
+  ✓ club set in session by middleware                                    0.75s  
+   PASS  Tests\Feature\ClubTest
+  ✓ clubs generate slugs automatically on create                         0.71s  
+  ✓ can manually set club slug                                           0.69s  
+  ✓ super admin can get clubs                                            0.70s  
+  ✓ super admin can get clubs filtered by slug                           0.70s  
+  ✓ other user cannot get clubs                                          0.69s  
+   PASS  Tests\Feature\DivisionTest
+  ✓ club can only get own divisions                                      0.73s  
+  ✓ club can attach member to division of own club                       0.75s  
+  ✓ admin user can only get current clubs divisions                      0.67s  
+   PASS  Tests\Feature\Export\ExportOrderTest
+  ✓ an export returns rows in the requested id order                     0.66s  
+  ✓ ids outside the list sort last and an empty list adds no ordering    0.68s  
+   PASS  Tests\Feature\Federation\ConcurrentAuthorizationTest
+  ✓ a patch is refused when the application leaves the applicants hands… 0.94s  
+  ✓ document metadata is refused when the application is submitted befo… 0.79s  
+  ✓ a document review is refused when the application is decided before… 0.87s  
+   PASS  Tests\Feature\Federation\CredentialSnapshotsTest
+  ✓ a refresh stores the answer and audits the first record              0.82s  
+  ✓ a changed eligibility is audited with both states                    0.84s  
+  ✓ an unchanged answer writes no audit entry                            0.80s  
+  ✓ an answer about another person is a contract error and nothing is s… 0.75s  
+  ✓ a member the provider does not know is recorded as not found         0.83s  
+  ✓ a user without a linked identity is not asked about                  0.83s  
+  ✓ a slow or absent provider leaves the previous snapshot untouched     0.84s  
+  ✓ a server error is unavailable not a new snapshot                     0.80s  
+  ✓ the service token is fetched once and reused                         0.84s  
+   PASS  Tests\Feature\Federation\HierarchyAndAuditTest
+  ✓ a club may belong to a member organization and defaults to none      0.73s  
+  ✓ deleting an organization detaches its clubs instead of deleting the… 0.69s  
+  ✓ an organization with applications cannot be deleted                  0.71s  
+  ✓ a member may be linked to a user                                     0.80s  
+  ✓ audit entries are append only                                        0.74s  
+   PASS  Tests\Feature\Federation\Http\ApplicationDocumentsHttpTest
+  ✓ the applicant attaches metadata and replacing resets the review      0.95s  
+  ✓ only the applicant attaches and only while editable                  0.85s  
+  ✓ format size and checksum are validated                               0.82s  
+  ✓ a reviewer accepts or rejects documents under review                 0.91s  
+   PASS  Tests\Feature\Federation\Http\ApplicationFieldsPatchHttpTest
+  ✓ the applicant patches their own details on a draft and the change i… 0.80s  
+  ✓ one forbidden operation refuses the whole patch                      0.80s  
+  ✓ a reviewer writes reviewer notes that the applicant never sees       0.87s  
+  ✓ a reviewer may not touch the applicants fields                       0.80s  
+  ✓ an administrator of another organization cannot reach the applicati… 0.87s  
+  ✓ the applicant can no longer patch details once submitted             0.82s  
+  ✓ a test operation guards against a stale view                         0.83s  
+  ✓ remove clears a field and values are validated                       0.83s  
+  ✓ the wrong media type is refused before anything is read              0.81s  
+  ✓ a malformed document is refused as a whole                           0.80s  
+  ✓ the resource update cannot write reviewer notes                      0.80s  
+   PASS  Tests\Feature\Federation\Http\ObservabilityHttpTest
+  ✓ liveness answers without touching anything                           0.77s  
+  ✓ readiness is ready with a healthy provider                           0.79s  
+  ✓ readiness stays ready when the provider is away but reports it       0.77s  
+  ✓ readiness fails when the outbox is backing up                        0.79s  
+  ✓ checks report unknown until spatie health has run                    0.78s  
+  ✓ metrics render the federation numbers in prometheus text             0.84s  
+  ✓ metrics require the token when one is configured                     0.78s  
+  ✓ checks require the same token while the probes stay open             0.82s  
+  ✓ the shipped environment file sets a scrape token                     0.81s  
+   PASS  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ✓ an approval asks the provider once and the application shows partic… 0.95s  
+  ✓ an approval succeeds when the provider is away and participation is… 2.53s  
+  ✓ a reviewer can refresh and sees the new answer                       1.04s  
+  ✓ a refresh answered about another person is a 502 and the snapshot s… 0.81s  
+  ✓ only a reviewer of that organization may refresh                     0.82s  
+  ✓ a refresh while the provider is away is a 503 with a stable code     0.80s  
+  ✓ the queue reads snapshots without calling the provider               0.80s  
+  ✓ an unapproved application reports findings but is not participating  0.72s  
+   PASS  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ✓ an applicant starts a draft inside an open window                    0.75s  
+  ✓ the response lists what is still missing before submission           0.77s  
+  ✓ submitting an incomplete application is a 422 with the missing piec… 0.77s  
+  ✓ a complete application submits and a retry with the same key is ide… 0.81s  
+  ✓ a replayed start answers the stored application and never rewrites…  0.76s  
+  ✓ applicants only see their own applications                           0.80s  
+  ✓ a reviewer sees the queue for their organization only                0.84s  
+  ✓ the review path over http with reasons and actor rules               0.81s  
+  ✓ the applicant can edit details while editable and not afterwards     0.78s  
+  ✓ a closed window and a duplicate are conflicts                        0.75s  
+   PASS  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ✓ an organization administrator opens a window for their organization  0.76s  
+  ✓ an applicant cannot open a window                                    0.74s  
+  ✓ an administrator cannot open a window for another organization       0.75s  
+  ✓ a federation administrator can open a window for any organization    0.71s  
+  ✓ a window cannot be opened on another federations season              0.76s  
+  ✓ windows are listed and filtered by openness                          0.71s  
+  ✓ validation rejects a window that closes before it opens              0.91s  
+   PASS  Tests\Feature\Federation\Http\SecretsNeverLoggedTest
+  ✓ tokens and secrets appear in no log line and no span                 0.85s  
+   PASS  Tests\Feature\Federation\OidcGuardTest
+  ✓ a request without a token is unauthenticated                         0.83s  
+  ✓ a request with a rejected token is unauthenticated and says nothing… 0.79s  
+  ✓ an unknown subject with a verified email is provisioned              0.76s  
+  ✓ a known subject is matched without touching the email                0.76s  
+  ✓ an existing user is linked by verified email once                    0.74s  
+  ✓ an unverified email never links or provisions                        0.74s  
+  ✓ an email already linked to another subject is a conflict             0.85s  
+  ✓ provisioning can be disabled                                         0.87s  
+  ✓ scopes and administered bodies come from the database                0.86s  
+  ✓ upstream sanctum login still works beside the new guard              0.77s  
+   PASS  Tests\Feature\Federation\OidcTokenVerifierTest
+  ✓ a valid token yields the identity                                    0.75s  
+  ✓ the audience may be a list that contains ours                        0.79s  
+  ✓ a token for another audience is rejected                             0.76s  
+  ✓ a token from another issuer is rejected                              0.75s  
+  ✓ an expired token is rejected                                         0.74s  
+  ✓ a token signed with an unknown key is rejected after one refresh     0.81s  
+  ✓ key rotation is absorbed by refreshing the key set                   0.71s  
+  ✓ a symmetric algorithm is rejected even with the public key as secre… 0.71s  
+  ✓ the key set is cached between requests                               0.85s  
+  ✓ missing configuration fails closed                                   0.78s  
+   PASS  Tests\Feature\Federation\OutboxTest
+  ✓ an outbox event cannot be recorded outside a transaction             0.68s  
+  ✓ a rolled back transaction leaves no event behind                     0.75s  
+  ✓ transitions write facts only for the published types                 0.72s  
+  ✓ the relay dispatches one job per consumer and marks the row publish… 0.80s  
+  ✓ the worker delivers an approval to both consumers exactly once       0.87s  
+  ✓ a credential change is itself a fact with a notification             0.74s  
+  ✓ incident 003 the worker fails after an approval and the event is pa… 7.67s  
+  ✓ status reports the queue and succeeds when nothing failed            1.04s  
+   PASS  Tests\Feature\Federation\ReconcileCredentialsCommandTest
+  ✓ it fills a missing snapshot for an approved applicant and skips a f… 0.92s  
+  ✓ it refreshes old snapshots and reports a change                      0.85s  
+  ✓ it ignores applicants without an approved application                0.75s  
+  ✓ an absent provider is counted and fails the command                  2.36s  
+   PASS  Tests\Feature\Federation\ScheduleTest
+  ✓ the federation tasks are scheduled with failure hooks                0.69s  
+   PASS  Tests\Feature\Federation\StartApplicationTest
+  ✓ a new application starts as a draft with an audit entry              0.73s  
+  ✓ a second live application for the same person organization season a… 0.70s  
+  ✓ a different role in the same season is a separate application        0.74s  
+  ✓ a new application is allowed after a cancellation                    0.74s  
+  ✓ the same idempotency key returns the existing application            0.71s  
+  ✓ an idempotency key belongs to the applicant who presented it         0.76s  
+  ✓ a reused key with other parameters is refused not replayed           0.73s  
+  ✓ the database rejects a duplicate that bypasses the action            0.72s  
+  ✓ a closed window refuses new applications                             0.74s  
+  ✓ a window only accepts the roles it offers                            0.76s  
+  ✓ the application inherits organization and season from the window     0.76s  
+   PASS  Tests\Feature\Federation\TracingTest
+  ✓ an approval and its worker jobs share one trace and the provider re… 0.72s  
+   PASS  Tests\Feature\Federation\TransitionApplicationTest
+  ✓ the applicant submits a draft and the transition is audited          0.74s  
+  ✓ an illegal transition is rejected and leaves no trace                0.72s  
+  ✓ the applicant cannot perform reviewer transitions                    0.76s  
+  ✓ a reviewer cannot perform applicant transitions                      0.79s  
+  ✓ an administrator of another organization cannot review               0.78s  
+  ✓ a federation administrator can review for any organization           0.70s  
+  ✓ a rejection requires a reason and records it                         0.70s  
+  ✓ the happy path ends approved with a complete audit trail             0.74s  
+  ✓ an information request round trips back to review                    0.70s  
+  ✓ status cannot be assigned outside the transition service             0.69s  
+  ✓ the domain event carries the transition                              0.71s  
+   PASS  Tests\Feature\Filters\QueryFilterCurrencyTest
+  ✓ query filter converts formatted amounts to cents                     0.69s  
+  ✓ query filter handles multiple currency formats                       0.69s  
+  ✓ query filter works with mixed columns                                0.69s  
+   PASS  Tests\Feature\Filters\QueryFilterTest
+  ✓ query filter searches multiple transaction columns                   0.71s  
+   PASS  Tests\Feature\FinanceAccountTest
+  ✓ api can get finance accounts for club                                0.73s  
+  ✓ api can get statements for a finance account                         0.72s  
+   PASS  Tests\Feature\FinanceContactTest
+  ✓ club can only get own finance contacts                               0.78s  
+  ✓ club can edit external finance contacts                              0.71s  
+  ✓ creating non external finance contacts requires many fields          0.71s  
+  ✓ creating external finance contacts bypasses most required rules      0.77s  
+   PASS  Tests\Feature\LoginTest
+  ✓ successful login attempt returns token                               0.75s  
+  ✓ login requires club role association                                 0.67s  
+   PASS  Tests\Feature\MediaTest
+  ✓ user cannot upload media for other club                              0.74s  
+  ✓ user can upload media for own club                                   0.90s  
+  ✓ unauthenticated user cannot upload media                             0.84s  
+  ✓ user can download media for own club                                 0.82s  
+  ✓ user cannot download media for other club                            0.87s  
+  ✓ unauthenticated user cannot download media                           0.88s  
+  ✓ user can preview media for own club                                  0.84s  
+  ✓ user cannot preview media for other club                             0.91s  
+  ✓ unauthenticated user cannot preview media                            0.80s  
+   PASS  Tests\Feature\MemberTest
+  ✓ club can create new member                                           0.71s  
+  ✓ cannot create member for other club                                  0.80s  
+  ✓ consent boolean mutates timestamp column                             0.77s  
+  ✓ cannot create member when membership has no capacity                 0.75s  
+  ✓ cannot update member to membership with no capacity                  0.79s  
+   PASS  Tests\Feature\MembershipApplicationTest
+  ✓ can apply completed membership                                       1.95s  
+  ✓ cannot apply for membership if status wasnt null                     0.76s  
+  ✓ cannot apply for membership if owner is missing                      0.74s  
+  ✓ cannot apply for membership if members count is above maximum membe… 0.70s  
+  ✓ cannot apply for membership if members count is below minimum membe… 0.70s  
+  ✓ club is notified on membership application                           0.77s  
+  ✓ all members are notified on membership application                   0.76s  
+  ✓ api can apply for membership                                         1.90s  
+   PASS  Tests\Feature\MembershipTest
+  ✓ club can create new membership                                       0.74s  
+  ✓ club can create new membership with payment period                   0.72s  
+  ✓ club can set owner                                                   0.79s  
+  ✓ club cannot update memberships for other club                        0.78s  
+  ✓ club cannot create membership for other club                         0.76s  
+   PASS  Tests\Feature\MembershipTypeTest
+  ✓ club can only get own membership types                               0.73s  
+   PASS  Tests\Feature\PasswordResetTest
+  ✓ forgot password sends reset notification                             0.97s  
+  ✓ forgot password with non existing email returns generic error        0.97s  
+  ✓ forgot password fails when reaches rate limiting                     1.83s  
+  ✓ reset password updates database                                      0.91s  
+  ✓ reset password fails with invalid token                              1.04s  
+  ✓ reset password fails with expired token                              1.07s  
+   PASS  Tests\Feature\PaymentPeriodTest
+  ✓ cannot apply membership with unattached payment period               0.77s  
+   PASS  Tests\Feature\Performance\ClubIdIndexTest
+  ✓ every tenant scoped upstream table has a club id index               0.77s  
+   PASS  Tests\Feature\Performance\MembershipsListingQueryCountTest
+  ✓ a page of memberships costs a bounded number of queries              0.82s  
+   PASS  Tests\Feature\ReceiptTest
+  ✓ club can only get own receipts                                       0.80s  
+  ✓ can create receipt with media                                        0.76s  
+  ✓ can update receipt with existing media                               0.75s  
+   PASS  Tests\Feature\StatementTest
+  ✓ club can only get own statements                                     0.79s  
+   PASS  Tests\Feature\TaxAccountTest
+  ✓ club can only get related tax accounts                               0.77s  
+  ✓ club can get custom tax accounts with null chart relation            0.70s  
+  ✓ club without chart can only get custom tax accounts                  0.76s  
+   PASS  Tests\Feature\UserTest
+  ✓ club can only get own users                                          0.71s  
+  ✓ admin can create new user with roles                                 0.73s  
+  ✓ admin can update user with roles                                     0.72s  
+  Tests:    247 passed (1148 assertions)
+  Duration: 197.22s

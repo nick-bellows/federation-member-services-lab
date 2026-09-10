@@ -37,27 +37,31 @@ class AttachDocumentMetadata
         string $checksumSha256,
         ?string $requestId = null,
     ): ApplicationDocument {
-        if (! $this->actors->canActAs($actor, $application, ApplicationActor::APPLICANT)) {
-            throw new TransitionNotAllowedForActorException($application->status, $application->status, ApplicationActor::APPLICANT);
-        }
-
-        if (! $application->isEditableByApplicant()) {
-            throw new ApplicationNotEditableException;
-        }
-
-        if (! in_array($mimeType, ApplicationDocument::ALLOWED_MIME_TYPES, true)) {
-            throw new DocumentNotAllowedException("Format {$mimeType} is not accepted.");
-        }
-
-        if ($sizeBytes <= 0 || $sizeBytes > ApplicationDocument::MAX_SIZE_BYTES) {
-            throw new DocumentNotAllowedException('Documents must be between 1 byte and 10 MB.');
-        }
-
-        if (! preg_match('/^[a-f0-9]{64}$/', $checksumSha256)) {
-            throw new DocumentNotAllowedException('Checksum must be a lowercase hex SHA-256.');
-        }
-
         return DB::transaction(function () use ($application, $actor, $type, $fileName, $mimeType, $sizeBytes, $checksumSha256, $requestId) {
+            // Lock first, authorise on what was locked (ADR-0016): the row the
+            // request loaded may have moved on since it was read.
+            $application = RegistrationApplication::query()->lockForUpdate()->findOrFail($application->getKey());
+
+            if (! $this->actors->canActAs($actor, $application, ApplicationActor::APPLICANT)) {
+                throw new TransitionNotAllowedForActorException($application->status, $application->status, ApplicationActor::APPLICANT);
+            }
+
+            if (! $application->isEditableByApplicant()) {
+                throw new ApplicationNotEditableException;
+            }
+
+            if (! in_array($mimeType, ApplicationDocument::ALLOWED_MIME_TYPES, true)) {
+                throw new DocumentNotAllowedException("Format {$mimeType} is not accepted.");
+            }
+
+            if ($sizeBytes <= 0 || $sizeBytes > ApplicationDocument::MAX_SIZE_BYTES) {
+                throw new DocumentNotAllowedException('Documents must be between 1 byte and 10 MB.');
+            }
+
+            if (! preg_match('/^[a-f0-9]{64}$/', $checksumSha256)) {
+                throw new DocumentNotAllowedException('Checksum must be a lowercase hex SHA-256.');
+            }
+
             $document = ApplicationDocument::query()->updateOrCreate(
                 ['registration_application_id' => $application->getKey(), 'document_type' => $type->value],
                 [

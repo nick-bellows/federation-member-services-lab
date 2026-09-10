@@ -9,6 +9,7 @@ use App\Federation\Exceptions\IllegalTransitionException;
 use App\Federation\Exceptions\ReasonRequiredException;
 use App\Federation\Exceptions\TransitionNotAllowedForActorException;
 use App\Federation\Models\ApplicationDocument;
+use App\Federation\Models\RegistrationApplication;
 use App\Federation\Support\ApplicationActorResolver;
 use App\Federation\Support\AuditRecorder;
 use App\Models\User;
@@ -32,21 +33,24 @@ class ReviewDocument
         ?string $note = null,
         ?string $requestId = null,
     ): ApplicationDocument {
-        $application = $document->application;
+        return DB::transaction(function () use ($document, $reviewer, $status, $note, $requestId) {
+            // Lock the application first, decide on what was locked (ADR-0016):
+            // the application the request loaded may have been decided since.
+            $application = RegistrationApplication::query()->lockForUpdate()->findOrFail($document->registration_application_id);
+            $document = ApplicationDocument::query()->lockForUpdate()->findOrFail($document->getKey());
 
-        if (! $this->actors->canActAs($reviewer, $application, ApplicationActor::REVIEWER)) {
-            throw new TransitionNotAllowedForActorException($application->status, $application->status, ApplicationActor::REVIEWER);
-        }
+            if (! $this->actors->canActAs($reviewer, $application, ApplicationActor::REVIEWER)) {
+                throw new TransitionNotAllowedForActorException($application->status, $application->status, ApplicationActor::REVIEWER);
+            }
 
-        if ($application->status !== ApplicationStatus::UNDER_REVIEW) {
-            throw new IllegalTransitionException($application->status, ApplicationStatus::UNDER_REVIEW);
-        }
+            if ($application->status !== ApplicationStatus::UNDER_REVIEW) {
+                throw new IllegalTransitionException($application->status, ApplicationStatus::UNDER_REVIEW);
+            }
 
-        if ($status === DocumentReviewStatus::REJECTED && blank($note)) {
-            throw new ReasonRequiredException(ApplicationStatus::NEEDS_INFORMATION);
-        }
+            if ($status === DocumentReviewStatus::REJECTED && blank($note)) {
+                throw new ReasonRequiredException(ApplicationStatus::NEEDS_INFORMATION);
+            }
 
-        return DB::transaction(function () use ($document, $reviewer, $status, $note, $application, $requestId) {
             $previous = $document->review_status;
 
             $document->forceFill([

@@ -4,6 +4,7 @@ namespace Tests\Feature\Federation;
 
 use App\Federation\LearningCenter\CredentialsClient;
 use App\Federation\LearningCenter\CredentialSnapshots;
+use App\Federation\LearningCenter\Exceptions\ContractMismatchException;
 use App\Federation\LearningCenter\Exceptions\LearningCenterUnavailableException;
 use App\Federation\Models\AuditEntry;
 use App\Federation\Models\CredentialSnapshot;
@@ -25,7 +26,7 @@ class CredentialSnapshotsTest extends FederationTestCase
 
     private const TOKEN_ENDPOINT = 'http://oidc.test/default/token';
 
-    /** @var array<string, string> subject => fixture file */
+    /** @var array<string, string|array<string, mixed>> subject => fixture file, or the answer itself */
     private array $subjects = [];
 
     private ?string $failure = null;
@@ -60,9 +61,9 @@ class CredentialSnapshotsTest extends FederationTestCase
                 if ($this->failure === 'server') {
                     return Http::response(['error' => 'boom'], 500);
                 }
-                foreach ($this->subjects as $subject => $file) {
+                foreach ($this->subjects as $subject => $answer) {
                     if ($request->url() === self::BASE.'/v1/members/'.rawurlencode($subject).'/credentials') {
-                        return Http::response(CredentialFactsTest::fixture($file));
+                        return Http::response(is_array($answer) ? $answer : CredentialFactsTest::fixture($answer));
                     }
                 }
 
@@ -99,7 +100,7 @@ class CredentialSnapshotsTest extends FederationTestCase
         $this->subjects = ['mock|alex' => 'alex-eligible.json'];
         app(CredentialSnapshots::class)->refresh($this->applicant);
 
-        $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+        $this->subjects = ['mock|alex' => CredentialFactsTest::answerFor('mock|alex', 'sam-suspended.json')];
         $result = app(CredentialSnapshots::class)->refresh($this->applicant);
 
         $this->assertTrue($result->changed);
@@ -118,6 +119,20 @@ class CredentialSnapshotsTest extends FederationTestCase
 
         $this->assertSame(1, AuditEntry::query()->whereIn('action', ['credentials.recorded', 'credentials.changed'])->count());
         $this->assertSame(1, CredentialSnapshot::query()->count());
+    }
+
+    public function test_an_answer_about_another_person_is_a_contract_error_and_nothing_is_stored(): void
+    {
+        // The provider answers alex's URL with sam's facts.
+        $this->subjects = ['mock|alex' => 'sam-suspended.json'];
+
+        $this->assertThrows(
+            fn () => app(CredentialSnapshots::class)->refresh($this->applicant),
+            ContractMismatchException::class,
+        );
+
+        $this->assertSame(0, CredentialSnapshot::query()->count());
+        $this->assertSame(0, AuditEntry::query()->whereIn('action', ['credentials.recorded', 'credentials.changed'])->count());
     }
 
     public function test_a_member_the_provider_does_not_know_is_recorded_as_not_found(): void

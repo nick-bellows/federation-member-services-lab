@@ -7,6 +7,7 @@ use App\Federation\Http\Middleware\AssignRequestId;
 use App\Federation\Models\AuditEntry;
 use App\Federation\Models\RegistrationApplication;
 use App\Federation\Models\RegistrationWindow;
+use App\Models\User;
 
 class RegistrationApplicationsHttpTest extends FederationHttpTestCase
 {
@@ -69,6 +70,42 @@ class RegistrationApplicationsHttpTest extends FederationHttpTestCase
 
         $submitted = AuditEntry::query()->where('action', 'application.submitted')->firstOrFail();
         $this->assertSame('req-submit-0001', $submitted->request_id);
+    }
+
+    public function test_a_replayed_start_answers_the_stored_application_and_never_rewrites_it(): void
+    {
+        $headers = ['Idempotency-Key' => 'start-attempt-0001'];
+        $start = fn (User $as, string $dateOfBirth, string $role = 'participant') => $this->request($as, 'POST', self::BASE.'/registration-applications', $this->resource(
+            'registration-applications',
+            ['role' => $role, 'dateOfBirth' => $dateOfBirth],
+            ['registrationWindow' => ['type' => 'registration-windows', 'id' => (string) $this->window->getKey()]],
+        ), $headers);
+
+        $first = $start($this->applicant, '1998-04-12');
+        $first->assertStatus(201);
+        $id = $first->json('data.id');
+
+        // The retry carries a different detail: the stored application answers, untouched.
+        $start($this->applicant, '2001-01-01')
+            ->assertStatus(200)
+            ->assertJsonPath('data.id', $id)
+            ->assertJsonPath('data.attributes.dateOfBirth', '1998-04-12');
+        $this->assertSame('1998-04-12', RegistrationApplication::query()->findOrFail($id)->date_of_birth->format('Y-m-d'));
+
+        // The same key for another role is a reused key, not a replay.
+        $start($this->applicant, '1998-04-12', 'coach')
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'idempotency_key_reused');
+
+        // The key is the applicant's: another person presenting it starts their own application.
+        $start($this->otherApplicant, '1999-05-05')
+            ->assertStatus(201)
+            ->assertJsonPath('data.attributes.dateOfBirth', '1999-05-05');
+        $this->assertNotSame($id, (string) RegistrationApplication::query()->where('applicant_user_id', $this->otherApplicant->getKey())->sole()->getKey());
+        $this->assertSame(2, RegistrationApplication::count());
+
+        // The rollback at teardown restores the pre-C1 global constraint, which two rows sharing a key would violate.
+        RegistrationApplication::query()->where('applicant_user_id', $this->otherApplicant->getKey())->delete();
     }
 
     public function test_applicants_only_see_their_own_applications(): void

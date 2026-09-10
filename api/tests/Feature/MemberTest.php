@@ -159,6 +159,11 @@ class MemberTest extends TestCase
 
     public function test_consent_boolean_mutates_timestamp_column()
     {
+        // The request stores now(); asserting against a second now() read after
+        // the request flaked when the second ticked in between (MariaDB CI,
+        // 2026-09-05). The assertion below brackets the request instead.
+        $before = now()->startOfSecond();
+
         $club = Club::factory()->create();
         $membership = Membership::factory()->create([
             'membership_type_id' => MembershipType::factory()->create([
@@ -212,10 +217,9 @@ class MemberTest extends TestCase
             ->assertCreatedWithServerId(config('app.url') . '/api/v1/members', $data)
             ->id();
 
-        $this->assertDatabaseHas('members', [
-            'id' => $id,
-            'consented_media_publication_at' => now(),
-        ]);
+        $consentedAt = Member::query()->findOrFail($id)->consented_media_publication_at;
+        $this->assertNotNull($consentedAt);
+        $this->assertTrue($consentedAt->betweenIncluded($before, now()), "consented at {$consentedAt}, request began at {$before}");
     }
 
     public function test_cannot_create_member_when_membership_has_no_capacity(): void
