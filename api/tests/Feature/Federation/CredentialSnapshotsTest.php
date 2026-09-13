@@ -5,6 +5,7 @@ namespace Tests\Feature\Federation;
 use App\Federation\LearningCenter\CredentialsClient;
 use App\Federation\LearningCenter\CredentialSnapshots;
 use App\Federation\LearningCenter\Exceptions\ContractMismatchException;
+use App\Federation\LearningCenter\Exceptions\LearningCenterUnauthorizedException;
 use App\Federation\LearningCenter\Exceptions\LearningCenterUnavailableException;
 use App\Federation\Models\AuditEntry;
 use App\Federation\Models\CredentialSnapshot;
@@ -60,6 +61,9 @@ class CredentialSnapshotsTest extends FederationTestCase
                 }
                 if ($this->failure === 'server') {
                     return Http::response(['error' => 'boom'], 500);
+                }
+                if ($this->failure === 'unauthorized') {
+                    return Http::response(['error' => 'invalid_token'], 401);
                 }
                 foreach ($this->subjects as $subject => $answer) {
                     if ($request->url() === self::BASE.'/v1/members/'.rawurlencode($subject).'/credentials') {
@@ -192,5 +196,24 @@ class CredentialSnapshotsTest extends FederationTestCase
 
         Http::assertSentCount(3);
         $this->assertSame(1, $this->tokenRequests);
+    }
+
+    public function test_a_rejected_service_token_is_dropped_and_the_next_call_fetches_a_new_one(): void
+    {
+        $this->subjects = ['mock|alex' => 'alex-eligible.json'];
+        app(CredentialSnapshots::class)->refresh($this->applicant);
+        $this->assertSame(1, $this->tokenRequests);
+
+        // The Learning Center revokes the credential: the cached token is
+        // rejected once and never replayed for the rest of its lifetime.
+        $this->failure = 'unauthorized';
+        $this->assertThrows(
+            fn () => app(CredentialSnapshots::class)->refresh($this->applicant),
+            LearningCenterUnauthorizedException::class,
+        );
+
+        $this->failure = null;
+        app(CredentialSnapshots::class)->refresh($this->applicant);
+        $this->assertSame(2, $this->tokenRequests);
     }
 }

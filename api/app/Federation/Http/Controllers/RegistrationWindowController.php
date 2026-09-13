@@ -3,12 +3,14 @@
 namespace App\Federation\Http\Controllers;
 
 use App\Federation\Exceptions\SeasonNotInFederationException;
+use App\Federation\Exceptions\WindowAlreadyOpenException;
 use App\Federation\Http\Controllers\Concerns\RendersDomainExceptions;
 use App\Federation\Models\MemberOrganization;
 use App\Federation\Models\RegistrationWindow;
 use App\Federation\Models\Season;
 use App\Federation\Support\AuditRecorder;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\UniqueConstraintViolationException;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Responses\DataResponse;
@@ -54,14 +56,30 @@ class RegistrationWindowController extends Controller
             throw $this->toJsonApiException(new SeasonNotInFederationException);
         }
 
-        $window = RegistrationWindow::query()->create([
-            'member_organization_id' => $organization->getKey(),
-            'season_id' => $season->getKey(),
-            'opens_at' => $data['opensAt'],
-            'closes_at' => $data['closesAt'],
-            'roles' => $data['roles'],
-            'created_by_user_id' => $request->user()->getKey(),
-        ]);
+        // One window per organization and season (the unique index). The
+        // check answers the common case with a stable code; the catch covers
+        // two administrators opening the same window at the same moment.
+        $exists = RegistrationWindow::query()
+            ->where('member_organization_id', $organization->getKey())
+            ->where('season_id', $season->getKey())
+            ->exists();
+
+        if ($exists) {
+            throw $this->toJsonApiException(new WindowAlreadyOpenException);
+        }
+
+        try {
+            $window = RegistrationWindow::query()->create([
+                'member_organization_id' => $organization->getKey(),
+                'season_id' => $season->getKey(),
+                'opens_at' => $data['opensAt'],
+                'closes_at' => $data['closesAt'],
+                'roles' => $data['roles'],
+                'created_by_user_id' => $request->user()->getKey(),
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            throw $this->toJsonApiException(new WindowAlreadyOpenException);
+        }
 
         $audit->record(
             actor: $request->user(),

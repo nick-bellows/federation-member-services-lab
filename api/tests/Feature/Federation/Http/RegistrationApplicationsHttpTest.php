@@ -244,4 +244,22 @@ class RegistrationApplicationsHttpTest extends FederationHttpTestCase
             ['registrationWindow' => ['type' => 'registration-windows', 'id' => (string) $this->window->getKey()]],
         ))->assertStatus(409)->assertJsonPath('errors.0.code', 'duplicate_application');
     }
+
+    public function test_transition_actions_reveal_nothing_about_an_application_the_user_may_not_see(): void
+    {
+        $id = $this->startApplicationOverHttp($this->applicant);
+
+        // A stranger probing the state machine with a legal move, an illegal
+        // one and a reviewer's move gets the same plain 403 each time: no
+        // transition code, no "from draft" in the message.
+        foreach (['submit', 'approve', 'start-review'] as $action) {
+            $response = $this->request($this->otherApplicant, 'POST', self::BASE."/registration-applications/{$id}/-actions/{$action}")
+                ->assertStatus(403);
+
+            $this->assertNotContains($response->json('errors.0.code'), ['illegal_transition', 'transition_not_allowed_for_actor']);
+            $this->assertStringNotContainsString('draft', (string) $response->json('errors.0.detail'));
+        }
+
+        $this->assertSame('draft', RegistrationApplication::query()->findOrFail($id)->status->value);
+    }
 }

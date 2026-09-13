@@ -5,7 +5,9 @@ namespace App\Federation\LearningCenter;
 use App\Federation\Enums\ApplicationRole;
 use App\Federation\Enums\ApplicationStatus;
 use App\Federation\Enums\Participation;
+use App\Federation\LearningCenter\Exceptions\ContractMismatchException;
 use App\Federation\Models\RegistrationApplication;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Participation = approved application + the provider's eligibility + a valid
@@ -43,8 +45,23 @@ final class ParticipationResolver
 
         // A stored snapshot was bound to its subject when it was fetched; the
         // same check here keeps a hand-edited or migrated row from reading as
-        // someone else's facts.
-        $facts = CredentialFacts::fromArray($snapshot->payload, $this->contract, (string) $snapshot->subject);
+        // someone else's facts. A row written under an older contract, or one
+        // this version cannot read, is reported as unreadable rather than
+        // failing every page that lists the application: the next refresh or
+        // the hourly reconciliation rewrites it.
+        try {
+            $facts = CredentialFacts::fromArray($snapshot->payload, $this->contract, (string) $snapshot->subject);
+        } catch (ContractMismatchException $exception) {
+            Log::warning('federation.participation.snapshot_unreadable', [
+                'user_id' => $snapshot->user_id,
+                'stored_contract' => $snapshot->contract,
+                'expected_contract' => $this->contract,
+                'reason' => $exception->getMessage(),
+            ]);
+            $reasons[] = ParticipationStatus::REASON_SNAPSHOT_UNREADABLE;
+
+            return new ParticipationStatus($approved ? Participation::UNKNOWN : Participation::BLOCKED, $reasons, null, $snapshot->fetched_at, true);
+        }
 
         if ($facts->eligibilityStatus === CredentialFacts::STATUS_SUSPENDED) {
             $reasons[] = ParticipationStatus::REASON_HOLD;

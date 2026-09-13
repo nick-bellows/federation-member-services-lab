@@ -173,6 +173,11 @@ class RegistrationApplicationController extends Controller
 
     private function transition(Request $request, RegistrationApplication $application, TransitionApplication $transition, ApplicationStatus $to): DataResponse
     {
+        // Whoever may not see the application learns nothing from the
+        // transition rules: no "cannot move from draft", no actor message.
+        // The domain decides only for people the policy already admits.
+        $this->authorize('view', $application);
+
         $reason = $request->input('meta.reason') ?? $request->input('reason');
 
         $application = $this->domain(fn () => $transition->execute(

@@ -24,6 +24,25 @@ type Compound<T> = {
     included?: JsonApiResource<Record<string, unknown>>[];
 };
 
+/**
+ * A list the API refused or could not answer. Thrown rather than returned
+ * as an empty list, so a rejected token or an API outage reaches the route's
+ * error boundary instead of rendering as "nothing here".
+ */
+export class FederationRequestError extends Error {
+    constructor(
+        public readonly status: number,
+        resource: string,
+    ) {
+        super(`Federation API answered ${status} for ${resource}`);
+        this.name = 'FederationRequestError';
+    }
+}
+
+function refused(resource: string, response: Response | undefined): never {
+    throw new FederationRequestError(response?.status ?? 0, resource);
+}
+
 export interface WindowView {
     id: string;
     opensAt: string;
@@ -37,7 +56,7 @@ export interface WindowView {
 export async function listOpenWindows(
     client: FederationClient,
 ): Promise<WindowView[]> {
-    const { data, error } = await client.GET('/registration-windows', {
+    const { data, error, response } = await client.GET('/registration-windows', {
         params: {
             query: {
                 'filter[open]': 'true',
@@ -48,7 +67,7 @@ export async function listOpenWindows(
     });
 
     if (error || !data) {
-        return [];
+        refused('open registration windows', response);
     }
 
     const document = data as unknown as Compound<WindowResource[]>;
@@ -61,7 +80,7 @@ export async function listOpenWindows(
 export async function listWindows(
     client: FederationClient,
 ): Promise<WindowView[]> {
-    const { data, error } = await client.GET('/registration-windows', {
+    const { data, error, response } = await client.GET('/registration-windows', {
         params: {
             query: {
                 include: 'memberOrganization,season',
@@ -71,7 +90,7 @@ export async function listWindows(
     });
 
     if (error || !data) {
-        return [];
+        refused('registration windows', response);
     }
 
     const document = data as unknown as Compound<WindowResource[]>;
@@ -141,12 +160,15 @@ export async function listApplications(
         query['filter[status]'] = statuses.join(',');
     }
 
-    const { data, error } = await client.GET('/registration-applications', {
-        params: { query: query as never },
-    });
+    const { data, error, response } = await client.GET(
+        '/registration-applications',
+        {
+            params: { query: query as never },
+        },
+    );
 
     if (error || !data) {
-        return [];
+        refused('registration applications', response);
     }
 
     const document = data as unknown as Compound<ApplicationResource[]>;
@@ -260,16 +282,22 @@ export async function listReferenceData(
         }),
     ]);
 
-    const orgs =
-        (
-            organizations.data as unknown as
-                Compound<JsonApiResource<OrganizationAttributes>[]> | undefined
-        )?.data ?? [];
-    const seas =
-        (
-            seasons.data as unknown as
-                Compound<JsonApiResource<SeasonAttributes>[]> | undefined
-        )?.data ?? [];
+    if (organizations.error || !organizations.data) {
+        refused('member organizations', organizations.response);
+    }
+
+    if (seasons.error || !seasons.data) {
+        refused('seasons', seasons.response);
+    }
+
+    const orgs = (
+        organizations.data as unknown as Compound<
+            JsonApiResource<OrganizationAttributes>[]
+        >
+    ).data;
+    const seas = (
+        seasons.data as unknown as Compound<JsonApiResource<SeasonAttributes>[]>
+    ).data;
 
     return {
         organizations: orgs.map((o) => ({

@@ -17,6 +17,7 @@ use App\Federation\Exceptions\ReasonRequiredException;
 use App\Federation\Exceptions\RoleNotOfferedException;
 use App\Federation\Exceptions\SeasonNotInFederationException;
 use App\Federation\Exceptions\TransitionNotAllowedForActorException;
+use App\Federation\Exceptions\WindowAlreadyOpenException;
 use App\Federation\Exceptions\WindowClosedException;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
@@ -54,6 +55,7 @@ trait RendersDomainExceptions
             $exception instanceof ApplicationNotEditableException => [409, 'application_not_editable'],
             $exception instanceof IdempotencyKeyReusedException => [409, 'idempotency_key_reused'],
             $exception instanceof SeasonNotInFederationException => [409, 'season_not_in_federation'],
+            $exception instanceof WindowAlreadyOpenException => [409, 'window_exists'],
             $exception instanceof ReasonRequiredException => [422, 'reason_required'],
             $exception instanceof ApplicationIncompleteException => [422, 'application_incomplete'],
             $exception instanceof DocumentNotAllowedException => [422, 'document_not_allowed'],

@@ -101,4 +101,18 @@ class RegistrationWindowsHttpTest extends FederationHttpTestCase
             ->assertStatus(422)
             ->assertJsonPath('errors.0.source.pointer', '/data/attributes/closesAt');
     }
+
+    public function test_a_second_window_for_the_same_organization_and_season_is_a_409(): void
+    {
+        // The organization's window for this season already exists (set up).
+        $this->request($this->organizationAdmin, 'POST', self::BASE.'/registration-windows', $this->windowDocument((string) $this->organization->getKey()))
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'window_exists');
+
+        $this->assertSame(1, RegistrationWindow::query()
+            ->where('member_organization_id', $this->organization->getKey())
+            ->where('season_id', $this->season->getKey())
+            ->count());
+        $this->assertSame(0, AuditEntry::query()->where('action', 'window.opened')->count());
+    }
 }
