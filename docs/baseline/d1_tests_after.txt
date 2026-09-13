@@ -1,0 +1,19 @@
+# Closing-review regression tests AFTER the fixes (2026-09-12, SQLite in memory, api container as verein)
+# php artisan test --filter 'test_transition_actions_reveal_nothing|test_a_snapshot_under_another_contract|test_a_rejected_service_token_is_dropped|test_a_second_window_for_the_same'
+
+
+   PASS  Tests\Feature\Federation\CredentialSnapshotsTest
+  ✓ a rejected service token is dropped and the next call fetches a new… 2.30s  
+
+   PASS  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ✓ a snapshot under another contract reads as unreadable not as an err… 1.07s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ✓ transition actions reveal nothing about an application the user may… 0.71s  
+
+   PASS  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ✓ a second window for the same organization and season is a 409        0.70s  
+
+  Tests:    4 passed (36 assertions)
+  Duration: 5.11s
+

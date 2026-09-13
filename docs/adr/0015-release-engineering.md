@@ -2,7 +2,7 @@
 
 - Status: accepted (2026-09-04; the opening decision defaulted by the owner's instruction, see Context)
 - Milestone: B8 (M10 in the brief)
-- Related: ADR-0010 (outbox and the broker mapping), ADR-0011 (PostgreSQL compatibility), ADR-0012 (observability), ADR-0014 (threat model and update policy), [`docs/DEPLOYMENT.md`](../DEPLOYMENT.md), [`docs/RELEASE.md`](../RELEASE.md), [`deploy/compose.release.yml`](../../deploy/compose.release.yml)
+- Related: ADR-0010 (outbox and the broker mapping), ADR-0011 (PostgreSQL compatibility), ADR-0012 (observability), ADR-0014 (threat model and update policy), [`docs/DEPLOYMENT.md`](../DEPLOYMENT.md), [`docs/RELEASE.md`](../RELEASE.md), [`deploy/compose.release.yml`](https://github.com/nick-bellows/federation-member-services-lab/blob/main/deploy/compose.release.yml)
 
 ## Context
 

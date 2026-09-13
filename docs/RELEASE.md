@@ -1,6 +1,6 @@
 # Release checklist and rollback plan
 
-Status: the checklist is exercised by the release rehearsal in Compose (`deploy/compose.release.yml`, `docs/baseline/release_rehearsal_2026-09-04.txt`); the deployment steps are **planned** until an environment exists (`docs/DEPLOYMENT.md`, ADR-0015). "CI" here means the workflow in `.github/workflows/ci.yml`; there is no automated deployment.
+Status: the checklist is exercised by the release rehearsal in Compose (`deploy/compose.release.yml`, `docs/baseline/release_rehearsal_2026-09-04.txt`, re-run on the rootless image as `release_rehearsal_2026-09-10.txt`); the deployment steps are **planned** until an environment exists (`docs/DEPLOYMENT.md`, ADR-0015). "CI" here means the workflow in `.github/workflows/ci.yml`; there is no automated deployment.
 
 ## Versioning
 
@@ -13,7 +13,7 @@ Every line has an owner (the person releasing) and evidence (a link or a file). 
 
 ### Before merging
 
-1. CI green on the pull request: three engines, style and env guard, frontend build, browser journeys, upstream manifest, and the dependency audit summaries read (`dependency-audit` job, report only).
+1. CI green on the pull request: three engines, style and env guard, frontend build, browser journeys, upstream manifest, the secret scan over the full history (`secret-scan` job, enforced), and the dependency audit summaries read (`dependency-audit` job, report only).
 2. Dependency audits: within-major fixes applied per the policy in `docs/THREAT_MODEL.md`; every unapplied major listed in `docs/future-work.md` with its advisory.
 3. Migrations in the change are expand-and-contract: a new column is nullable or defaulted, a rename is add-copy-drop across two releases, an index is added with `Schema::getIndexes` guards (as `2026_09_03_130000` does). No migration deletes data.
 4. `ROADMAP.md` and the README rows say what the release contains; numbers link to retained runs.

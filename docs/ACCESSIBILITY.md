@@ -31,7 +31,7 @@ Pages: sign-in, member home, applications list, new application, application det
 2. **Page titles.** The browser tab title was the same for every member page. **Resolved in B9:** every member page exports `generateMetadata` through `memberMetadata`, which renders the page name, then the site, in the page's language (`titles` in the federation namespace); the review spec asserts each title.
 3. **Transition buttons.** `Approve`, `Reject`, `Start review`, `Request information`, `Submit application` and `Withdraw application` were unambiguous in context but not out of it. **Resolved in B9:** each carries `aria-describedby` pointing at a visually hidden sentence saying what it does to the application, read before the person confirms; the review spec asserts the description exists and is a sentence.
 
-No serious or critical issue was found in B6; the three findings were improvements, not failures against AA, and all three are in place as of B9 (`docs/baseline/a11y_review_2026-09-04.txt`). A screen reader run by ear remains undone.
+No serious or critical issue was found in B6; the three findings were improvements, not failures against AA, and all three are in place as of B9 (`docs/baseline/a11y_review_2026-09-04.txt`). The two retained records are copies from the runs whose dates they carry; a rerun of `e2e/tests/accessibility-review.spec.ts` writes its notes to `e2e/test-results/a11y_review.txt` (untracked; `A11Y_REPORT` names another file) and touches nothing under `docs/baseline/`. A screen reader run by ear remains undone.
 
 ## Low bandwidth
 

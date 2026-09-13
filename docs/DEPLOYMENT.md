@@ -1,6 +1,6 @@
 # Deployment architecture
 
-Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document exists in any cloud account. What exists is the release rehearsal in Compose (`deploy/compose.release.yml`), which runs the release images this design would deploy, and the CI matrix, which proves the code on the engine this design chooses. Since 2026-09-04 (owner's approval of provisioning, ADR-0015 addendum) a minimal proof of this design is written in Terraform under [`deploy/terraform/`](../deploy/terraform/README.md): validated, priced, and waiting for AWS credentials to be planned and applied. Every service below is named with what it replaces from the Compose stack, so a reader can see that the design is the same system, not a different one.
+Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document exists in any cloud account. What exists is the release rehearsal in Compose (`deploy/compose.release.yml`), which runs the release images this design would deploy, and the CI matrix, which proves the code on the engine this design chooses. Since 2026-09-04 (owner's approval of provisioning, ADR-0015 addendum) a minimal proof of this design is written in Terraform under [`deploy/terraform/`](https://github.com/nick-bellows/federation-member-services-lab/blob/main/deploy/terraform/README.md): validated, priced, and waiting for AWS credentials to be planned and applied. Every service below is named with what it replaces from the Compose stack, so a reader can see that the design is the same system, not a different one.
 
 ## Shape
 
@@ -64,4 +64,4 @@ Status: **planned, not provisioned** (B8, ADR-0015). Nothing in this document ex
 
 ## Cost
 
-Nothing here has been provisioned or priced. The smallest honest version (two Fargate tasks for the API, one each for web, worker and scheduler, a single-AZ RDS instance, one CloudFront distribution) is a recurring monthly cost that the owner decides on; the approvals list at the end of B9 carries the question. A one-day proof on a personal account would still cost money and would need the owner's approval first (workspace rule: no paid resources without it).
+Nothing here has been provisioned. The Terraform proof is priced at about $2.50 a day while it runs (the smallest honest version: two Fargate tasks for the API, one each for web, worker and scheduler, a single-AZ RDS instance, one CloudFront distribution; the arithmetic is in `deploy/terraform/README.md`). Applying it needs the owner's AWS credentials and a go on the cost and the teardown date (ROADMAP O2); nothing is spent without that.

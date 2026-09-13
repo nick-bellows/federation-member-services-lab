@@ -29,4 +29,4 @@ Upstream authenticates club admins with a password against its own users table a
 
 - Positive: no passwords for federation users; upstream flows unchanged; every rejection reason logged without the token; account-takeover through unverified e-mail claims is closed; tests cover signature, issuer, audience, expiry, algorithm confusion, key rotation, provisioning, linking and conflicts without any provider running.
 - Negative: two identity systems coexist until upstream's club-admin login is migrated, which is not planned; `host.docker.internal` is a Docker Desktop convention that CI has to reproduce with `extra_hosts`; the ID token's multi-audience shape must be configured on the provider.
-- Follow-ups: Auth0 tenant walkthrough with screenshots (owner action); CI end-to-end job; refresh tokens and session expiry handling when the review slice needs longer sessions; token binding to the audit request id.
+- Follow-ups: Auth0 tenant walkthrough with screenshots (owner action, still open); the CI end-to-end job (done in A5, the `e2e` job); refresh tokens and session expiry handling when the review slice needs longer sessions; token binding to the audit request id.

@@ -56,4 +56,4 @@ The operator's half of the contract (ADR-0012): for each situation, the symptom,
 
 ## What is not covered yet
 
-Scheduling (the worker, the reconciliation, `health:check` and `outbox-status` run by hand here), alert delivery, and a production log or trace store: all B8 release-engineering decisions. The runbook names the commands a scheduler would run and the exit codes it would alert on.
+Alert delivery beyond the `scheduled_task_failed` log line and the CloudWatch alarm in the Terraform proof, and a production log or trace store: the proof ships logs to the container streams and traces to nothing until an environment exists (`docs/DEPLOYMENT.md`). In development the worker runs as a Compose command and the reconciliation, `health:check` and `outbox-status` run by hand; in the release stack and the proof they run as the scheduler service (B8, ADR-0015). The runbook names the commands a scheduler would run and the exit codes it would alert on.
