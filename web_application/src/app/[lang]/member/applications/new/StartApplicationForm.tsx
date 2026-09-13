@@ -17,19 +17,29 @@ interface Props {
     windows: WindowView[];
 }
 
+function rolesOfferedBy(window: WindowView | undefined): ApplicationRole[] {
+    return applicationRoles.filter((r) => window?.roles.includes(r));
+}
+
+// The preselected role is one the window offers; a coach-only window must
+// not post "participant" and be refused by the API.
+function firstOfferedRole(window: WindowView | undefined): ApplicationRole {
+    return rolesOfferedBy(window)[0] ?? 'participant';
+}
+
 export default function StartApplicationForm({ lang, windows }: Props) {
     const { t } = useTranslation('federation');
     const router = useRouter();
     const [pending, startTransition] = useTransition();
     const [windowId, setWindowId] = useState(windows[0]?.id ?? '');
-    const [role, setRole] = useState<ApplicationRole>('participant');
+    const [role, setRole] = useState<ApplicationRole>(() =>
+        firstOfferedRole(windows[0]),
+    );
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [result, setResult] = useState<ActionResult | null>(null);
 
     const selectedWindow = windows.find((w) => w.id === windowId);
-    const offeredRoles = applicationRoles.filter((r) =>
-        selectedWindow?.roles.includes(r),
-    );
+    const offeredRoles = rolesOfferedBy(selectedWindow);
     const fieldError = (name: string) => result?.fieldErrors?.[name]?.[0];
 
     function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -69,7 +79,11 @@ export default function StartApplicationForm({ lang, windows }: Props) {
                     value={windowId}
                     onChange={(e) => {
                         setWindowId(e.target.value);
-                        setRole('participant');
+                        setRole(
+                            firstOfferedRole(
+                                windows.find((w) => w.id === e.target.value),
+                            ),
+                        );
                     }}
                     className="mt-1 w-full rounded border border-slate-500 px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2"
                     aria-describedby="window-help"

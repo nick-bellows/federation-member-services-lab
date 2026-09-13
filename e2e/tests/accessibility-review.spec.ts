@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { appendFileSync, mkdirSync } from 'node:fs';
+import path from 'node:path';
 
 /**
  * The manual-review scaffolding for B6 (docs/ACCESSIBILITY.md): a keyboard-only
@@ -13,12 +14,15 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 const runId = Date.now().toString(36);
 const applicant = { subject: `mock|a11y-${runId}`, email: `a11y-${runId}@northgate.example`, name: `A11y Reviewer ${runId}` };
 const naslAdmin = { subject: 'mock|nasl-admin', email: 'nasl-admin@northgate.example', name: 'NASL Admin' };
-// B6's record stays as it was; the B9 rerun (skip link, titles, described buttons) writes its own.
-const reportPath = 'docs/baseline/a11y_review_2026-09-04.txt';
+// Notes go to an untracked file under e2e/test-results by default. The retained
+// records under docs/baseline (B6, B9) are copied there by hand from a run
+// whose date they carry; set A11Y_REPORT to write elsewhere. Resolved from this
+// file, not from the working directory, so the path holds wherever the run starts.
+const reportPath = process.env.A11Y_REPORT ?? path.resolve(__dirname, '../test-results/a11y_review.txt');
 
 function note(line: string) {
-    mkdirSync('../docs/baseline', { recursive: true });
-    appendFileSync(`../${reportPath}`, line + '\n');
+    mkdirSync(path.dirname(reportPath), { recursive: true });
+    appendFileSync(reportPath, line + '\n');
 }
 
 async function signIn(page: Page, persona: { subject: string; email: string; name: string }) {
@@ -200,7 +204,7 @@ test.describe.serial('accessibility review of the slice', () => {
         await signOut(page);
     });
 
-    test('the new-application page is usable on a slow connection', async ({ page, browser }) => {
+    test('the new-application page is usable on a slow connection', async ({ page }) => {
         test.skip(!!process.env.CI, 'machine-specific timing; recorded locally in docs/baseline');
         await signIn(page, applicant);
         const context = page.context();
@@ -217,6 +221,6 @@ test.describe.serial('accessibility review of the slice', () => {
         const transferred = await page.evaluate(() => performance.getEntriesByType('resource').reduce((sum, e) => sum + ((e as PerformanceResourceTiming).transferSize || 0), 0));
         note(`[slow-3g] new-application page: form usable after ${usableAfterMs} ms, load event after ${loadedAfterMs} ms, resources transferred ${Math.round(transferred / 1024)} KiB`);
         await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
-        await browser.close;
+        await cdp.detach();
     });
 });

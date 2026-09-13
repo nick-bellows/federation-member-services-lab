@@ -37,11 +37,11 @@ docker compose exec tooling bash
 
 ### Exercise E1 — count the queries behind one test
 
-_Pending; recorded in the internal review file._
+_Result kept in the owner's review notes, outside this repository._
 
 ### Exercise E2 — watch the tenant context during a public application
 
-_Pending; recorded in the internal review file._
+_Result kept in the owner's review notes, outside this repository._
 
 ## 2026-09-02 — Milestone 1: baseline quality and one defensible fix
 
@@ -569,7 +569,7 @@ docker compose -p federation-release -f deploy/compose.release.yml down -v
 **Three lessons.**
 
 1. A port is named in more places than the file that binds it: the image, the health check, the Compose mapping, the consumer's environment, the target group, the security group and the container port. Change it with a grep, then with a rehearsal.
-2. A precondition is a regression test for infrastructure code that costs nothing to run; the plan is its test run. `validate` alone does not evaluate it, which the exercise E27 in the internal record makes visible.
+2. A precondition is a regression test for infrastructure code that costs nothing to run; the plan is its test run. `validate` alone does not evaluate it, which running `plan` against a deliberately swapped rule priority makes visible.
 3. Rootless is a set of small facts, each checkable with one command inside the running container; the record lists them so a reviewer can re-check without trusting the Dockerfile's comments.
 
 ## 2026-09-10 — Phase C, C4: the evidence and the reviewer's path
@@ -602,7 +602,7 @@ cd e2e && npx playwright test tests/screenshots.spec.ts   # against the developm
 
 ## 2026-09-10 — Phase C, C5: the final verification
 
-**Goal.** Repeat, on the closing state, the three proofs a stranger can repeat: the whole suite, the release rehearsal, and a cold clone of the README's run instructions from the public fork; check the documentation site as deployed; bring the roadmap, the learning log, the interview guide and the internal record to the closing state.
+**Goal.** Repeat, on the closing state, the three proofs a stranger can repeat: the whole suite, the release rehearsal, and a cold clone of the README's run instructions from the public fork; check the documentation site as deployed; bring the roadmap, the learning log, the interview guide and the owner's learning notes to the closing state.
 
 **Commands run.**
 
@@ -632,4 +632,47 @@ bash coldclone_c5.sh                                                            
 2. A record that shows a gap with its explanation beats a record re-run until it is clean.
 3. Done is a state of the evidence, not of the code: every claim a stranger meets has a file behind it, every open item names who can close it.
 
-**Not done, on the owner (ROADMAP O1 to O6).** The Auth0 tenant and its walk; the AWS proof and its cost; whether the fork carries releases; the owner's read and the review of the internal record; the pin; the upstream offer, last.
+**Not done, on the owner (ROADMAP O1 to O6).** The Auth0 tenant and its walk; the AWS proof and its cost; whether the fork carries releases; the owner's read and the review of the owner's learning notes; the pin; the upstream offer, last.
+
+## 2026-09-12 — D1: the closing code review
+
+**Goal.** One more independent read of the closing state before the repository is left alone: four reviews in parallel (the Laravel backend, the Next.js frontend with the browser specs, the workflows, images and Terraform, and the documentation against the repository), each finding verified in the source before it counted; then fix what is fixable without the owner, with a fail-then-pass record for every behavioural change, and bring the documents to the new state.
+
+**What the review found and what was done.**
+
+| Finding (severity) | Where | Fix |
+|---|---|---|
+| The six transition actions ran the domain rules before any policy check, so a signed-in stranger could post `approve` against every id and read the status from "cannot move from draft" or the actor message (medium) | `RegistrationApplicationController::transition` | `authorize('view')` first; the stranger gets the policy's plain 403 whatever the state. Threat model leaf 2.9. |
+| A snapshot stored under an older Learning Center contract threw on every read, so a contract bump would 500 every list and page that shows the application until reconciliation rewrote the rows (medium) | `ParticipationResolver` | the mismatch is caught, logged with both contract names, and reported as `snapshot_unreadable` (unknown or blocked, stale) |
+| A service token the Learning Center rejected stayed in the cache for its whole lifetime; `forget()` had no caller (medium) | `HttpCredentialsClient::interpret` | a 401 or 403 drops the cached token before the exception |
+| A second window for the same organization and season was a raw unique-constraint 500 (low) | `RegistrationWindowController` | 409 `window_exists`, checked first and caught on the race |
+| The list queries returned an empty list on any API failure, so a rejected token or an outage rendered as "no applications" or "queue empty" (medium) | `web_application/src/lib/federation/queries.ts` | they throw `FederationRequestError`; a new `member/error.tsx` boundary shows the failure with "try again" and "sign in again" |
+| The `/admin` gate only asked whether a session existed, so an OIDC member reached the club-admin server components (medium; the API refused them downstream) | `web_application/src/middlewares/auth.ts` | an OIDC session counts as not signed in for the admin area |
+| The start form preselected `participant` even for a window that does not offer it, and the API refused the post (low) | `StartApplicationForm.tsx` | the preselected role is the first the window offers |
+| Every GitHub Action ran on a floating major tag, including `git-cliff-action` with `contents: write` (medium) | the three workflows | every action pinned to the commit of its latest release within the same major, the version in a comment |
+| The accessibility spec appended to a tracked, dated record on every run from a working-directory-relative path, and ended with `await browser.close` (a property read) (low) | `e2e/tests/accessibility-review.spec.ts` | notes go to `e2e/test-results/a11y_review.txt` (or `A11Y_REPORT`), resolved from the spec's own location; the CDP session is detached instead |
+| The README banner said eight CI jobs; the release checklist omitted the secret scan; the deployment document ended with "not priced" under a header that said priced; the runbook still listed B8 as not covered; ADR-0007 listed a CI job that exists as a follow-up; three links relative to the repository root answered 404 on the documentation site; the threat model and the roadmap referred to files that are not in the repository | the documents | corrected; the references now say "the owner's learning notes, outside this repository" |
+
+Findings recorded and deliberately not changed: the JWKS refetch on a token without a `kid` (bounded by the rate limit; a cache of "unknown kid" answers is a follow-up), readiness failing on every instance at once when the outbox relay stalls (ADR-0012 chose it; the wording there is corrected to say so), the verified-e-mail link covering upstream's privileged accounts (the trade-off of ADR-0007), the ALB accepting plain HTTP from the whole CloudFront prefix list (a proof, listed in `docs/DEPLOYMENT.md`), the reviewer's e-mail visible to the applicant through `include=reviewedBy` (threat model 2.4 says so), a dependency bot (an owner decision; the pins move by hand until then).
+
+**Commands run.**
+
+```sh
+git stash push -- api/app && docker compose exec -u verein api php artisan test --filter '<the four new tests>' && git stash pop   # docs/baseline/d1_tests_before.txt: 4 failed
+docker compose exec -u verein api php artisan test --filter '<the four new tests>'                                                  # docs/baseline/d1_tests_after.txt: 4 passed
+docker compose exec -u verein api php artisan test                                                                                  # docs/baseline/phpunit_after_d1_backend.txt: 251 passed (1,184 assertions)
+docker compose exec -u verein api vendor/bin/pint --test app/Federation app/Support tests/Unit/Federation tests/Feature/Federation  # clean
+docker compose exec tooling sh -c 'cd web_application && npm ci && npx tsc --noEmit && npm run lint'                                # clean (upstream's warnings only)
+```
+
+**What went wrong, in order.**
+
+1. The first whole-suite run failed seven upstream media tests with "unable to create a directory": the run used the API container's application user against `storage/app/private` that an earlier root-owned run had created. Ownership corrected (`chown -R verein storage`), the seven pass; the record is the clean run, and this line is where the first one went.
+
+**Three lessons.**
+
+1. A policy check belongs before the domain's first answer, not after it: an error message that names the current state is an oracle for whoever may not see the state.
+2. Returning an empty list on failure is a lie the user cannot detect; throwing to a boundary that says "try again" costs one file.
+3. A pinned action is a supply-chain decision, not a style preference; a floating major tag with write permission is the widest door in the repository.
+
+**Not done, on the owner (ROADMAP O1 to O6, plus the dependency-bot decision).** As before.

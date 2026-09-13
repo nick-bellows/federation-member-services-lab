@@ -186,4 +186,23 @@ class ParticipationHttpTest extends FederationHttpTestCase
 
         return $id;
     }
+
+    public function test_a_snapshot_under_another_contract_reads_as_unreadable_not_as_an_error(): void
+    {
+        $id = $this->approvedApplication();
+
+        // The contract moves on while a row written under the old one is
+        // still stored: the page still renders, the participation says why.
+        config()->set('learning_center.contract', 'learning-center.credentials.v2');
+
+        $this->request($this->organizationAdmin, 'GET', self::BASE."/registration-applications/{$id}")
+            ->assertOk()
+            ->assertJsonPath('data.attributes.participation.status', 'unknown')
+            ->assertJsonPath('data.attributes.participation.reasons', ['snapshot_unreadable'])
+            ->assertJsonPath('data.attributes.participation.stale', true);
+
+        $this->request($this->organizationAdmin, 'GET', self::BASE.'/registration-applications?filter[status]=approved')
+            ->assertOk()
+            ->assertJsonPath('data.0.attributes.participation.status', 'unknown');
+    }
 }

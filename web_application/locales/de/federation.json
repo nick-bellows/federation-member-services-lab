@@ -205,5 +205,11 @@
         "review_application": "Antrag prüfen",
         "windows": "Registrierungszeiträume",
         "sign_in": "Anmelden"
+    },
+    "errors": {
+        "heading": "Etwas ist schiefgelaufen",
+        "description": "Der Verbandsdienst hat diese Seite nicht beantwortet. Versuche es erneut; wenn das nicht hilft, melde dich neu an.",
+        "retry": "Erneut versuchen",
+        "sign_in_again": "Neu anmelden"
     }
 }

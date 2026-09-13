@@ -205,5 +205,11 @@
         "review_application": "Review application",
         "windows": "Registration windows",
         "sign_in": "Sign in"
+    },
+    "errors": {
+        "heading": "Something went wrong",
+        "description": "The federation service did not answer this page. Try again; if that fails, sign in again.",
+        "retry": "Try again",
+        "sign_in_again": "Sign in again"
     }
 }

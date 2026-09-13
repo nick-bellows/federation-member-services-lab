@@ -4,7 +4,7 @@ title: Retained evidence
 
 # Retained evidence
 
-Every number in the documentation comes from one of these files, each written by the run that produced it and committed unchanged (ANSI colour stripped). The file names carry the milestone or the date; the learning log says which command wrote which file. Generated on 2026-09-10 from the folder listing.
+Every number in the documentation comes from one of these files, each written by the run that produced it and committed unchanged (ANSI colour stripped). The file names carry the milestone or the date; the learning log says which command wrote which file. Generated on 2026-09-10 from the folder listing; the closing-review records of 2026-09-12 added by hand.
 
 
 ## Test suites
@@ -20,6 +20,7 @@ Every number in the documentation comes from one of these files, each written by
 - [`phpunit_after_b8_backend.txt`](phpunit_after_b8_backend.txt) (21 KB)
 - [`phpunit_after_c1_backend.txt`](phpunit_after_c1_backend.txt) (22 KB)
 - [`phpunit_after_c_backend.txt`](phpunit_after_c_backend.txt) (22 KB)
+- [`phpunit_after_d1_backend.txt`](phpunit_after_d1_backend.txt) (24 KB)
 - [`phpunit_after_env_fix.txt`](phpunit_after_env_fix.txt) (8 KB)
 - [`phpunit_after_m2.txt`](phpunit_after_m2.txt) (11 KB)
 - [`phpunit_after_m3.txt`](phpunit_after_m3.txt) (13 KB)
@@ -38,6 +39,11 @@ Every number in the documentation comes from one of these files, each written by
 - [`playwright_b7.txt`](playwright_b7.txt) (4 KB)
 - [`playwright_m3.txt`](playwright_m3.txt) (584 bytes)
 - [`playwright_m4.txt`](playwright_m4.txt) (1 KB)
+
+## Closing review records (D1, 2026-09-12)
+
+- [`d1_tests_after.txt`](d1_tests_after.txt) (1 KB)
+- [`d1_tests_before.txt`](d1_tests_before.txt) (41 KB)
 
 ## Phase C closing records
 

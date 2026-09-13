@@ -68,6 +68,13 @@ final class HttpCredentialsClient implements CredentialsClient
 
     private function interpret(Response $response, string $subject): CredentialFacts
     {
+        // A rejected service token is dropped from the cache at once, so the
+        // next call fetches a fresh one instead of replaying the revoked token
+        // until its cached lifetime runs out.
+        if (in_array($response->status(), [401, 403], true)) {
+            $this->tokens->forget();
+        }
+
         return match (true) {
             $response->successful() => CredentialFacts::fromArray((array) $response->json(), $this->contract, $subject),
             $response->status() === 404 => throw new LearningCenterMemberNotFoundException('No Learning Center member for the subject'),

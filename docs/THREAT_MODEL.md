@@ -86,7 +86,8 @@ Goal: list or fetch applications, documents, reviewer notes or snapshots of an o
 - 2.5 Read credential facts → **Mitigated** for the raw facts (the snapshot stores facts; the page renders the derived participation status and its age) and **Partly** for the derived status, which a reviewer of the application sees by design.
 - 2.6 Read through the audit `history` attribute → **Mitigated.** The history renders action, time, actor name, from, to, reason; never the request id, internal ids or the previous state of fields (`RegistrationApplicationSchema`).
 - 2.7 Read through the probes and metrics → see Tree 5.
-- 2.8 Read through upstream's tenancy → **Upstream.** `ClubScope` and the super-admin bypass (M0 quiz Q1 and Q2); the fork does not change them and the federation routes do not use them.
+- 2.9 Probe the state machine of an application the actor may not see (POST a transition action against every id and read the status from "cannot move from draft" or the actor message) → **Mitigated** (closing review, 2026-09-12). Every transition action authorises `view` before the domain decides, so a stranger gets the policy's plain 403 whatever the state (`test_transition_actions_reveal_nothing_about_an_application_the_user_may_not_see`).
+- 2.8 Read through upstream's tenancy → **Upstream.** `ClubScope` and the super-admin bypass (described in `docs/UPSTREAM_ANALYSIS.md`); the fork does not change them and the federation routes do not use them.
 
 ## Tree 3 — Obtain or forge a token
 
@@ -131,7 +132,7 @@ Goal: learn the environment, the dependencies, the counts or the errors without 
 - 5.4 `/api/metrics` → **Mitigated (B7).** Counts of applications by status, outbox depth and age, failed jobs, stale snapshots: no personal data, but a picture of the operation. Behind the same token by default; `docs/OBSERVABILITY.md` says when leaving it open is defensible.
 - 5.5 Error messages
   - 5.5.1 federation errors → **Mitigated.** Domain exceptions carry the domain's message and a stable code; everything else is a 500 with the request id and no message (`RendersDomainExceptions`).
-  - 5.5.2 upstream's `apply` → **Upstream.** Maps every `Throwable` to 422 with the exception message (M0 quiz Q3).
+  - 5.5.2 upstream's `apply` → **Upstream.** Maps every `Throwable` to 422 with the exception message (`docs/UPSTREAM_ANALYSIS.md`).
 - 5.6 OpenAPI documents (`:3002`, `api/public/*_openapi.json`) → **Accepted.** They describe the contract, which is public by intent; the examples are sampled from the development seed and contain no real person.
 - 5.7 Logs and traces → **Mitigated.** No tokens (3.2.2); request ids are validated against a pattern before they are logged, so a caller cannot inject line breaks or markup (`AssignRequestId`).
 - 5.8 CORS → **Partly, Upstream.** `allowed_origins => ['*']` with `supports_credentials => false`: a browser on any origin may call the API, but without cookies, and bearer tokens never sit in the browser for the federation slice (3.2.1). Residual: upstream's Sanctum tokens are sent by its own frontend; the wildcard is upstream's choice.
@@ -159,7 +160,7 @@ None of the advisories above was patched in B7: the review's job was to know wha
 
 ## What this review did not do
 
-- No penetration test, no fuzzing, no dynamic scanner. The trees are read from the code and the tests; the exercises E21 and E22 in the internal record are manual.
+- No penetration test, no fuzzing, no dynamic scanner. The trees are read from the code and the tests; the two manual walks behind them are in the owner's review notes, outside this repository.
 - No review of upstream's Filament panel or public apply form beyond what M0 found.
 - No deployment exists, so network controls, TLS, secret storage and image scanning are B8's design, labelled planned there.
 

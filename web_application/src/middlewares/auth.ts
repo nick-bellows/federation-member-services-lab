@@ -13,7 +13,16 @@ export function handleAdminPaths(
     request: NextRequestWithAuth,
     nextUrl: NextURL,
 ) {
-    if (request.nextauth.token === null) {
+    const token = request.nextauth.token;
+
+    // Federation (fork): a session from an OIDC provider carries no club-admin
+    // token, so for the admin area it counts as not signed in; the member
+    // area has its own gate in middlewares/federation.ts.
+    const isClubAdminSession =
+        token !== null &&
+        (token.provider === undefined || token.provider === 'credentials');
+
+    if (!isClubAdminSession) {
         return handleUnauthenticated(request, nextUrl);
     }
 

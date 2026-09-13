@@ -17,6 +17,8 @@ final class ParticipationStatus
 
     public const REASON_NO_RECORD = 'no_learning_center_record';
 
+    public const REASON_SNAPSHOT_UNREADABLE = 'snapshot_unreadable';
+
     public const REASON_HOLD = 'hold_active';
 
     public const REASON_LAPSED = 'credential_lapsed';

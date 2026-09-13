@@ -1,0 +1,342 @@
+# Closing-review regression tests BEFORE the fixes (2026-09-12, SQLite in memory, api container as verein)
+# php artisan test --filter 'test_transition_actions_reveal_nothing|test_a_snapshot_under_another_contract|test_a_rejected_service_token_is_dropped|test_a_second_window_for_the_same'
+
+
+   FAIL  Tests\Feature\Federation\CredentialSnapshotsTest
+  ⨯ a rejected service token is dropped and the next call fetches a new… 2.44s  
+
+   FAIL  Tests\Feature\Federation\Http\ParticipationHttpTest
+  ⨯ a snapshot under another contract reads as unreadable not as an err… 1.13s  
+
+   FAIL  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest
+  ⨯ transition actions reveal nothing about an application the user may… 0.70s  
+
+   FAIL  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest
+  ⨯ a second window for the same organization and season is a 409        0.90s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\CredentialSnapshotsTest > a rejected ser…   
+  Failed asserting that 1 is identical to 2.
+
+  at tests/Feature/Federation/CredentialSnapshotsTest.php:217
+    213▕         );
+    214▕ 
+    215▕         $this->failure = null;
+    216▕         app(CredentialSnapshots::class)->refresh($this->applicant);
+  ➜ 217▕         $this->assertSame(2, $this->tokenRequests);
+    218▕     }
+    219▕ }
+    220▕
+
+  1   tests/Feature/Federation/CredentialSnapshotsTest.php:217
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\ParticipationHttpTest > a snapshot…    
+  Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+
+The following exception occurred during the last request:
+
+App\Federation\LearningCenter\Exceptions\ContractMismatchException: Expected contract learning-center.credentials.v2, received 'learning-center.credentials.v1' in /var/www/html/app/Federation/LearningCenter/CredentialFacts.php:49
+Stack trace:
+#0 /var/www/html/app/Federation/LearningCenter/ParticipationResolver.php(47): App\Federation\LearningCenter\CredentialFacts::fromArray()
+#1 /var/www/html/app/Federation/JsonApi/RegistrationApplications/RegistrationApplicationSchema.php(92): App\Federation\LearningCenter\ParticipationResolver->for()
+#2 /var/www/html/vendor/laravel-json-api/eloquent/src/Fields/Attribute.php(258): App\Federation\JsonApi\RegistrationApplications\RegistrationApplicationSchema::App\Federation\JsonApi\RegistrationApplications\{closure}()
+#3 /var/www/html/vendor/laravel-json-api/eloquent/src/Fields/ArrayHash.php(192): LaravelJsonApi\Eloquent\Fields\Attribute->serialize()
+#4 /var/www/html/vendor/laravel-json-api/core/src/Core/Resources/JsonApiResource.php(164): LaravelJsonApi\Eloquent\Fields\ArrayHash->serialize()
+#5 /var/www/html/vendor/laravel-json-api/core/src/Core/Resources/ConditionalIterator.php(44): LaravelJsonApi\Core\Resources\JsonApiResource->attributes()
+#6 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Representation/FieldSetFilter.php(117): LaravelJsonApi\Core\Resources\ConditionalIterator->cursor()
+#7 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Representation/FieldSetFilter.php(62): Neomerx\JsonApi\Representation\FieldSetFilter->filterFields()
+#8 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Representation/DocumentWriter.php(174): Neomerx\JsonApi\Representation\FieldSetFilter->getAttributes()
+#9 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Representation/DocumentWriter.php(269): Neomerx\JsonApi\Representation\DocumentWriter->getAttributesRepresentation()
+#10 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Representation/DocumentWriter.php(68): Neomerx\JsonApi\Representation\DocumentWriter->getResourceRepresentation()
+#11 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Encoder/Encoder.php(198): Neomerx\JsonApi\Representation\DocumentWriter->addResourceToData()
+#12 /var/www/html/vendor/laravel-json-api/neomerx-json-api/src/Encoder/Encoder.php(106): Neomerx\JsonApi\Encoder\Encoder->encodeDataToArray()
+#13 /var/www/html/vendor/laravel-json-api/encoder-neomerx/src/CompoundDocument.php(52): Neomerx\JsonApi\Encoder\Encoder->encodeData()
+#14 /var/www/html/vendor/laravel-json-api/encoder-neomerx/src/Document.php(178): LaravelJsonApi\Encoder\Neomerx\CompoundDocument->encode()
+#15 /var/www/html/vendor/laravel-json-api/core/src/Core/Responses/Internal/ResourceResponse.php(108): LaravelJsonApi\Encoder\Neomerx\Document->toJson()
+#16 /var/www/html/vendor/laravel-json-api/core/src/Core/Responses/DataResponse.php(112): LaravelJsonApi\Core\Responses\Internal\ResourceResponse->toResponse()
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(921): LaravelJsonApi\Core\Responses\DataResponse->toResponse()
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(906): Illuminate\Routing\Router::toResponse()
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Routing\Router->prepareResponse()
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}()
+#21 /var/www/html/app/Federation/Http/Middleware/TraceRequest.php(45): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\TraceRequest->handle()
+#23 /var/www/html/app/Federation/Http/Middleware/AssignRequestId.php(32): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\AssignRequestId->handle()
+#25 /var/www/html/vendor/laravel-json-api/laravel/src/Http/Middleware/BootJsonApi.php(97): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi->handle()
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#29 /var/www/html/app/Http/Middleware/ClubPermission.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ClubPermission->handle()
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle()
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}()
+#44 /var/www/html/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware->handle()
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#57 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#58 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#59 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#60 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#61 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#62 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#63 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel->handle()
+#64 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\Foundation\Testing\TestCase->call()
+#65 /var/www/html/tests/Feature/Federation/Http/FederationHttpTestCase.php(100): Illuminate\Foundation\Testing\TestCase->json()
+#66 /var/www/html/tests/Feature/Federation/Http/ParticipationHttpTest.php(198): Tests\Feature\Federation\Http\FederationHttpTestCase->request()
+#67 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\Federation\Http\ParticipationHttpTest->test_a_snapshot_under_another_contract_reads_as_unreadable_not_as_an_error()
+#68 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase->invokeTestMethod()
+#69 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase->runTest()
+#70 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#71 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner->run()
+#72 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#73 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#74 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#75 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#76 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner->run()
+#77 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#78 {main}
+
+----------------------------------------------------------------------------------
+
+Expected contract learning-center.credentials.v2, received 'learning-center.credentials.v1'
+
+  at tests/Feature/Federation/Http/ParticipationHttpTest.php:199
+    195▕         // still stored: the page still renders, the participation says why.
+    196▕         config()->set('learning_center.contract', 'learning-center.credentials.v2');
+    197▕ 
+    198▕         $this->request($this->organizationAdmin, 'GET', self::BASE."/registration-applications/{$id}")
+  ➜ 199▕             ->assertOk()
+    200▕             ->assertJsonPath('data.attributes.participation.status', 'unknown')
+    201▕             ->assertJsonPath('data.attributes.participation.reasons', ['snapshot_unreadable'])
+    202▕             ->assertJsonPath('data.attributes.participation.stale', true);
+    203▕
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\RegistrationApplicationsHttpTest >…    
+  Failed asserting that an array does not contain 'transition_not_allowed_for_actor'.
+
+  at tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php:259
+    255▕         foreach (['submit', 'approve', 'start-review'] as $action) {
+    256▕             $response = $this->request($this->otherApplicant, 'POST', self::BASE."/registration-applications/{$id}/-actions/{$action}")
+    257▕                 ->assertStatus(403);
+    258▕ 
+  ➜ 259▕             $this->assertNotContains($response->json('errors.0.code'), ['illegal_transition', 'transition_not_allowed_for_actor']);
+    260▕             $this->assertStringNotContainsString('draft', (string) $response->json('errors.0.detail'));
+    261▕         }
+    262▕ 
+    263▕         $this->assertSame('draft', RegistrationApplication::query()->findOrFail($id)->status->value);
+
+  1   tests/Feature/Federation/Http/RegistrationApplicationsHttpTest.php:259
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Federation\Http\RegistrationWindowsHttpTest > a sec…   
+  Expected response status code [409] but received 500.
+Failed asserting that 500 is identical to 409.
+
+The following exception occurred during the last request:
+
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: registration_windows.member_organization_id, registration_windows.season_id in /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+Stack trace:
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(601): PDOStatement->execute()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(846): Illuminate\Database\Connection->Illuminate\Database\{closure}()
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(813): Illuminate\Database\Connection->runQueryCallback()
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(590): Illuminate\Database\Connection->run()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(554): Illuminate\Database\Connection->statement()
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php(32): Illuminate\Database\Connection->insert()
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4313): Illuminate\Database\Query\Processors\Processor->processInsertGetId()
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2304): Illuminate\Database\Query\Builder->insertGetId()
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1687): Illuminate\Database\Eloquent\Builder->__call()
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1603): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1407): Illuminate\Database\Eloquent\Model->performInsert()
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1258): Illuminate\Database\Eloquent\Model->save()
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->Illuminate\Database\Eloquent\{closure}()
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1257): tap()
+#14 /var/www/html/app/Federation/Http/Controllers/RegistrationWindowController.php(57): Illuminate\Database\Eloquent\Builder->create()
+#15 /var/www/html/vendor/laravel-json-api/laravel/src/Http/Controllers/Actions/Store.php(46): App\Federation\Http\Controllers\RegistrationWindowController->creating()
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\Federation\Http\Controllers\RegistrationWindowController->store()
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction()
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(276): Illuminate\Routing\ControllerDispatcher->dispatch()
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(216): Illuminate\Routing\Route->runController()
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}()
+#22 /var/www/html/app/Federation/Http/Middleware/TraceRequest.php(45): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\TraceRequest->handle()
+#24 /var/www/html/app/Federation/Http/Middleware/AssignRequestId.php(32): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\AssignRequestId->handle()
+#26 /var/www/html/vendor/laravel-json-api/laravel/src/Http/Middleware/BootJsonApi.php(97): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi->handle()
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#30 /var/www/html/app/Http/Middleware/ClubPermission.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ClubPermission->handle()
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle()
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}()
+#45 /var/www/html/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware->handle()
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#57 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#58 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#59 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#60 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#61 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#62 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#63 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#64 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel->handle()
+#65 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\Foundation\Testing\TestCase->call()
+#66 /var/www/html/tests/Feature/Federation/Http/FederationHttpTestCase.php(100): Illuminate\Foundation\Testing\TestCase->json()
+#67 /var/www/html/tests/Feature/Federation/Http/RegistrationWindowsHttpTest.php(108): Tests\Feature\Federation\Http\FederationHttpTestCase->request()
+#68 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\Federation\Http\RegistrationWindowsHttpTest->test_a_second_window_for_the_same_organization_and_season_is_a_409()
+#69 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase->invokeTestMethod()
+#70 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase->runTest()
+#71 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#72 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner->run()
+#73 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#74 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#75 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#76 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#77 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner->run()
+#78 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#79 {main}
+
+Next Illuminate\Database\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: registration_windows.member_organization_id, registration_windows.season_id (Connection: sqlite, Database: :memory:, SQL: insert into "registration_windows" ("member_organization_id", "season_id", "opens_at", "closes_at", "roles", "created_by_user_id", "updated_at", "created_at") values (1, 1, 2026-09-12 01:26:41, 2026-10-13 01:26:41, ["participant","coach"], 3, 2026-09-13 01:26:41, 2026-09-13 01:26:41)) in /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+Stack trace:
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(813): Illuminate\Database\Connection->runQueryCallback()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(590): Illuminate\Database\Connection->run()
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(554): Illuminate\Database\Connection->statement()
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php(32): Illuminate\Database\Connection->insert()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4313): Illuminate\Database\Query\Processors\Processor->processInsertGetId()
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2304): Illuminate\Database\Query\Builder->insertGetId()
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1687): Illuminate\Database\Eloquent\Builder->__call()
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1603): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1407): Illuminate\Database\Eloquent\Model->performInsert()
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1258): Illuminate\Database\Eloquent\Model->save()
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->Illuminate\Database\Eloquent\{closure}()
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1257): tap()
+#12 /var/www/html/app/Federation/Http/Controllers/RegistrationWindowController.php(57): Illuminate\Database\Eloquent\Builder->create()
+#13 /var/www/html/vendor/laravel-json-api/laravel/src/Http/Controllers/Actions/Store.php(46): App\Federation\Http\Controllers\RegistrationWindowController->creating()
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\Federation\Http\Controllers\RegistrationWindowController->store()
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction()
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(276): Illuminate\Routing\ControllerDispatcher->dispatch()
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(216): Illuminate\Routing\Route->runController()
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}()
+#20 /var/www/html/app/Federation/Http/Middleware/TraceRequest.php(45): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\TraceRequest->handle()
+#22 /var/www/html/app/Federation/Http/Middleware/AssignRequestId.php(32): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Federation\Http\Middleware\AssignRequestId->handle()
+#24 /var/www/html/vendor/laravel-json-api/laravel/src/Http/Middleware/BootJsonApi.php(97): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi->handle()
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#28 /var/www/html/app/Http/Middleware/ClubPermission.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ClubPermission->handle()
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(168): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle()
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}()
+#43 /var/www/html/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware->handle()
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#57 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#58 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#59 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}()
+#60 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#61 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#62 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel->handle()
+#63 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\Foundation\Testing\TestCase->call()
+#64 /var/www/html/tests/Feature/Federation/Http/FederationHttpTestCase.php(100): Illuminate\Foundation\Testing\TestCase->json()
+#65 /var/www/html/tests/Feature/Federation/Http/RegistrationWindowsHttpTest.php(108): Tests\Feature\Federation\Http\FederationHttpTestCase->request()
+#66 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\Federation\Http\RegistrationWindowsHttpTest->test_a_second_window_for_the_same_organization_and_season_is_a_409()
+#67 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase->invokeTestMethod()
+#68 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase->runTest()
+#69 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#70 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner->run()
+#71 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#72 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#73 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#74 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#75 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner->run()
+#76 /var/www/html/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#77 {main}
+
+----------------------------------------------------------------------------------
+
+SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: registration_windows.member_organization_id, registration_windows.season_id (Connection: sqlite, Database: :memory:, SQL: insert into "registration_windows" ("member_organization_id", "season_id", "opens_at", "closes_at", "roles", "created_by_user_id", "updated_at", "created_at") values (1, 1, 2026-09-12 01:26:41, 2026-10-13 01:26:41, ["participant","coach"], 3, 2026-09-13 01:26:41, 2026-09-13 01:26:41))
+
+  at tests/Feature/Federation/Http/RegistrationWindowsHttpTest.php:109
+    105▕     public function test_a_second_window_for_the_same_organization_and_season_is_a_409(): void
+    106▕     {
+    107▕         // The organization's window for this season already exists (set up).
+    108▕         $this->request($this->organizationAdmin, 'POST', self::BASE.'/registration-windows', $this->windowDocument((string) $this->organization->getKey()))
+  ➜ 109▕             ->assertStatus(409)
+    110▕             ->assertJsonPath('errors.0.code', 'window_exists');
+    111▕ 
+    112▕         $this->assertSame(1, RegistrationWindow::query()
+    113▕             ->where('member_organization_id', $this->organization->getKey())
+
+
+  Tests:    4 failed (18 assertions)
+  Duration: 5.49s
+

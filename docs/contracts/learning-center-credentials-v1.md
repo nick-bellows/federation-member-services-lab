@@ -2,7 +2,7 @@
 
 `learning-center.credentials.v1` — how this repository (the consumer) reads a person's credential facts and the Learning Center's derived eligibility from the Learning Center (the provider). Decided in [ADR-0009](../adr/0009-learning-center-credentials-contract.md); roadmap decision 6 places the endpoint in the Learning Center.
 
-The contract is executable on both sides. The fixture files under [`api/tests/Fixtures/learning-center/credentials/`](../../api/tests/Fixtures/learning-center/credentials/) are the reference responses: the provider's tests assert that its handler produces this shape for its seeded members, this repository's tests are fed from these files, and the mock service in Docker Compose serves them verbatim. A change to the shape changes the fixtures, and the other side's tests fail before a deployment would.
+The contract is executable on both sides. The fixture files under [`api/tests/Fixtures/learning-center/credentials/`](https://github.com/nick-bellows/federation-member-services-lab/tree/main/api/tests/Fixtures/learning-center/credentials/) are the reference responses: the provider's tests assert that its handler produces this shape for its seeded members, this repository's tests are fed from these files, and the mock service in Docker Compose serves them verbatim. A change to the shape changes the fixtures, and the other side's tests fail before a deployment would.
 
 ## Request
 

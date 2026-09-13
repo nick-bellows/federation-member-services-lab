@@ -551,3 +551,36 @@ Pinned links that must be re-pinned when a record is corrected; a Pages check th
 2. What does "done" mean for this project, and what is deliberately left undone?
 3. Your documentation site failed its own accessibility check. What was wrong and how is it checked now?
 4. What would a stranger have to repeat to trust this repository, and how long would it take them?
+
+## D1 — The closing code review
+
+### What it does
+
+A last independent read of the closing state, split four ways (backend, frontend and browser specs, delivery, documentation), every finding verified in the source before it counted. Four behavioural fixes on the API, each with a regression test recorded failing and passing (`docs/baseline/d1_tests_before.txt`, `d1_tests_after.txt`): the transition actions authorise `view` before the domain speaks, an unreadable credential snapshot is reported instead of thrown, a rejected service token leaves the cache, a duplicate window is a 409. Three on the web app: list queries throw to a new error boundary instead of rendering "nothing here", the admin gate refuses an OIDC session, the start form preselects a role the window offers. Every GitHub Action pinned to a commit. The documents corrected where they had drifted.
+
+### Why we built it this way
+
+A review by the people who wrote the code finds what they were looking for; four narrow reviews with a verification step find what nobody was looking for. The fixes are small because the review was late: the state machine, the outbox and the identity boundary held, and what remained was ordering (authorise, then decide), failure paths (what a page does when the API says no) and the supply chain (what `@v4` means with write permission).
+
+### Alternatives considered
+
+Leaving the findings as a list for the owner (they were all fixable without the owner, so the roadmap's rule applied); a 404 instead of a 403 for the stranger (the existing `fields` action answers 403 through the same policy, and consistency beats hiding); bumping the actions to their newest majors while pinning (a behaviour change on top of a security change; the pins stay within the majors the workflows were written against).
+
+### Failure modes
+
+A whole-suite run that failed seven upstream media tests on directory ownership, not on code; a "before" record that had to be produced by stashing the fixes and running only the new tests.
+
+### Tradeoffs
+
+Pins that move only by hand until a dependency bot is enabled (an owner decision); an error boundary whose text is generic because production strips server messages; a snapshot marked unreadable that a reviewer could misread as "nothing on file" (the reason names it).
+
+### Code to locate immediately
+
+`api/app/Federation/Http/Controllers/RegistrationApplicationController.php` (`transition`) · `api/app/Federation/LearningCenter/ParticipationResolver.php` · `api/app/Federation/LearningCenter/HttpCredentialsClient.php` (`interpret`) · `api/app/Federation/Http/Controllers/RegistrationWindowController.php` · `web_application/src/lib/federation/queries.ts` · `web_application/src/app/[lang]/member/error.tsx` · `web_application/src/middlewares/auth.ts` · `.github/workflows/ci.yml` · `docs/THREAT_MODEL.md` (2.9)
+
+### Likely interviewer questions
+
+1. Why is an error message that names the current state a security finding?
+2. When should a page throw rather than render an empty state?
+3. What does pinning an action to a commit protect against that a version tag does not?
+4. You found more than you fixed. How did you decide what to leave?
