@@ -36,7 +36,7 @@ The sibling project [learning-center-reference](https://github.com/nick-bellows/
 
 Full milestone detail with every retained run: [`docs/MILESTONES.md`](docs/MILESTONES.md)
 
-Not done, by design: the application is not deployed (the architecture is designed, and a minimal Terraform proof of it is validated and priced, not applied); the documentation site is, at [nick-bellows.github.io/federation-member-services-lab](https://nick-bellows.github.io/federation-member-services-lab/). Nothing has been offered upstream (one offer is drafted and waits for the owner's word); the Auth0 walkthrough waits for a tenant. The order and gates are in [`ROADMAP.md`](ROADMAP.md).
+Not done, by design: the application is not deployed (the architecture is designed, and a minimal Terraform proof of it is validated and priced, not applied); the documentation site is, at [nick-bellows.github.io/federation-member-services-lab](https://nick-bellows.github.io/federation-member-services-lab/). Nothing has been offered upstream (one offer is drafted, not sent: O6 in the roadmap); the Auth0 walkthrough waits for a tenant (O1). The order and gates are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Architecture
 
@@ -145,7 +145,7 @@ Measured on 2026-09-10 and retained under [`docs/baseline/`](https://github.com/
 
 ## Upstream contributions
 
-None sent yet, by decision: the offer is made once, at the end of the project, when the fork has more to give than a two-line fix (roadmap decision 7). That offer is now drafted as a single issue in [`docs/UPSTREAM_OFFER.md`](docs/UPSTREAM_OFFER.md) (the `env()` fix with `.gitattributes`, the PostgreSQL portability fixes, the indexes and the eager-loaded listing) and waits for the owner's word. The policy is in [ADR-0004](docs/adr/0004-upstream-contribution-policy.md): one small, generic, tested change at a time, after reading the issue thread. First candidate: the `env()` fix together with `.gitattributes`, then the locale-header matching for upstream issue #125. Nothing here will be described as merged unless it is.
+None sent yet, by decision: the offer is made once, at the end of the project, when the fork has more to give than a two-line fix (roadmap decision 7). That offer is now drafted as a single issue in [`docs/UPSTREAM_OFFER.md`](docs/UPSTREAM_OFFER.md) (the `env()` fix with `.gitattributes`, the PostgreSQL portability fixes, the indexes and the eager-loaded listing) and is not sent until the roadmap's O6 says so. The policy is in [ADR-0004](docs/adr/0004-upstream-contribution-policy.md): one small, generic, tested change at a time, after reading the issue thread. First candidate: the `env()` fix together with `.gitattributes`, then the locale-header matching for upstream issue #125. Nothing here will be described as merged unless it is.
 
 ## Documentation
 
